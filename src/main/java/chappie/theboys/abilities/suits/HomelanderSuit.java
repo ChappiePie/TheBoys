@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.minecraft.inventory.EquipmentSlotType.*;
 
-public class HomelanderSuit extends Suit {
+public class HomelanderSuit extends TheSevenSuit {
 
     public HomelanderSuit() {
         super(TBSuitTypes.HOMELANDER);

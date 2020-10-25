@@ -18,6 +18,7 @@ public class BoysCap implements IBoys {
 
     private int speedLevel;
     private boolean isInSpeed;
+    private boolean compoundV;
 
     @Override
     public int getSpeedLevel() {
@@ -39,12 +40,23 @@ public class BoysCap implements IBoys {
         this.isInSpeed = isInSpeed;
     }
 
+    @Override
+    public boolean haveCompoundV() {
+        return compoundV;
+    }
+
+    @Override
+    public void setCompoundV(boolean compoundV) {
+        this.compoundV = compoundV;
+    }
+
 
     @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt("SpeedLevel", this.speedLevel);
         nbt.putBoolean("isInSpeed", this.isInSpeed);
+        nbt.putBoolean("CompoundV", this.compoundV);
         return nbt;
     }
 
@@ -55,6 +67,9 @@ public class BoysCap implements IBoys {
         }
         if (nbt.contains("isInSpeed")) {
             this.isInSpeed = nbt.getBoolean("isInSpeed");
+        }
+        if (nbt.contains("CompoundV")) {
+            this.compoundV = nbt.getBoolean("CompoundV");
         }
     }
 

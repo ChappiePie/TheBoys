@@ -9,16 +9,21 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.generatorrex.abilities.AbilityHelper;
 import xyz.heroesunited.generatorrex.abilities.suit.Suit;
+import xyz.heroesunited.generatorrex.util.GRPlayerUtil;
 
+import java.util.List;
 import java.util.UUID;
 
 public abstract class SpeedAbility extends TBAbility {
@@ -35,6 +40,16 @@ public abstract class SpeedAbility extends TBAbility {
             if (player.isOnGround() && boys.getSpeedLevel() > 10 && walkedDifference > 1.6F && !player.abilities.isCreativeMode) {
                 if (!(Suit.getSuit(player) instanceof ISpeedSuit)) {
                     player.setFire(10);
+                }
+            }
+        }
+
+        if (boys.isInSpeed() && player.isSprinting() && boys.getSpeedLevel() > 20) {
+            List<Entity> e = player.world.getEntitiesWithinAABBExcludingEntity(player, GRPlayerUtil.getCollisionBoxWithRange(GRPlayerUtil.getPlayerPos(player), 1.0D));
+            if (!e.isEmpty()) {
+                for (Entity entity : e) {
+                    if (entity instanceof LivingEntity)
+                        entity.attackEntityFrom(DamageSource.FALL, 2.0F);
                 }
             }
         }
@@ -65,12 +80,12 @@ public abstract class SpeedAbility extends TBAbility {
 
     public abstract Vector3d getTrailColor();
 
-    public abstract int getMaxSpeedLevel();
+    public abstract int getMaxSpeedLevel(PlayerEntity player);
 
     protected void increaseDecreaseSpeedLevel(PlayerEntity player, boolean faster) {
         if (BoysCap.getCap(player).isInSpeed()) {
             int speedLevel = BoysCap.getCap(player).getSpeedLevel() + (faster ? 1 : -1);
-            if (speedLevel > getMaxSpeedLevel() || speedLevel < 1)
+            if (speedLevel > getMaxSpeedLevel(player) || speedLevel < 1)
                 return;
             setSpeedModifier(player, speedLevel);
         }

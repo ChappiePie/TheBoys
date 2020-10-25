@@ -38,15 +38,13 @@ public class TheBoys {
     public TheBoys() {
         final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.register(this);
-        MinecraftForge.EVENT_BUS.register(this);
+
+        TBItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+
         bus.addListener(this::setup);
+        MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new TBEventHandler());
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new TBClientEventHandler()));
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void registries(RegistryEvent.NewRegistry e) {
-        TBItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
     private void setup(final FMLCommonSetupEvent event) {

@@ -52,6 +52,7 @@ public class TBCapabilityEvents {
     public static void syncDeath(IBoys newCap, IBoys oldCap) {
         newCap.setSpeedLevel(0);
         newCap.setInSpeed(false);
+        newCap.setCompoundV(false);
     }
 
     public static void syncServerMessages(Entity entity, IBoys cap) {

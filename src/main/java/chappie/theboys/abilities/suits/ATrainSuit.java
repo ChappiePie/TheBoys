@@ -9,13 +9,12 @@ import net.minecraft.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.generatorrex.abilities.AbilityType;
-import xyz.heroesunited.generatorrex.abilities.suit.Suit;
 import xyz.heroesunited.generatorrex.abilities.suit.SuitItem;
 import xyz.heroesunited.heroesunited.client.events.HUSetRotationAnglesEvent;
 
 import static net.minecraft.inventory.EquipmentSlotType.*;
 
-public class ATrainSuit extends Suit implements ISpeedSuit {
+public class ATrainSuit extends TheSevenSuit implements ISpeedSuit {
 
     public ATrainSuit() {
         super(TBSuitTypes.ATRAIN);

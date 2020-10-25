@@ -10,4 +10,9 @@ public interface IBoys extends INBTSerializable<CompoundNBT> {
 
     boolean isInSpeed();
     void setInSpeed(boolean isInSpeed);
+
+    boolean haveCompoundV();
+    void setCompoundV(boolean compoundV);
+
+
 }

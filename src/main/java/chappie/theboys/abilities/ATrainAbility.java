@@ -34,27 +34,13 @@ public class ATrainAbility extends SpeedAbility {
         AbilityHelper.removeAttribute(player, Attributes.ATTACK_DAMAGE, ATTRIBUTE_UUID);
     }
 
-    public void onUpdate(PlayerEntity player) {
-        super.onUpdate(player);
-        IBoys boys = BoysCap.getCap(player);
-        if (boys.isInSpeed() && player.isSprinting() && boys.getSpeedLevel() > 20) {
-            List<Entity> e = player.world.getEntitiesWithinAABBExcludingEntity(player, GRPlayerUtil.getCollisionBoxWithRange(GRPlayerUtil.getPlayerPos(player), 1.0D));
-            if (!e.isEmpty()) {
-                for (Entity entity : e) {
-                    if (entity instanceof LivingEntity)
-                        entity.attackEntityFrom(DamageSource.FALL, 2.0F);
-                }
-            }
-        }
-    }
-
     @Override
     public Vector3d getTrailColor() {
         return new Vector3d(0.5F, 0.5F, 0.8F);
     }
 
     @Override
-    public int getMaxSpeedLevel() {
+    public int getMaxSpeedLevel(PlayerEntity player) {
         return 40;
     }
 }
