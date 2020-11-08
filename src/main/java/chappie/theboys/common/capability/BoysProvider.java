@@ -14,7 +14,7 @@ import static chappie.theboys.common.capability.BoysCap.CAPABILITY;
 
 public class BoysProvider implements ICapabilitySerializable<CompoundNBT> {
 
-    public LazyOptional<IBoys> instance = LazyOptional.of(CAPABILITY::getDefaultInstance);
+    public LazyOptional<IBoys> instance;
 
     public BoysProvider(PlayerEntity player) {
         instance = LazyOptional.of(() -> new BoysCap(player));

@@ -1,18 +1,32 @@
 package chappie.theboys.util;
 
-import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.AbstractGlassBlock;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.SandBlock;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Timer;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class TBUtil {
 
+    public static float CLIENT_DEFAULT_TICKS = 20.0F;
+
+    //Slow-motion
+    @OnlyIn(Dist.CLIENT)
+    public static void updateClientTickrate(float tickrate) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc == null) return;
+        ObfuscationReflectionHelper.setPrivateValue(Minecraft.class, mc, new Timer(tickrate, 0l), "field_71428_T");
+    }
+
+    //Laser
     public static void makeLaserLooking(PlayerEntity player) {
         RayTraceResult rtr = getPosLookingAt(player);
         if (rtr != null && !player.world.isRemote) {

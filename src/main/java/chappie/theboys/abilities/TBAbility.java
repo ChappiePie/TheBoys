@@ -2,8 +2,8 @@ package chappie.theboys.abilities;
 
 import chappie.theboys.common.capability.BoysCap;
 import net.minecraft.entity.player.PlayerEntity;
-import xyz.heroesunited.generatorrex.abilities.Ability;
-import xyz.heroesunited.generatorrex.abilities.AbilityHelper;
+import xyz.heroesunited.heroesunited.common.abilities.Ability;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
 
 public abstract class TBAbility extends Ability {
 

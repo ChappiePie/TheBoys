@@ -1,4 +1,4 @@
-package chappie.theboys.network;
+package chappie.theboys.network.client;
 
 import chappie.theboys.common.capability.BoysCap;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
@@ -8,24 +8,24 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class SetInSpeedMessage {
+public class ClientSetSpeedLevel {
 
     public int entityId;
-    public boolean InSpeed;
+    public int speedLevel;
 
-    public SetInSpeedMessage(int entityId, boolean InSpeed) {
+    public ClientSetSpeedLevel(int entityId, int speedLevel) {
         this.entityId = entityId;
-        this.InSpeed = InSpeed;
+        this.speedLevel = speedLevel;
     }
 
-    public SetInSpeedMessage(PacketBuffer buffer) {
+    public ClientSetSpeedLevel(PacketBuffer buffer) {
         this.entityId = buffer.readInt();
-        this.InSpeed = buffer.readBoolean();
+        this.speedLevel = buffer.readInt();
     }
 
     public void toBytes(PacketBuffer buffer) {
         buffer.writeInt(this.entityId);
-        buffer.writeBoolean(this.InSpeed);
+        buffer.writeInt(this.speedLevel);
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -34,7 +34,7 @@ public class SetInSpeedMessage {
 
             if (entity instanceof AbstractClientPlayerEntity) {
                 entity.getCapability(BoysCap.CAPABILITY).ifPresent((a) -> {
-                    a.setInSpeed(this.InSpeed);
+                    a.setSpeedLevel(this.speedLevel);
                 });
             }
         });

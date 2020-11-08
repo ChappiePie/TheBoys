@@ -1,14 +1,10 @@
 package chappie.theboys.abilities;
 
 import chappie.theboys.TheBoys;
-import com.google.common.collect.Lists;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.DeferredRegister;
-import xyz.heroesunited.generatorrex.abilities.AbilityType;
-import xyz.heroesunited.generatorrex.abilities.superpower.Superpower;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityType;
 
 @Mod.EventBusSubscriber(modid = TheBoys.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TBAbilityTypes {

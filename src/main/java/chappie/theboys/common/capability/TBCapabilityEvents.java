@@ -1,7 +1,7 @@
 package chappie.theboys.common.capability;
 
 import chappie.theboys.TheBoys;
-import chappie.theboys.network.SetSpeedLevelMessage;
+import chappie.theboys.network.client.ClientSetSpeedLevel;
 import chappie.theboys.network.TBNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -56,6 +56,6 @@ public class TBCapabilityEvents {
     }
 
     public static void syncServerMessages(Entity entity, IBoys cap) {
-        TBNetworking.INSTANCE.sendTo(new SetSpeedLevelMessage(entity.getEntityId(), cap.getSpeedLevel()), ((ServerPlayerEntity) entity).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+        TBNetworking.INSTANCE.sendTo(new ClientSetSpeedLevel(entity.getEntityId(), cap.getSpeedLevel()), ((ServerPlayerEntity) entity).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
     }
 }

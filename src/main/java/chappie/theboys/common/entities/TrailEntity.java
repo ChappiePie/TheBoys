@@ -15,12 +15,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import java.awt.*;
+
 public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     @OnlyIn(Dist.CLIENT)
     public PlayerRenderer renderer;
-    public PlayerEntity parent;
+    public PlayerEntity player;
     public int lifeTime;
-    public float renderYawOffset, red = 1, green = 1, blue = 1;
+    public Color color;
 
     public TrailEntity(EntityType<TrailEntity> entityType, World world) {
         super(entityType, world);
@@ -28,18 +30,18 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         this.ignoreFrustumCheck = true;
     }
 
-    public TrailEntity(World worldIn, PlayerEntity parent, int lifeTime) {
+    public TrailEntity(World worldIn, PlayerEntity player, int lifeTime) {
         super(TBEntities.TRAIL, worldIn);
         this.noClip = true;
         this.ignoreFrustumCheck = true;
-        this.parent = parent;
+        this.player = player;
         this.lifeTime = lifeTime;
-        this.setLocationAndAngles(parent.getPosX(), parent.getPosY(), parent.getPosZ(), parent.rotationYaw, parent.rotationPitch);
+        this.setLocationAndAngles(player.getPosX(), player.getPosY(), player.getPosZ(), player.rotationYaw, player.rotationPitch);
     }
 
     @Override
     public EntitySize getSize(Pose poseIn) {
-        return parent.getSize(poseIn);
+        return player.getSize(poseIn);
     }
 
     @Override
@@ -58,13 +60,13 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     @Override
     public void writeSpawnData(PacketBuffer buffer) {
         buffer.writeInt(this.lifeTime);
-        buffer.writeUniqueId(this.parent.getUniqueID());
+        buffer.writeUniqueId(this.player.getUniqueID());
     }
 
     @Override
     public void readSpawnData(PacketBuffer additionalData) {
         this.lifeTime = additionalData.readInt();
-        this.parent = this.world.getPlayerByUuid(additionalData.readUniqueId());
+        this.player = this.world.getPlayerByUuid(additionalData.readUniqueId());
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -73,12 +75,7 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         return true;
     }
 
-    @Override
     protected void registerData() {}
-
-    @Override
     protected void readAdditional(CompoundNBT compound) {}
-
-    @Override
     protected void writeAdditional(CompoundNBT compound) {}
 }

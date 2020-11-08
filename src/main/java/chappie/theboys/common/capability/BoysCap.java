@@ -1,7 +1,8 @@
 package chappie.theboys.common.capability;
 
-import chappie.theboys.network.SetInSpeedMessage;
-import chappie.theboys.network.SetSpeedLevelMessage;
+import chappie.theboys.network.client.ClientSetInSpeed;
+import chappie.theboys.network.client.ClientSetSlowMotion;
+import chappie.theboys.network.client.ClientSetSpeedLevel;
 import chappie.theboys.network.TBNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -17,8 +18,7 @@ import javax.annotation.Nullable;
 public class BoysCap implements IBoys {
 
     private int speedLevel;
-    private boolean isInSpeed;
-    private boolean compoundV;
+    private boolean isInSpeed, slowMotion, compoundV;
 
     @Override
     public int getSpeedLevel() {
@@ -28,6 +28,8 @@ public class BoysCap implements IBoys {
     @Override
     public void setSpeedLevel(int speedLevel) {
         this.speedLevel = speedLevel;
+        if (!player.world.isRemote)
+            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetSpeedLevel(player.getEntityId(), speedLevel));
     }
 
     @Override
@@ -38,6 +40,20 @@ public class BoysCap implements IBoys {
     @Override
     public void setInSpeed(boolean isInSpeed) {
         this.isInSpeed = isInSpeed;
+        if (!player.world.isRemote)
+            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetInSpeed(player.getEntityId(), isInSpeed));
+    }
+
+    @Override
+    public boolean isSlowMotion() {
+        return slowMotion;
+    }
+
+    @Override
+    public void setSlowMotion(boolean slowMotion) {
+        this.slowMotion = slowMotion;
+        if (!player.world.isRemote)
+            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetSlowMotion(player.getEntityId(), slowMotion));
     }
 
     @Override
@@ -56,6 +72,7 @@ public class BoysCap implements IBoys {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt("SpeedLevel", this.speedLevel);
         nbt.putBoolean("isInSpeed", this.isInSpeed);
+        nbt.putBoolean("SlowMotion", this.slowMotion);
         nbt.putBoolean("CompoundV", this.compoundV);
         return nbt;
     }
@@ -68,10 +85,15 @@ public class BoysCap implements IBoys {
         if (nbt.contains("isInSpeed")) {
             this.isInSpeed = nbt.getBoolean("isInSpeed");
         }
+        if (nbt.contains("SlowMotion")) {
+            this.slowMotion = nbt.getBoolean("SlowMotion");
+        }
         if (nbt.contains("CompoundV")) {
             this.compoundV = nbt.getBoolean("CompoundV");
         }
     }
+
+    //-------------------------------------------------------------------------------------
 
     @CapabilityInject(IBoys.class)
     public static Capability<IBoys> CAPABILITY;
@@ -85,18 +107,6 @@ public class BoysCap implements IBoys {
     public static IBoys getCap(PlayerEntity player) {
         IBoys cap = player.getCapability(CAPABILITY).orElse(null);
         return cap != null ? cap : null;
-    }
-
-    public static void setSpeedLevel(PlayerEntity player, IBoys a, int speedLevel) {
-        a.setSpeedLevel(speedLevel);
-        if (!player.world.isRemote)
-            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new SetSpeedLevelMessage(player.getEntityId(), speedLevel));
-    }
-
-    public static void setInSpeed(PlayerEntity player, IBoys a, boolean inSpeed) {
-        a.setInSpeed(inSpeed);
-        if (!player.world.isRemote)
-            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new SetInSpeedMessage(player.getEntityId(), inSpeed));
     }
 
     public static class BoysStorage implements Capability.IStorage<IBoys> {

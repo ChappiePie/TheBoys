@@ -2,15 +2,22 @@ package chappie.theboys.abilities.suits;
 
 import chappie.theboys.abilities.SpeedAbility;
 import chappie.theboys.common.items.TBItems;
+import com.google.common.collect.Lists;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import xyz.heroesunited.generatorrex.abilities.AbilityType;
-import xyz.heroesunited.generatorrex.abilities.suit.SuitItem;
 import xyz.heroesunited.heroesunited.client.events.HUSetRotationAnglesEvent;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityType;
+import xyz.heroesunited.heroesunited.common.abilities.suit.SuitItem;
+
+import java.util.List;
 
 import static net.minecraft.inventory.EquipmentSlotType.*;
 
@@ -26,28 +33,29 @@ public class ATrainSuit extends TheSevenSuit implements ISpeedSuit {
 
     @Override
     public Item getHelmet() {
-        return TBItems.ATRAIN_HELMET.get();
+        return TBItems.ATRAIN_HELMET;
     }
 
     @Override
     public Item getChestplate() {
-        return TBItems.ATRAIN_CHEST.get();
+        return TBItems.ATRAIN_CHEST;
     }
 
     @Override
     public Item getLegs() {
-        return TBItems.ATRAIN_LEGS.get();
+        return TBItems.ATRAIN_LEGS;
     }
 
     @Override
     public Item getBoots() {
-        return TBItems.ATRAIN_BOOTS.get();
+        return TBItems.ATRAIN_BOOTS;
     }
 
     @Override
     public boolean canCombineWithAbility(AbilityType type, PlayerEntity player) {
         return type.create() instanceof SpeedAbility;
     }
+
     @OnlyIn(Dist.CLIENT)
     @Override
     public void setRotationAngles(HUSetRotationAnglesEvent event) {

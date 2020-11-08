@@ -3,6 +3,8 @@ package chappie.theboys.abilities.suits;
 import chappie.theboys.TheBoys;
 import chappie.theboys.abilities.TBAbilityTypes;
 import chappie.theboys.common.items.TBItems;
+import chappie.theboys.util.TBArmorMaterial;
+import chappie.theboys.util.TBClientUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
@@ -15,13 +17,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import xyz.heroesunited.generatorrex.abilities.AbilityHelper;
-import xyz.heroesunited.generatorrex.abilities.suit.Suit;
-import xyz.heroesunited.generatorrex.abilities.suit.SuitItem;
-import xyz.heroesunited.generatorrex.common.capability.RexCap;
-import xyz.heroesunited.generatorrex.util.GRArmorMaterial;
-import xyz.heroesunited.generatorrex.util.GRClientUtil;
 import xyz.heroesunited.heroesunited.client.events.HUSetRotationAnglesEvent;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
+import xyz.heroesunited.heroesunited.common.abilities.suit.SuitItem;
+import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,22 +34,22 @@ public class HomelanderSuit extends TheSevenSuit {
     }
 
     public IArmorMaterial getSuitMaterial() {
-        return new GRArmorMaterial("homelander", 36, new int[]{3, 7, 8, 4}, 4, SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 0.0F, () -> Ingredient.fromItems(Items.BLUE_CONCRETE), 0.0F);
+        return TBArmorMaterial.HOMELANDER;
     }
 
     @Override
     public Item getChestplate() {
-        return TBItems.HOMELANDER_CHEST.get();
+        return TBItems.HOMELANDER_CHEST;
     }
 
     @Override
     public Item getLegs() {
-        return TBItems.HOMELANDER_LEGS.get();
+        return TBItems.HOMELANDER_LEGS;
     }
 
     @Override
     public Item getBoots() {
-        return TBItems.HOMELANDER_BOOTS.get();
+        return TBItems.HOMELANDER_BOOTS;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -59,9 +58,9 @@ public class HomelanderSuit extends TheSevenSuit {
         AtomicBoolean haveNullRotation = new AtomicBoolean(false);
         if (entity instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) entity;
-            haveNullRotation.set(AbilityHelper.getEnabled(TBAbilityTypes.HOMELANDER, player) && RexCap.getCap(player).isFlying() && !player.isOnGround() && !player.isSwimming() && player.isSprinting());
+            haveNullRotation.set(AbilityHelper.getEnabled(TBAbilityTypes.HOMELANDER, player) && HUPlayer.getCap(player).isFlying() && !player.isOnGround() && !player.isSwimming() && player.isSprinting());
         }
-        GRClientUtil.renderCape(entityRenderer, matrix, bufferIn, packedLightIn, entity, partialTicks, new ResourceLocation(TheBoys.MODID, "textures/suits/homelander/cape.png"), haveNullRotation.get());
+        TBClientUtil.renderCape(entityRenderer, matrix, bufferIn, packedLightIn, entity, partialTicks, new ResourceLocation(TheBoys.MODID, "textures/suits/homelander/cape.png"), haveNullRotation.get());
     }
 
     @OnlyIn(Dist.CLIENT)

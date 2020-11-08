@@ -1,6 +1,7 @@
 package chappie.theboys.abilities;
 
 import chappie.theboys.TheBoys;
+import chappie.theboys.network.TBNetworking;
 import chappie.theboys.util.TBClientUtil;
 import chappie.theboys.util.TBUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -27,16 +28,15 @@ import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
-import xyz.heroesunited.generatorrex.abilities.AbilityHelper;
-import xyz.heroesunited.generatorrex.common.capability.IRex;
-import xyz.heroesunited.generatorrex.common.capability.RexCap;
-import xyz.heroesunited.generatorrex.network.GRType;
-import xyz.heroesunited.generatorrex.network.Networking;
-import xyz.heroesunited.generatorrex.network.server.SSetGRIntMessage;
-import xyz.heroesunited.generatorrex.util.GRAttributes;
-import xyz.heroesunited.generatorrex.util.GRClientUtil;
-import xyz.heroesunited.generatorrex.util.GRPlayerUtil;
 import xyz.heroesunited.heroesunited.client.events.HUSetRotationAnglesEvent;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
+import xyz.heroesunited.heroesunited.common.abilities.superpower.Superpower;
+import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
+import xyz.heroesunited.heroesunited.common.capabilities.IHUPlayer;
+import xyz.heroesunited.heroesunited.common.networking.HUNetworking;
+import xyz.heroesunited.heroesunited.common.networking.server.ServerSetType;
+import xyz.heroesunited.heroesunited.util.HUAttributes;
+import xyz.heroesunited.heroesunited.util.HUClientUtil;
 
 import java.util.UUID;
 
@@ -47,26 +47,26 @@ public class HomelanderAbility extends TBAbility {
     public void onActivated(PlayerEntity player) {
         super.onActivated(player);
         AbilityHelper.addAttribute(player, Attributes.MAX_HEALTH, 10D, AttributeModifier.Operation.ADDITION, ATTRIBUTE_UUID);
-        AbilityHelper.addAttribute(player, GRAttributes.JUMP_BOOST.get(), 2D, AttributeModifier.Operation.ADDITION, ATTRIBUTE_UUID);
+        AbilityHelper.addAttribute(player, HUAttributes.JUMP_BOOST, 2D, AttributeModifier.Operation.ADDITION, ATTRIBUTE_UUID);
         AbilityHelper.addAttribute(player, Attributes.ATTACK_DAMAGE, 2.0D, AttributeModifier.Operation.ADDITION, ATTRIBUTE_UUID);
-        AbilityHelper.addAttribute(player, GRAttributes.FALL_RESISTANCE.get(), -1.0D, AttributeModifier.Operation.ADDITION, ATTRIBUTE_UUID);
+        AbilityHelper.addAttribute(player, HUAttributes.FALL_RESISTANCE, -1.0D, AttributeModifier.Operation.ADDITION, ATTRIBUTE_UUID);
     }
 
     public void onDeactivated(PlayerEntity player) {
         super.onDeactivated(player);
-        AbilityHelper.removeAttribute(player, GRAttributes.FALL_RESISTANCE.get(), ATTRIBUTE_UUID);
+        AbilityHelper.removeAttribute(player, HUAttributes.FALL_RESISTANCE, ATTRIBUTE_UUID);
         AbilityHelper.removeAttribute(player, Attributes.MAX_HEALTH, ATTRIBUTE_UUID);
-        AbilityHelper.removeAttribute(player, GRAttributes.JUMP_BOOST.get(), ATTRIBUTE_UUID);
+        AbilityHelper.removeAttribute(player, HUAttributes.JUMP_BOOST, ATTRIBUTE_UUID);
         AbilityHelper.removeAttribute(player, Attributes.ATTACK_DAMAGE, ATTRIBUTE_UUID);
     }
 
     public void onUpdate(PlayerEntity player) {
-        IRex cap = RexCap.getCap(player);
+        IHUPlayer cap = HUPlayer.getCap(player);
         if (cap.isFlying() && player.getPosY() > 500.0D) {
             cap.setFlying(false);
         }
         if (player.world.isRemote && !AbilityHelper.keyPressed(1) && cap.getType() == 1) {
-            Networking.INSTANCE.send(PacketDistributor.SERVER.noArg(), new SSetGRIntMessage(GRType.TYPE, 0));
+            TBNetworking.INSTANCE.send(PacketDistributor.SERVER.noArg(), new ServerSetType(0));
         }
         if (cap.getType() == 1) {
             TBUtil.makeLaserLooking(player);
@@ -74,7 +74,7 @@ public class HomelanderAbility extends TBAbility {
     }
 
     public void toggle(PlayerEntity player, int id) {
-        IRex cap = RexCap.getCap(player);
+        IHUPlayer cap = HUPlayer.getCap(player);
         if (id == 1) {
             if (cap.getType() == 0) {
                 cap.setType(1);
@@ -90,31 +90,31 @@ public class HomelanderAbility extends TBAbility {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void setRotationAngles(PlayerEntity player, HUSetRotationAnglesEvent event) {
-        IRex cap = RexCap.getCap(player);
+    public void setRotationAngles(HUSetRotationAnglesEvent event) {
+        IHUPlayer cap = HUPlayer.getCap(event.getPlayer());
         if (cap.isFlying()) {
-            if (!player.isOnGround() && !player.isSwimming() && player.isSprinting()) {
+            if (!event.getPlayer().isOnGround() && !event.getPlayer().isSwimming() && event.getPlayer().isSprinting()) {
                 event.getPlayerModel().bipedRightArm.rotateAngleX = (float) Math.toRadians(180F);
             }
         }
         if (cap.getType() == 2) {
-            float f = player.ticksExisted + event.getAgeInTicks();
+            float f = event.getPlayer().ticksExisted + event.getAgeInTicks();
             float rotationX = (float) Math.toRadians(-(45F + (MathHelper.cos(f))));
-            if (player.getPrimaryHand() == HandSide.RIGHT) {
+            if (event.getPlayer().getPrimaryHand() == HandSide.RIGHT) {
                 event.getPlayerModel().bipedRightArm.rotateAngleX = rotationX;
                 event.getPlayerModel().bipedRightArm.rotateAngleZ = (float) Math.toRadians(-45F);
             }else{
                 event.getPlayerModel().bipedLeftArm.rotateAngleX = rotationX;
                 event.getPlayerModel().bipedLeftArm.rotateAngleZ = (float) Math.toRadians(45F);
             }
-            GRClientUtil.copyAnglesToWear(event.getPlayerModel());
+            HUClientUtil.copyAnglesToWear(event.getPlayerModel());
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
     public void render(PlayerRenderer renderer, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        IRex cap = RexCap.getCap(player);
+        IHUPlayer cap = HUPlayer.getCap(player);
         if (cap.getType() == 1) {
             TBClientUtil.renderHeatvision(renderer, matrix, bufferIn, packedLightIn, player, true, 1f, 0f, 0f);
             TBClientUtil.renderHeatvision(renderer, matrix, bufferIn, packedLightIn, player, false, 1f, 0f, 0f);
@@ -128,7 +128,7 @@ public class HomelanderAbility extends TBAbility {
         public static void onBurnDamage(LivingAttackEvent event) {
             if (event.getEntityLiving() instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) event.getEntityLiving();
-                if (AbilityHelper.getEnabled(TBAbilityTypes.HOMELANDER, player)) {
+                if (Superpower.getSuperpower(player) == TBSuperpowers.HOMELANDER) {
                     if (event.getSource().equals(DamageSource.LAVA)
                             || event.getSource().equals(DamageSource.IN_FIRE)
                             || event.getSource().equals(DamageSource.ON_FIRE)) {
