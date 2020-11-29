@@ -7,7 +7,11 @@ import chappie.theboys.common.capability.IBoys;
 import chappie.theboys.common.entities.TBEntities;
 import chappie.theboys.common.items.TBItems;
 import chappie.theboys.network.TBNetworking;
+import chappie.theboys.util.TBUtil;
+import net.minecraft.item.Items;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -22,6 +26,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
+import xyz.heroesunited.heroesunited.util.HUArmorMaterial;
+import xyz.heroesunited.heroesunited.util.HUJsonUtils;
 
 @Mod(TheBoys.MODID)
 public class TheBoys {

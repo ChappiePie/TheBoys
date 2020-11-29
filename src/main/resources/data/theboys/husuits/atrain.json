@@ -1,0 +1,13 @@
+{
+	"armor_material": "chain",
+	"description": {
+		"translate": "theseven.motto"
+	},
+	"visibility_parts": {
+		"body_wear": true,
+		"right_arm_wear": true,
+		"left_arm_wear": true,
+		"right_leg_wear": true,
+		"left_leg_wear": true
+	}
+}

@@ -1,0 +1,7 @@
+{
+    "resources": {
+        "layer_0": "ash:textures/suits/homelander/layer_0.png",
+        "layer_1": "ash:textures/suits/homelander/layer_1.png",
+        "cape": "ash:textures/suits/homelander/cape.png"
+    }
+}

@@ -5,11 +5,13 @@ import chappie.theboys.network.client.ClientSetSlowMotion;
 import chappie.theboys.network.client.ClientSetSpeedLevel;
 import chappie.theboys.network.TBNetworking;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
@@ -52,8 +54,8 @@ public class BoysCap implements IBoys {
     @Override
     public void setSlowMotion(boolean slowMotion) {
         this.slowMotion = slowMotion;
-        if (!player.world.isRemote)
-            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetSlowMotion(player.getEntityId(), slowMotion));
+        if (player instanceof ServerPlayerEntity)
+            TBNetworking.INSTANCE.sendTo(new ClientSetSlowMotion(player.getEntityId(), slowMotion), ((ServerPlayerEntity)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @Override
