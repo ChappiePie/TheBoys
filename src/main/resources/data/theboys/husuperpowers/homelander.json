@@ -1,7 +1,60 @@
 {
 	"abilities": {
-		"homelander": {
-			"ability": "theboys:homelander"
+		"theboys:homelander_lasers": {
+			"title": {
+				"translate": "ability.theboys.lasers_from_eyes"
+			},
+			"ability": "theboys:lasers_from_eyes",
+			"color": [255, 0, 0, 255],
+			"active": true, "hidden": true
+		},
+		"theboys:homelander_flight": {
+			"ability": "heroesunited:flight",
+			"title": {
+				"translate": "ability.theboys.flight"
+			},
+			"rotateArms": true, "active": true,
+			"hidden": true, "break_blocks": true,
+			"key": {
+				"id": 2,
+				"pressType": "toggle"
+			}
+		},
+		"theboys:homelander_health": {
+			"ability": "heroesunited:attribute_modifier",
+			"active": true, "hidden": true,
+			"attribute": {
+				"name": "minecraft:generic.max_health",
+				"amount": 10, "operation": 0,
+				"uuid": "831d9761-3e36-46a6-ba4b-7a2e38d80d3b"
+			}
+		},
+		"theboys:homelander_jump_boost": {
+			"ability": "heroesunited:attribute_modifier",
+			"active": true, "hidden": true,
+			"attribute": {
+				"name": "heroesunited:jump_boost",
+				"amount": 2, "operation": 0,
+				"uuid": "831d9761-3e36-46a6-ba4b-7a2e38d80d3b"
+			}
+		},
+		"theboys:homelander_strength": {
+			"ability": "heroesunited:attribute_modifier",
+			"active": true, "hidden": true,
+			"attribute": {
+				"name": "minecraft:generic.attack_damage",
+				"amount": 2, "operation": 0,
+				"uuid": "831d9761-3e36-46a6-ba4b-7a2e38d80d3b"
+			}
+		},
+		"theboys:homelander_fall_resistance": {
+			"ability": "heroesunited:attribute_modifier",
+			"active": true, "hidden": true,
+			"attribute": {
+				"name": "heroesunited:fall_resistance",
+				"amount": -1, "operation": 0,
+				"uuid": "831d9761-3e36-46a6-ba4b-7a2e38d80d3b"
+			}
 		}
 	}
 }

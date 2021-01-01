@@ -63,13 +63,12 @@ minecraft {
 }
 
 repositories {
-    maven {
-        url "https://jitpack.io/"
-    }
+    maven { url 'https://repo.repsy.io/mvn/gandiber/geckolib' }
+    maven { url "https://jitpack.io/" }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:$project.minecraft_version-$project.forge_version"
-    compile "com.github.Heroes-United:HeroesUnited:$project.core_version:deobf"
-    implementation 'com.github.Vatuu:discord-rpc:1.6.2'
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compile "com.github.Heroes-United:HeroesUnited:${core_version}:deobf"
+    compile fg.deobf('software.bernie.geckolib:forge-1.16.4-geckolib:3.0.0')
 }

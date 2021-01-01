@@ -1,7 +1,40 @@
 {
 	"abilities": {
-		"atrain": {
-			"ability": "theboys:atrain"
+		"theboys:atrain_speed": {
+			"ability": "theboys:speed",
+			"title": {
+				"translate": "ability.theboys.speed"
+			},
+			"color": [24, 76, 153, 1],
+			"lifeTimeTrail": 5,
+			"maxSpeedLevel": 25
+		},
+		"theboys:atrain_health": {
+			"ability": "heroesunited:attribute_modifier",
+			"active": true, "hidden": true,
+			"attribute": {
+				"name": "minecraft:generic.max_health",
+				"amount": 1, "operation": 0,
+				"uuid": "931d9761-4e36-46a6-ab4f-7a2e38d80d3b"
+			}
+		},
+		"theboys:atrain_strength": {
+			"ability": "heroesunited:attribute_modifier",
+			"active": true, "hidden": true,
+			"attribute": {
+				"name": "minecraft:generic.attack_damage",
+				"amount": 1, "operation": 0,
+				"uuid": "931d9761-4e36-46a6-ab4f-7a2e38d80d3b"
+			}
+		},
+		"theboys:atrain_fall_resistance": {
+			"ability": "heroesunited:attribute_modifier",
+			"active": true, "hidden": true,
+			"attribute": {
+				"name": "heroesunited:fall_resistance",
+				"amount": -0.2, "operation": 2,
+				"uuid": "931d9761-4e36-46a6-ab4f-7a2e38d80d3b"
+			}
 		}
 	}
 }

@@ -8,12 +8,14 @@ import xyz.heroesunited.heroesunited.common.abilities.AbilityType;
 
 @Mod.EventBusSubscriber(modid = TheBoys.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TBAbilityTypes {
-    public static final AbilityType ATRAIN = new AbilityType(ATrainAbility::new, TheBoys.MODID, "atrain");
-    public static final AbilityType HOMELANDER = new AbilityType(HomelanderAbility::new, TheBoys.MODID, "homelander");
+    public static final AbilityType SPEED = new AbilityType(SpeedAbility::new, TheBoys.MODID, "speed");
+    public static final AbilityType LASERS_FROM_EYES = new AbilityType(LasersFromEyesAbility::new, TheBoys.MODID, "lasers_from_eyes");
+    public static final AbilityType FIRE_IMMUNITY = new AbilityType(FireImmunityAbility::new, TheBoys.MODID, "fire_immunitry");
 
     @SubscribeEvent
     public static void registerAbilities(RegistryEvent.Register<AbilityType> e) {
-        e.getRegistry().register(ATRAIN);
-        e.getRegistry().register(HOMELANDER);
+        e.getRegistry().register(SPEED);
+        e.getRegistry().register(FIRE_IMMUNITY);
+        e.getRegistry().register(LASERS_FROM_EYES);
     }
 }

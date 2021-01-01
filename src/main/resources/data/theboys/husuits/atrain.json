@@ -1,13 +1,29 @@
 {
+	"type": "theboys:speedster",
 	"armor_material": "chain",
 	"description": {
 		"translate": "theseven.motto"
 	},
 	"visibility_parts": {
-		"body_wear": true,
-		"right_arm_wear": true,
-		"left_arm_wear": true,
-		"right_leg_wear": true,
-		"left_leg_wear": true
+		"body_wear": {
+			"show": false,
+			"slot": "chest"
+		},
+		"right_arm_wear": {
+			"show": false,
+			"slot": "chest"
+		},
+		"left_arm_wear": {
+			"show": false,
+			"slot": "chest"
+		},
+		"right_leg_wear": {
+			"show": false,
+			"slot": "legs"
+		},
+		"left_leg_wear": {
+			"show": false,
+			"slot": "legs"
+		}
 	}
 }

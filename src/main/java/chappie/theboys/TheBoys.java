@@ -1,5 +1,6 @@
 package chappie.theboys;
 
+import chappie.theboys.abilities.SpeedsterSuit;
 import chappie.theboys.client.TBClientEventHandler;
 import chappie.theboys.common.TBEventHandler;
 import chappie.theboys.common.capability.BoysCap;
@@ -7,11 +8,8 @@ import chappie.theboys.common.capability.IBoys;
 import chappie.theboys.common.entities.TBEntities;
 import chappie.theboys.common.items.TBItems;
 import chappie.theboys.network.TBNetworking;
-import chappie.theboys.util.TBUtil;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,8 +24,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
-import xyz.heroesunited.heroesunited.util.HUArmorMaterial;
-import xyz.heroesunited.heroesunited.util.HUJsonUtils;
+import xyz.heroesunited.heroesunited.hupacks.HUPackSuit;
 
 @Mod(TheBoys.MODID)
 public class TheBoys {
@@ -45,6 +42,10 @@ public class TheBoys {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new TBClientEventHandler()));
     }
 
+    static {
+        HUPackSuit.registerSuitType(new ResourceLocation(TheBoys.MODID, "speedster"), SpeedsterSuit::new);
+    }
+
     private void setup(final FMLCommonSetupEvent event) {
         TBNetworking.registerMessages();
         CapabilityManager.INSTANCE.register(IBoys.class, new BoysCap.BoysStorage(), () -> new BoysCap(null));
@@ -56,5 +57,9 @@ public class TheBoys {
         TBEntities.EntityRenderers();
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
+
+        ItemModelsProperties.registerProperty(TBItems.VIAL, new ResourceLocation(TheBoys.MODID, "vial"),
+                (stack, clientWorld, livingEntity) ->
+                        TBItems.VIAL.getCompoundV(stack) ? 1.0F : 0F);
     }
 }

@@ -1,5 +1,6 @@
 package chappie.theboys.common.capability;
 
+import chappie.theboys.network.client.ClientSetCompoundV;
 import chappie.theboys.network.client.ClientSetInSpeed;
 import chappie.theboys.network.client.ClientSetSlowMotion;
 import chappie.theboys.network.client.ClientSetSpeedLevel;
@@ -66,6 +67,8 @@ public class BoysCap implements IBoys {
     @Override
     public void setCompoundV(boolean compoundV) {
         this.compoundV = compoundV;
+        if (!player.world.isRemote)
+            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetCompoundV(player.getEntityId(), compoundV));
     }
 
 
