@@ -5,10 +5,13 @@ import chappie.theboys.util.TBClientUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.PlayerContainer;
@@ -45,7 +48,7 @@ public class TrailRenderer extends EntityRenderer<TrailEntity> {
         matrixStackIn.rotate(Vector3f.YP.rotationDegrees(entityIn.player.renderYawOffset));
         matrixStackIn.translate((entityIn.world.rand.nextFloat() - 1F) / 80, 0, (entityIn.world.rand.nextFloat() - 1F) / 80);
         matrixStackIn.translate(0,0,1);
-        entityIn.renderer.getEntityModel().render(matrixStackIn, bufferIn.getBuffer(TBClientUtil.TBRenderTypes.TRAIL), packedLightIn, OverlayTexture.NO_OVERLAY, -entityIn.color.getRed(), -entityIn.color.getGreen(), -entityIn.color.getBlue(), 1F - (entityIn.ticksExisted / entityIn.lifeTime));
+        entityIn.renderer.getEntityModel().render(matrixStackIn, bufferIn.getBuffer(RenderType.getLightning()), packedLightIn, OverlayTexture.NO_OVERLAY, entityIn.color.getRed() /255F, entityIn.color.getGreen() /255F, entityIn.color.getBlue() /255F, 1F - (entityIn.ticksExisted / entityIn.lifeTime));
         matrixStackIn.pop();
         super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }

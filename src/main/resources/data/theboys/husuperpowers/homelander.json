@@ -6,7 +6,19 @@
 			},
 			"ability": "theboys:lasers_from_eyes",
 			"color": [255, 0, 0, 255],
-			"active": true, "hidden": true
+			"active": true, "hidden": true,
+			"key": {
+				"id": 1,
+				"pressType": "held"
+			}
+		},
+		"theboys:homelander_jerk_off": {
+			"ability": "theboys:jerk_off",
+			"active": true, "hidden": true,
+			"key": {
+				"id": 5,
+				"pressType": "held"
+			}
 		},
 		"theboys:homelander_flight": {
 			"ability": "heroesunited:flight",
@@ -19,6 +31,10 @@
 				"id": 2,
 				"pressType": "toggle"
 			}
+		},
+		"theboys:homelander_fire_immunity": {
+			"ability": "heroesunited:damage_immunity",
+			"damage_sources": ["lava", "onFire", "inFire", "onFire", "hotFloor"]
 		},
 		"theboys:homelander_health": {
 			"ability": "heroesunited:attribute_modifier",

@@ -33,9 +33,7 @@ public class ClientSetCompoundV {
             Entity entity = net.minecraft.client.Minecraft.getInstance().world.getEntityByID(this.entityId);
 
             if (entity instanceof AbstractClientPlayerEntity) {
-                entity.getCapability(BoysCap.CAPABILITY).ifPresent((a) -> {
-                    a.setInSpeed(this.compoundV);
-                });
+                entity.getCapability(BoysCap.CAPABILITY).ifPresent((a) -> a.setCompoundV(this.compoundV));
             }
         });
         ctx.get().setPacketHandled(true);

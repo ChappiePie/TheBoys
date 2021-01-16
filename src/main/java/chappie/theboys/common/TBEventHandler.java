@@ -1,30 +1,17 @@
 package chappie.theboys.common;
 
-import chappie.theboys.common.capability.BoysCap;
-import chappie.theboys.util.TBUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
 import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
 import xyz.heroesunited.heroesunited.common.abilities.FlightAbility;
-import xyz.heroesunited.heroesunited.common.events.HURegisterDataEvent;
 
 public class TBEventHandler {
-
-    @SubscribeEvent
-    public void playerTick(HURegisterDataEvent event) {
-        event.register("ShootsFromEyes", false);
-    }
 
     @SubscribeEvent
     public void livingFall(LivingFallEvent e) {

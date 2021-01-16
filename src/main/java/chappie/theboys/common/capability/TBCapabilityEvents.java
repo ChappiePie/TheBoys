@@ -1,8 +1,8 @@
 package chappie.theboys.common.capability;
 
 import chappie.theboys.TheBoys;
-import chappie.theboys.network.client.ClientSetSpeedLevel;
 import chappie.theboys.network.TBNetworking;
+import chappie.theboys.network.client.ClientSetCompoundV;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -33,29 +33,20 @@ public class TBCapabilityEvents {
 
     @SubscribeEvent
     public static void onStartTracking(PlayerEvent.StartTracking e) {
-        e.getTarget().getCapability(BoysCap.CAPABILITY).ifPresent(a -> {
-            if (e.getPlayer() instanceof ServerPlayerEntity) {
-                syncServerMessages(e.getEntity(), a);
-            }
-        });
+        e.getTarget().getCapability(BoysCap.CAPABILITY).ifPresent(a -> syncServerMessages(e.getPlayer(), a));
     }
 
     @SubscribeEvent
     public static void onJoinWorld(EntityJoinWorldEvent e) {
-        e.getEntity().getCapability(BoysCap.CAPABILITY).ifPresent(a -> {
-            if (e.getEntity() instanceof ServerPlayerEntity) {
-                syncServerMessages(e.getEntity(), a);
-            }
-        });
+        e.getEntity().getCapability(BoysCap.CAPABILITY).ifPresent(a -> syncServerMessages(e.getEntity(), a));
     }
 
     public static void syncDeath(IBoys newCap, IBoys oldCap) {
-        newCap.setSpeedLevel(0);
-        newCap.setInSpeed(false);
         newCap.setCompoundV(false);
     }
 
     public static void syncServerMessages(Entity entity, IBoys cap) {
-        TBNetworking.INSTANCE.sendTo(new ClientSetSpeedLevel(entity.getEntityId(), cap.getSpeedLevel()), ((ServerPlayerEntity) entity).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+        if (!(entity instanceof ServerPlayerEntity)) return;
+        TBNetworking.INSTANCE.sendTo(new ClientSetCompoundV(entity.getEntityId(), cap.haveCompoundV()), ((ServerPlayerEntity) entity).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
     }
 }

@@ -2,12 +2,13 @@
 	"abilities": {
 		"theboys:atrain_speed": {
 			"ability": "theboys:speed",
+			"active": true, "hidden": true,
+			"color": [24, 76, 153],
+			"lifeTimeTrail": 5,
+			"maxSpeedLevel": 25,
 			"title": {
 				"translate": "ability.theboys.speed"
-			},
-			"color": [24, 76, 153, 1],
-			"lifeTimeTrail": 5,
-			"maxSpeedLevel": 25
+			}
 		},
 		"theboys:atrain_health": {
 			"ability": "heroesunited:attribute_modifier",
