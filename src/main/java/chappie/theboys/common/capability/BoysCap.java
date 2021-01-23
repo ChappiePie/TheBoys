@@ -1,7 +1,6 @@
 package chappie.theboys.common.capability;
 
 import chappie.theboys.network.client.ClientSetCompoundV;
-import chappie.theboys.network.client.ClientSetSlowMotion;
 import chappie.theboys.network.TBNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -16,19 +15,7 @@ import javax.annotation.Nullable;
 
 public class BoysCap implements IBoys {
 
-    private boolean slowMotion, compoundV;
-
-    @Override
-    public boolean isSlowMotion() {
-        return slowMotion;
-    }
-
-    @Override
-    public void setSlowMotion(boolean slowMotion) {
-        this.slowMotion = slowMotion;
-        if (!player.world.isRemote)
-            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetSlowMotion(player.getEntityId(), slowMotion));
-    }
+    private boolean compoundV;
 
     @Override
     public boolean haveCompoundV() {
@@ -46,16 +33,12 @@ public class BoysCap implements IBoys {
     @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
-        nbt.putBoolean("SlowMotion", this.slowMotion);
         nbt.putBoolean("CompoundV", this.compoundV);
         return nbt;
     }
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        if (nbt.contains("SlowMotion")) {
-            this.slowMotion = nbt.getBoolean("SlowMotion");
-        }
         if (nbt.contains("CompoundV")) {
             this.compoundV = nbt.getBoolean("CompoundV");
         }

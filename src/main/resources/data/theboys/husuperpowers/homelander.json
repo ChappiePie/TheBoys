@@ -1,6 +1,6 @@
 {
 	"abilities": {
-		"theboys:homelander_lasers": {
+		"homelander_lasers": {
 			"title": {
 				"translate": "ability.theboys.lasers_from_eyes"
 			},
@@ -12,7 +12,7 @@
 				"pressType": "held"
 			}
 		},
-		"theboys:homelander_jerk_off": {
+		"homelander_jerk_off": {
 			"ability": "theboys:jerk_off",
 			"active": true, "hidden": true,
 			"key": {
@@ -20,7 +20,7 @@
 				"pressType": "held"
 			}
 		},
-		"theboys:homelander_flight": {
+		"homelander_flight": {
 			"ability": "heroesunited:flight",
 			"title": {
 				"translate": "ability.theboys.flight"
@@ -32,11 +32,11 @@
 				"pressType": "toggle"
 			}
 		},
-		"theboys:homelander_fire_immunity": {
+		"homelander_fire_immunity": {
 			"ability": "heroesunited:damage_immunity",
 			"damage_sources": ["lava", "onFire", "inFire", "onFire", "hotFloor"]
 		},
-		"theboys:homelander_health": {
+		"homelander_health": {
 			"ability": "heroesunited:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
@@ -45,7 +45,7 @@
 				"uuid": "831d9761-3e36-46a6-ba4b-7a2e38d80d3b"
 			}
 		},
-		"theboys:homelander_jump_boost": {
+		"homelander_jump_boost": {
 			"ability": "heroesunited:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
@@ -54,7 +54,7 @@
 				"uuid": "831d9761-3e36-46a6-ba4b-7a2e38d80d3b"
 			}
 		},
-		"theboys:homelander_strength": {
+		"homelander_strength": {
 			"ability": "heroesunited:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
@@ -63,7 +63,7 @@
 				"uuid": "831d9761-3e36-46a6-ba4b-7a2e38d80d3b"
 			}
 		},
-		"theboys:homelander_fall_resistance": {
+		"homelander_fall_resistance": {
 			"ability": "heroesunited:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {

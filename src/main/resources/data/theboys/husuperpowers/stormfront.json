@@ -1,6 +1,6 @@
 {
 	"abilities": {
-		"theboys:stormfront_lightning_from_arms": {
+		"stormfront_lightning_from_arms": {
 			"ability": "theboys:lightning_from_arms",
 			"color": [129, 48, 156],
 			"key": {
@@ -8,7 +8,7 @@
 				"pressType": "held"
 			}
 		},
-		"theboys:stormfront_lightning_projectile": {
+		"stormfront_lightning_projectile": {
 			"ability": "theboys:lightning_projectile",
 			"color": [129, 48, 156],
 			"cooldown": 40,
@@ -17,7 +17,7 @@
 				"pressType": "action"
 			}
 		},
-		"theboys:stormfront_flight": {
+		"stormfront_flight": {
 			"ability": "heroesunited:flight",
 			"type": "lightnings",
 			"color": [129, 48, 156],

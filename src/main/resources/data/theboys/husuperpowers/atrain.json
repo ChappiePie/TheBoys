@@ -1,6 +1,6 @@
 {
 	"abilities": {
-		"theboys:atrain_speed": {
+		"atrain_speed": {
 			"ability": "theboys:speed",
 			"active": true, "hidden": true,
 			"color": [24, 76, 153],
@@ -10,7 +10,7 @@
 				"translate": "ability.theboys.speed"
 			}
 		},
-		"theboys:atrain_health": {
+		"atrain_health": {
 			"ability": "heroesunited:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
@@ -19,7 +19,7 @@
 				"uuid": "931d9761-4e36-46a6-ab4f-7a2e38d80d3b"
 			}
 		},
-		"theboys:atrain_strength": {
+		"atrain_strength": {
 			"ability": "heroesunited:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
@@ -28,13 +28,21 @@
 				"uuid": "931d9761-4e36-46a6-ab4f-7a2e38d80d3b"
 			}
 		},
-		"theboys:atrain_fall_resistance": {
+		"atrain_fall_resistance": {
 			"ability": "heroesunited:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
 				"name": "heroesunited:fall_resistance",
 				"amount": -0.2, "operation": 2,
 				"uuid": "931d9761-4e36-46a6-ab4f-7a2e38d80d3b"
+			}
+		},
+		"atrain_slowmo": {
+			"ability": "heroesunited:slow_mo",
+			"active": true, "hidden": true,
+			"key": {
+				"id": 4,
+				"pressType": "toggle"
 			}
 		}
 	}

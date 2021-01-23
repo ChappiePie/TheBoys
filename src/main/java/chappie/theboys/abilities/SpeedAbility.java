@@ -1,22 +1,18 @@
 package chappie.theboys.abilities;
 
-import chappie.theboys.TheBoys;
 import chappie.theboys.client.render.TrailRenderer;
 import chappie.theboys.common.capability.BoysCap;
-import chappie.theboys.common.capability.IBoys;
 import chappie.theboys.common.entities.TrailEntity;
-import chappie.theboys.util.TBUtil;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tags.FluidTags;
@@ -27,14 +23,11 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
-import xyz.heroesunited.heroesunited.common.abilities.AbilityCreator;
-import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
 import xyz.heroesunited.heroesunited.common.abilities.suit.Suit;
-import xyz.heroesunited.heroesunited.common.objects.HUAttributes;
+import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 import xyz.heroesunited.heroesunited.util.HUJsonUtils;
 
-import java.awt.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,7 +76,6 @@ public class SpeedAbility extends Ability {
     public void onDeactivated(PlayerEntity player) {
         super.onDeactivated(player);
         resetSpeed(player);
-        BoysCap.getCap(player).setSlowMotion(false);
     }
 
     @Override
@@ -95,8 +87,6 @@ public class SpeedAbility extends Ability {
                 increaseDecreaseSpeedLevel(player, true);
             } else if (id == 3) {
                 increaseDecreaseSpeedLevel(player, false);
-            } else if (id == 4) {
-                BoysCap.getCap(player).setSlowMotion(!BoysCap.getCap(player).isSlowMotion());
             }
         }
     }
@@ -141,9 +131,30 @@ public class SpeedAbility extends Ability {
 
     protected void setSpeedModifier(PlayerEntity player, int amount) {
         this.speedLevel = amount;
-        TBUtil.setAttribute(player, "Speed", Attributes.MOVEMENT_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), amount, AttributeModifier.Operation.MULTIPLY_TOTAL);
-        TBUtil.setAttribute(player, "Speed", Attributes.ATTACK_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), amount, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        setAttribute(player, "Speed", Attributes.MOVEMENT_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), amount, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        setAttribute(player, "Speed", Attributes.ATTACK_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), amount, AttributeModifier.Operation.MULTIPLY_TOTAL);
         player.stepHeight = amount != 0 ? (int) MathHelper.clamp(speedLevel, 0, 5F) : 0.6F;
+    }
+
+    public void setAttribute(LivingEntity entity, String name, Attribute attribute, UUID uuid, double amount, AttributeModifier.Operation operation) {
+        ModifiableAttributeInstance instance = entity.getAttribute(attribute);
+
+        if (instance == null || entity.world.isRemote) {
+            return;
+        }
+
+        AttributeModifier modifier = instance.getModifier(uuid);
+
+        if (amount == 0 || modifier != null && (modifier.getAmount() != amount || modifier.getOperation() != operation)) {
+            instance.removeModifier(uuid);
+        }
+
+        modifier = instance.getModifier(uuid);
+
+        if (modifier == null) {
+            modifier = new AttributeModifier(uuid, name, amount, operation);
+            instance.applyNonPersistentModifier(modifier);
+        }
     }
 
     @Override
