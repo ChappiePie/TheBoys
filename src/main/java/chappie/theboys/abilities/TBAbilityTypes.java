@@ -13,6 +13,7 @@ public class TBAbilityTypes {
     public static final AbilityType LIGHTNING_FROM_ARMS = new AbilityType(LightningFromArmsAbility::new, TheBoys.MODID, "lightning_from_arms");
     public static final AbilityType LIGHTNING_PROJECTILE = new AbilityType(LightningProjectileAbility::new, TheBoys.MODID, "lightning_projectile");
     public static final AbilityType JERK_OFF = new AbilityType(JerkOffAbility::new, TheBoys.MODID, "jerk_off");
+    public static final AbilityType STARLIGHT = new AbilityType(StarLightAbility::new, TheBoys.MODID, "starlight");
 
     @SubscribeEvent
     public static void registerAbilities(RegistryEvent.Register<AbilityType> e) {
@@ -21,5 +22,6 @@ public class TBAbilityTypes {
         e.getRegistry().register(LIGHTNING_FROM_ARMS);
         e.getRegistry().register(LIGHTNING_PROJECTILE);
         e.getRegistry().register(JERK_OFF);
+        e.getRegistry().register(STARLIGHT);
     }
 }

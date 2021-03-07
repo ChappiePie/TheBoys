@@ -38,7 +38,7 @@ public class LightningProjectileAbility extends Ability {
             }
         } else {
             JsonObject key = JSONUtils.getJsonObject(this.getJsonObject(), "key");
-            if (JSONUtils.getString(key, "pressType").equals("action") && HUPlayer.getCap(player).getCooldown() == 0) {
+            if (JSONUtils.getString(key, "pressType").equals("action") && this.cooldownTicks == 0) {
                 shootsFromArm = false;
             }
         }
@@ -61,10 +61,10 @@ public class LightningProjectileAbility extends Ability {
                         shootsFromArm = !shootsFromArm;
                     }
                 } else if (pressType.equals("action")) {
-                    if (pressed && HUPlayer.getCap(player).getCooldown() == 0) {
+                    if (pressed && this.cooldownTicks == 0) {
                         shootsFromArm = true;
                         int cooldown = JSONUtils.getInt(key, "cooldown", 2);
-                        HUPlayer.getCap(player).setCooldown(BoysCap.getCap(player).haveCompoundV() ? cooldown / 2 : cooldown);
+                        this.cooldownTicks = BoysCap.getCap(player).haveCompoundV() ? cooldown / 2 : cooldown;
                     }
                 } else if (pressType.equals("held")) {
                     shootsFromArm = pressed;

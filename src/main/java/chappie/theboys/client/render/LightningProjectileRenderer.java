@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
 import xyz.heroesunited.heroesunited.util.HUClientUtil;
@@ -34,21 +35,20 @@ public class LightningProjectileRenderer extends EntityRenderer<LightningProject
 
     @Override
     public void render(LightningProjectile entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-        if (entityIn.ticksExisted >= 2 || !(this.renderManager.info.getRenderViewEntity().getDistanceSq(entityIn) < 12.25D)) {
-            matrixStackIn.push();
-            matrixStackIn.rotate(this.renderManager.getCameraOrientation());
-            matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180.0F));
-            for (int i = 0; i < 3; i++) {
-                matrixStackIn.push();
-                matrixStackIn.scale(0.05F, 0.05F, 0.05F);
-                matrixStackIn.translate(i, 10, 0);
-                matrixStackIn.rotate(new Quaternion(90,0,0, true));
-                HUClientUtil.renderLightning(entityIn.world.rand, matrixStackIn, bufferIn, packedLightIn, 2, i, entityIn.getColor());
-                matrixStackIn.pop();
+        float r = 0.15F;
+        AxisAlignedBB box = new AxisAlignedBB(-r, -r, -r, r, r, r);
+        matrixStackIn.push();
+        for (int i = 0; i < 5; i++) {
+            float angle = entityIn.ticksExisted * 4 + i * 180;
+            matrixStackIn.rotate(new Quaternion(angle, -angle, angle, true));
+            HUClientUtil.renderFilledBox(matrixStackIn, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box, 0f, 1f, 0f, 0.5f, packedLightIn);
+            for (int j = 0; j < 5; j++) {
+                float angleJ = entityIn.ticksExisted * 4 + j * 180;
+                matrixStackIn.rotate(new Quaternion(angleJ, -angleJ, angleJ, true));
+                HUClientUtil.renderFilledBox(matrixStackIn, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box.shrink(0.025F), 1f, 1f, 1f, 1f, packedLightIn);
             }
-            matrixStackIn.pop();
-            super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
         }
+        matrixStackIn.pop();
     }
 
     @Override

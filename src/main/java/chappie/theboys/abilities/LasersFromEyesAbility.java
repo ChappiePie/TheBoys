@@ -34,7 +34,7 @@ public class LasersFromEyesAbility extends Ability {
             }
         } else {
             JsonObject key = JSONUtils.getJsonObject(this.getJsonObject(), "key");
-            if (JSONUtils.getString(key, "pressType").equals("action") && HUPlayer.getCap(player).getCooldown() == 0) {
+            if (JSONUtils.getString(key, "pressType").equals("action") && this.cooldownTicks == 0) {
                 shootsFromEyes = false;
             }
         }
@@ -56,9 +56,9 @@ public class LasersFromEyesAbility extends Ability {
                         shootsFromEyes = !shootsFromEyes;
                     }
                 } else if (pressType.equals("action")) {
-                    if (pressed && HUPlayer.getCap(player).getCooldown() == 0) {
+                    if (pressed && this.cooldownTicks == 0) {
                         shootsFromEyes = true;
-                        HUPlayer.getCap(player).setCooldown(JSONUtils.getInt(key, "cooldown", 2));
+                        this.cooldownTicks = JSONUtils.getInt(key, "cooldown", 2);
                     }
                 } else if (pressType.equals("held")) {
                     shootsFromEyes = pressed;

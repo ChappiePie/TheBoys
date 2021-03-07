@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
     }
 }
 
@@ -14,17 +13,15 @@ apply plugin: 'java'
 apply plugin: "idea"
 apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'com.github.johnrengelman.shadow'
 
-version = modVersion
-group = modGroup
-archivesBaseName = modBaseName
+version = "${minecraft_version}-${build_version}"
+group = "chappie.theboys"
+archivesBaseName = "TheBoys"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: 'snapshot', version: "$project.mappings_version"
-
+    mappings channel: 'snapshot', version: "${mappings_version}"
     //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -32,6 +29,8 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            property "mixin.env.disableRefMap", "true"
+            arg "-mixin.config=heroesunited.mixins.json"
             mods {
                 theboys {
                     source sourceSets.main
@@ -39,10 +38,17 @@ minecraft {
             }
         }
 
+        clientWithCredentials {
+            parent runs.client
+            args '--username', 'ChappiePlayYT', '--uuid', '8464971c-f5ac-4eb5-87aa-511a0eec65f6', "-mixin.config=heroesunited.mixins.json"
+        }
+
         server {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            property "mixin.env.disableRefMap", "true"
+            arg "-mixin.config=heroesunited.mixins.json"
             mods {
                 theboys {
                     source sourceSets.main
@@ -54,7 +60,8 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
-            args '--mod', 'theboys', '--all', '--output', file('src/generated/resources/')
+            property "mixin.env.disableRefMap", "true"
+            args '--mod', 'theboys', '--all', '--output', file('src/generated/resources/'), "-mixin.config=heroesunited.mixins.json"
             mods {
                 theboys {
                     source sourceSets.main
@@ -65,42 +72,10 @@ minecraft {
 }
 
 repositories {
-    maven { url 'https://repo.repsy.io/mvn/gandiber/geckolib' }
-    maven { url "https://jitpack.io/" }
+    maven { url 'https://repo.repsy.io/mvn/heroesunited/default' }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    compile "com.github.Heroes-United:HeroesUnited:${core_version}:deobf"
-    compile fg.deobf('software.bernie.geckolib:forge-1.16.5-geckolib:3.0.1')
-}
-
-jar {
-    manifest {
-        attributes([
-                "Specification-Title": "${archivesBaseName}",
-                "Specification-Vendor": "${archivesBaseName}sareus",
-                "Specification-Version": "1",
-                "Implementation-Title": project.name,
-                "Implementation-Version": "${version}",
-                "Implementation-Vendor" :"${archivesBaseName}sareus",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-}
-
-configurations {
-    shade
-    compile.extendsFrom(shade)
-}
-
-shadowJar {
-    configurations = [project.configurations.shade]
-    relocate 'software.bernie.geckolib', 'software.bernie.HU.geckolib'
-
-    classifier ''
-}
-
-reobf {
-    shadowJar {}
+    minecraft "net.minecraftforge:forge:$minecraft_version-$forge_version"
+    compile "xyz.heroesunited:hu-core:$core_version"
 }
