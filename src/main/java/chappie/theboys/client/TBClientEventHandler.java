@@ -18,8 +18,8 @@ public class TBClientEventHandler {
     public void renderPlayerLayers(HURenderLayerEvent.Player event) {
         AbstractClientPlayerEntity player = event.getPlayer();
         for (Ability ability : AbilityHelper.getAbilities(player)) {
-            if (ability instanceof FlightAbility && HUPlayer.getCap(player).isFlying() && !player.isOnGround() && JSONUtils.getString(ability.getJsonObject(), "type", "").equals("lightnings")) {
-                double y = (((player.getPosY() !=0 ? player.getPosY() : 5) / player.getHeight()) + player.getHeight());
+            if (ability instanceof FlightAbility && HUPlayer.getCap(player).isFlying() && !player.isOnGround() && JSONUtils.getAsString(ability.getJsonObject(), "type", "").equals("lightnings")) {
+                double y = (((player.getY() !=0 ? player.getY() : 5) / player.getBbHeight()) + player.getBbHeight());
                 HUClientUtil.drawArmWithLightning(event.getMatrixStack(), event.getBuffers(), event.getRenderer(), player, HandSide.LEFT, y, event.getLight(), HUJsonUtils.getColor(ability.getJsonObject()));
                 HUClientUtil.drawArmWithLightning(event.getMatrixStack(), event.getBuffers(), event.getRenderer(), player, HandSide.RIGHT, y, event.getLight(), HUJsonUtils.getColor(ability.getJsonObject()));
             }

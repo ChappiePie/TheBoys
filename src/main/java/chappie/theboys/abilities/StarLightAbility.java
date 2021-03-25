@@ -1,11 +1,8 @@
 package chappie.theboys.abilities;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
@@ -17,20 +14,14 @@ import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import xyz.heroesunited.heroesunited.client.render.model.GeckoAbilityModel;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
 import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
 import xyz.heroesunited.heroesunited.util.HUClientUtil;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class StarLightAbility extends Ability {
     private boolean powersActivated;
@@ -69,17 +60,17 @@ public class StarLightAbility extends Ability {
         switch (id) {
             case 5:
                 if (pressed) {
-                    BlockPos.getAllInBox(HUPlayerUtil.getCollisionBoxWithRange(HUPlayerUtil.getPlayerPos(player), 5)).forEach(pos -> {
-                        if (!player.world.isRemote) {
-                            BlockState state = player.world.getBlockState(pos);
+                    BlockPos.betweenClosedStream(HUPlayerUtil.getCollisionBoxWithRange(HUPlayerUtil.getPlayerPos(player), 5)).forEach(pos -> {
+                        if (!player.level.isClientSide) {
+                            BlockState state = player.level.getBlockState(pos);
                             BooleanProperty property = state.getBlock() instanceof RedstoneLampBlock ? RedstoneLampBlock.LIT : BlockStateProperties.POWERED;
-                            IntegerProperty property1 = BlockStateProperties.POWER_0_15;
-                            if (state.func_235903_d_(property1).isPresent() && state.func_235903_d_(property1).get() != 0) {
-                                player.world.setBlockState(pos, state.with(property1, 0), 2);
+                            IntegerProperty property1 = BlockStateProperties.POWER;
+                            if (state.getOptionalValue(property1).isPresent() && state.getOptionalValue(property1).get() != 0) {
+                                player.level.setBlock(pos, state.setValue(property1, 0), 2);
                                 blocksWithEnergyEated++;
                             }
-                            if (state.func_235903_d_(property).isPresent() && state.func_235903_d_(property).get()) {
-                                player.world.setBlockState(pos, state.with(property, false), 2);
+                            if (state.getOptionalValue(property).isPresent() && state.getOptionalValue(property).get()) {
+                                player.level.setBlock(pos, state.setValue(property, false), 2);
                                 blocksWithEnergyEated++;
                             }
                             HUPlayer.getCap(player).sync();
@@ -114,11 +105,11 @@ public class StarLightAbility extends Ability {
                 float r = 0.15F;
                 float i = this.ticksExisted <= 1200 ? 1f : 0.5F;
                 AxisAlignedBB box = new AxisAlignedBB(-r, -r, -r, r, r, r);
-                matrix.push();
-                renderer.getEntityModel().translateHand(side, matrix);
+                matrix.pushPose();
+                renderer.getModel().translateToHand(side, matrix);
                 matrix.translate(side == HandSide.LEFT ? 0.06 : -0.06, 0.55, 0);
-                HUClientUtil.renderAura(matrix, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box, 0.025F, new Color(i, i, 0, i), packedLightIn, player.ticksExisted);
-                matrix.pop();
+                HUClientUtil.renderAura(matrix, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box, 0.025F, new Color(i, i, 0, i), packedLightIn, player.tickCount);
+                matrix.popPose();
             }
         }
     }

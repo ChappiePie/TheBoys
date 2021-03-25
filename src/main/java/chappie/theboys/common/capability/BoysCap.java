@@ -1,7 +1,7 @@
 package chappie.theboys.common.capability;
 
-import chappie.theboys.network.client.ClientSetCompoundV;
 import chappie.theboys.network.TBNetworking;
+import chappie.theboys.network.client.ClientSetCompoundV;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -25,8 +25,8 @@ public class BoysCap implements IBoys {
     @Override
     public void setCompoundV(boolean compoundV) {
         this.compoundV = compoundV;
-        if (!player.world.isRemote)
-            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetCompoundV(player.getEntityId(), compoundV));
+        if (!player.level.isClientSide)
+            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetCompoundV(player.getId(), compoundV));
     }
 
 

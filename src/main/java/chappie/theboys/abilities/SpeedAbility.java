@@ -24,9 +24,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
 import xyz.heroesunited.heroesunited.common.abilities.suit.Suit;
-import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
-import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 import xyz.heroesunited.heroesunited.util.HUJsonUtils;
+import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,28 +43,28 @@ public class SpeedAbility extends Ability {
     public void onUpdate(PlayerEntity player) {
         super.onUpdate(player);
         if (isInSpeed && player.isSprinting()) {
-            float walkedDifference = (player.distanceWalkedModified / 0.6F) - (player.prevDistanceWalkedModified / 0.6F);
-            if (!player.world.isRemote && player.ticksExisted % 2 == 0) {
-                TrailEntity trail = new TrailEntity(player.world, player, JSONUtils.getInt(this.getJsonObject(), "lifeTimeTrail", 10));
-                player.world.addEntity(trail);
+            float walkedDifference = (player.walkDist / 0.6F) - (player.walkDistO / 0.6F);
+            if (!player.level.isClientSide && player.tickCount % 2 == 0) {
+                TrailEntity trail = new TrailEntity(player.level, player, JSONUtils.getAsInt(this.getJsonObject(), "lifeTimeTrail", 10));
+                player.level.addFreshEntity(trail);
             }
-            if (player.isOnGround() && speedLevel > 10 && walkedDifference > 1.6F && !player.abilities.isCreativeMode) {
+            if (player.isOnGround() && speedLevel > 10 && walkedDifference > 1.6F && !player.abilities.instabuild) {
                 if (!(Suit.getSuit(player) instanceof SpeedsterSuit)) {
-                    player.setFire(10);
+                    player.setSecondsOnFire(10);
                 }
             }
-            if (!player.isInWater() && player.distanceWalkedModified / 0.6F != player.prevDistanceWalkedModified / 0.6F && player.world.getFluidState(player.getPosition().add(0, -0.1, 0)).isTagged(FluidTags.WATER)) {
-                Vector3d vec = player.getMotion();
-                player.setMotion(vec.x, 0, vec.z);
+            if (!player.isInWater() && player.walkDist / 0.6F != player.walkDistO / 0.6F && player.level.getFluidState(player.blockPosition().offset(0, -0.1, 0)).is(FluidTags.WATER)) {
+                Vector3d vec = player.getDeltaMovement();
+                player.setDeltaMovement(vec.x, 0, vec.z);
                 player.fallDistance = 0.0F;
                 player.setOnGround(true);
             }
 
             if (speedLevel > 20) {
-                List<Entity> e = player.world.getEntitiesWithinAABBExcludingEntity(player, HUPlayerUtil.getCollisionBoxWithRange(HUPlayerUtil.getPlayerPos(player), 1.0D));
+                List<Entity> e = player.level.getEntities(player, HUPlayerUtil.getCollisionBoxWithRange(HUPlayerUtil.getPlayerPos(player), 1.0D));
                 for (Entity entity : e) {
                     if (entity instanceof LivingEntity) {
-                        entity.attackEntityFrom(DamageSource.FALL, 2.0F);
+                        entity.hurt(DamageSource.FALL, 2.0F);
                     }
                 }
             }
@@ -102,7 +101,7 @@ public class SpeedAbility extends Ability {
     protected void increaseDecreaseSpeedLevel(PlayerEntity player, boolean faster) {
         if (isInSpeed) {
             int newSpeedLevel = speedLevel + (faster ? 1 : -1);
-            int maxSpeedLevel = JSONUtils.getInt(this.getJsonObject(), "maxSpeedLevel", 10);
+            int maxSpeedLevel = JSONUtils.getAsInt(this.getJsonObject(), "maxSpeedLevel", 10);
             if (newSpeedLevel > (BoysCap.getCap(player).haveCompoundV() ? maxSpeedLevel*1.2 : maxSpeedLevel)  || newSpeedLevel < 1) return;
             setSpeedModifier(player, newSpeedLevel);
         }
@@ -126,20 +125,20 @@ public class SpeedAbility extends Ability {
         if (player.getAttribute(Attributes.ATTACK_SPEED) != null && player.getAttribute(Attributes.ATTACK_SPEED).getModifier(UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409")) != null) {
             player.getAttribute(Attributes.ATTACK_SPEED).removeModifier(UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"));
         }
-        player.stepHeight = 0.6F;
+        player.maxUpStep = 0.6F;
     }
 
     protected void setSpeedModifier(PlayerEntity player, int amount) {
         this.speedLevel = amount;
         setAttribute(player, "Speed", Attributes.MOVEMENT_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), amount, AttributeModifier.Operation.MULTIPLY_TOTAL);
         setAttribute(player, "Speed", Attributes.ATTACK_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), amount, AttributeModifier.Operation.MULTIPLY_TOTAL);
-        player.stepHeight = amount != 0 ? (int) MathHelper.clamp(speedLevel, 0, 5F) : 0.6F;
+        player.maxUpStep = amount != 0 ? (int) MathHelper.clamp(speedLevel, 0, 5F) : 0.6F;
     }
 
     public void setAttribute(LivingEntity entity, String name, Attribute attribute, UUID uuid, double amount, AttributeModifier.Operation operation) {
         ModifiableAttributeInstance instance = entity.getAttribute(attribute);
 
-        if (instance == null || entity.world.isRemote) {
+        if (instance == null || entity.level.isClientSide) {
             return;
         }
 
@@ -153,7 +152,7 @@ public class SpeedAbility extends Ability {
 
         if (modifier == null) {
             modifier = new AttributeModifier(uuid, name, amount, operation);
-            instance.applyNonPersistentModifier(modifier);
+            instance.addTransientModifier(modifier);
         }
     }
 

@@ -30,7 +30,7 @@ public class ClientSetCompoundV {
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            Entity entity = net.minecraft.client.Minecraft.getInstance().world.getEntityByID(this.entityId);
+            Entity entity = net.minecraft.client.Minecraft.getInstance().level.getEntity(this.entityId);
 
             if (entity instanceof AbstractClientPlayerEntity) {
                 entity.getCapability(BoysCap.CAPABILITY).ifPresent((a) -> a.setCompoundV(this.compoundV));

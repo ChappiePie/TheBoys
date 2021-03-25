@@ -12,13 +12,11 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -29,12 +27,12 @@ public class VialItem extends Item {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         if(getCompoundV(stack)) tooltip.add(new TranslationTextComponent("Have Compound V"));
     }
 
     @Override
-    public UseAction getUseAction(ItemStack stack) {
+    public UseAction getUseAnimation(ItemStack stack) {
         return UseAction.BOW;
     }
 
@@ -44,25 +42,25 @@ public class VialItem extends Item {
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity playerIn) {
+    public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity playerIn) {
         return stack;
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-        playerIn.setActiveHand(hand);
-        return new ActionResult(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+        playerIn.startUsingItem(hand);
+        return new ActionResult(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
     }
 
     @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity livingEntity, int timeLeft) {
+    public void releaseUsing(ItemStack stack, World worldIn, LivingEntity livingEntity, int timeLeft) {
         if (livingEntity instanceof PlayerEntity && timeLeft <= 71980) {
             PlayerEntity player = (PlayerEntity) livingEntity;
             player.getCapability(BoysCap.CAPABILITY).ifPresent(a -> {
                 if (!getCompoundV(stack)) {
-                    if (player.getHeldItemOffhand().getItem() == Items.WATER_BUCKET) {
+                    if (player.getOffhandItem().getItem() == Items.WATER_BUCKET) {
                         setCompoundV(stack, true);
-                        player.getHeldItemOffhand().shrink(1);
+                        player.getOffhandItem().shrink(1);
                     } else if (a.haveCompoundV()) {
                         setCompoundV(stack, true);
                         a.setCompoundV(false);

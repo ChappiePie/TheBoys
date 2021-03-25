@@ -47,6 +47,6 @@ public class TBCapabilityEvents {
 
     public static void syncServerMessages(Entity entity, IBoys cap) {
         if (!(entity instanceof ServerPlayerEntity)) return;
-        TBNetworking.INSTANCE.sendTo(new ClientSetCompoundV(entity.getEntityId(), cap.haveCompoundV()), ((ServerPlayerEntity) entity).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+        TBNetworking.INSTANCE.sendTo(new ClientSetCompoundV(entity.getId(), cap.haveCompoundV()), ((ServerPlayerEntity) entity).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
     }
 }

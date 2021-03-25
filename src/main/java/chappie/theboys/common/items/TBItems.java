@@ -9,7 +9,7 @@ public class TBItems {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, TheBoys.MODID);
 
-    public static final VialItem VIAL = register("vial", new VialItem(new Item.Properties().maxStackSize(1)));
+    public static final VialItem VIAL = register("vial", new VialItem(new Item.Properties().stacksTo(1)));
 
     private static <T extends Item> T register(String name, T item) {
         ITEMS.register(name, () -> item);

@@ -58,7 +58,7 @@ public class TheBoys {
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
 
-        ItemModelsProperties.registerProperty(TBItems.VIAL, new ResourceLocation(TheBoys.MODID, "vial"),
+        ItemModelsProperties.register(TBItems.VIAL, new ResourceLocation(TheBoys.MODID, "vial"),
                 (stack, clientWorld, livingEntity) ->
                         TBItems.VIAL.getCompoundV(stack) ? 1.0F : 0F);
     }

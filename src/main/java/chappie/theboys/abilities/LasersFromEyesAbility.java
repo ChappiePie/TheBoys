@@ -12,9 +12,6 @@ import net.minecraft.util.JSONUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
-import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
-import xyz.heroesunited.heroesunited.common.capabilities.IHUPlayer;
-import xyz.heroesunited.heroesunited.util.HUClientUtil;
 import xyz.heroesunited.heroesunited.util.HUJsonUtils;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 
@@ -28,13 +25,13 @@ public class LasersFromEyesAbility extends Ability {
 
     @Override
     public void onUpdate(PlayerEntity player) {
-        if (!JSONUtils.hasField(this.getJsonObject(), "key")) {
+        if (!JSONUtils.isValidNode(this.getJsonObject(), "key")) {
             if (shootsFromEyes == false) {
                 shootsFromEyes = true;
             }
         } else {
-            JsonObject key = JSONUtils.getJsonObject(this.getJsonObject(), "key");
-            if (JSONUtils.getString(key, "pressType").equals("action") && this.cooldownTicks == 0) {
+            JsonObject key = JSONUtils.getAsJsonObject(this.getJsonObject(), "key");
+            if (JSONUtils.getAsString(key, "pressType").equals("action") && this.cooldownTicks == 0) {
                 shootsFromEyes = false;
             }
         }
@@ -46,11 +43,11 @@ public class LasersFromEyesAbility extends Ability {
 
     @Override
     public void toggle(PlayerEntity player, int id, boolean pressed) {
-        if (JSONUtils.hasField(this.getJsonObject(), "key")) {
-            JsonObject key = JSONUtils.getJsonObject(this.getJsonObject(), "key");
-            String pressType = JSONUtils.getString(key, "pressType", "toggle");
+        if (JSONUtils.isValidNode(this.getJsonObject(), "key")) {
+            JsonObject key = JSONUtils.getAsJsonObject(this.getJsonObject(), "key");
+            String pressType = JSONUtils.getAsString(key, "pressType", "toggle");
 
-            if (id == JSONUtils.getInt(key, "id")) {
+            if (id == JSONUtils.getAsInt(key, "id")) {
                 if (pressType.equals("toggle")) {
                     if (pressed) {
                         shootsFromEyes = !shootsFromEyes;
@@ -58,7 +55,7 @@ public class LasersFromEyesAbility extends Ability {
                 } else if (pressType.equals("action")) {
                     if (pressed && this.cooldownTicks == 0) {
                         shootsFromEyes = true;
-                        this.cooldownTicks = JSONUtils.getInt(key, "cooldown", 2);
+                        this.cooldownTicks = JSONUtils.getAsInt(key, "cooldown", 2);
                     }
                 } else if (pressType.equals("held")) {
                     shootsFromEyes = pressed;

@@ -26,56 +26,56 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
 
     public TrailEntity(EntityType<TrailEntity> entityType, World world) {
         super(entityType, world);
-        this.noClip = true;
-        this.ignoreFrustumCheck = true;
+        this.noPhysics = true;
+        this.noCulling = true;
     }
 
     public TrailEntity(World worldIn, PlayerEntity player, int lifeTime) {
         super(TBEntities.TRAIL, worldIn);
-        this.noClip = true;
-        this.ignoreFrustumCheck = true;
+        this.noPhysics = true;
+        this.noCulling = true;
         this.player = player;
         this.lifeTime = lifeTime;
-        this.setLocationAndAngles(player.getPosX(), player.getPosY(), player.getPosZ(), player.rotationYaw, player.rotationPitch);
+        this.moveTo(player.getX(), player.getY(), player.getZ(), player.yRot, player.xRot);
     }
 
     @Override
-    public EntitySize getSize(Pose poseIn) {
-        return player.getSize(poseIn);
+    public EntitySize getDimensions(Pose poseIn) {
+        return player.getDimensions(poseIn);
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (this.ticksExisted >= this.lifeTime) {
+        if (this.tickCount >= this.lifeTime) {
             this.remove();
         }
     }
 
     @Override
-    public IPacket<?> createSpawnPacket() {
+    public IPacket<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Override
     public void writeSpawnData(PacketBuffer buffer) {
         buffer.writeInt(this.lifeTime);
-        buffer.writeUniqueId(this.player.getUniqueID());
+        buffer.writeUUID(this.player.getUUID());
     }
 
     @Override
     public void readSpawnData(PacketBuffer additionalData) {
         this.lifeTime = additionalData.readInt();
-        this.player = this.world.getPlayerByUuid(additionalData.readUniqueId());
+        this.player = this.level.getPlayerByUUID(additionalData.readUUID());
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public boolean isInRangeToRender3d(double x, double y, double z) {
+    public boolean shouldRender(double x, double y, double z) {
         return true;
     }
 
-    protected void registerData() {}
-    protected void readAdditional(CompoundNBT compound) {}
-    protected void writeAdditional(CompoundNBT compound) {}
+    protected void defineSynchedData() {}
+    protected void readAdditionalSaveData(CompoundNBT compound) {}
+    protected void addAdditionalSaveData(CompoundNBT compound) {}
 }

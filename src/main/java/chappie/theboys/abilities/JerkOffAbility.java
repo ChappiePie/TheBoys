@@ -10,10 +10,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.client.events.HUSetRotationAnglesEvent;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
-import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
 import xyz.heroesunited.heroesunited.util.HUClientUtil;
-
-import java.util.Random;
 
 public class JerkOffAbility extends Ability {
 
@@ -25,13 +22,13 @@ public class JerkOffAbility extends Ability {
 
     @Override
     public void onUpdate(PlayerEntity player) {
-        if (!JSONUtils.hasField(this.getJsonObject(), "key")) {
+        if (!JSONUtils.isValidNode(this.getJsonObject(), "key")) {
             if (jerkingOff == false) {
                 jerkingOff = true;
             }
         } else {
-            JsonObject key = JSONUtils.getJsonObject(this.getJsonObject(), "key");
-            if (JSONUtils.getString(key, "pressType").equals("action") && this.cooldownTicks == 0) {
+            JsonObject key = JSONUtils.getAsJsonObject(this.getJsonObject(), "key");
+            if (JSONUtils.getAsString(key, "pressType").equals("action") && this.cooldownTicks == 0) {
                 jerkingOff = false;
             }
         }
@@ -39,11 +36,11 @@ public class JerkOffAbility extends Ability {
 
     @Override
     public void toggle(PlayerEntity player, int id, boolean pressed) {
-        if (JSONUtils.hasField(this.getJsonObject(), "key")) {
-            JsonObject key = JSONUtils.getJsonObject(this.getJsonObject(), "key");
-            String pressType = JSONUtils.getString(key, "pressType", "toggle");
+        if (JSONUtils.isValidNode(this.getJsonObject(), "key")) {
+            JsonObject key = JSONUtils.getAsJsonObject(this.getJsonObject(), "key");
+            String pressType = JSONUtils.getAsString(key, "pressType", "toggle");
 
-            if (id == JSONUtils.getInt(key, "id")) {
+            if (id == JSONUtils.getAsInt(key, "id")) {
                 if (pressType.equals("toggle")) {
                     if (pressed) {
                         jerkingOff = !jerkingOff;
@@ -51,7 +48,7 @@ public class JerkOffAbility extends Ability {
                 } else if (pressType.equals("action")) {
                     if (pressed && this.cooldownTicks == 0) {
                         jerkingOff = true;
-                        this.cooldownTicks = JSONUtils.getInt(key, "cooldown", 2);
+                        this.cooldownTicks = JSONUtils.getAsInt(key, "cooldown", 2);
                     }
                 } else if (pressType.equals("held")) {
                     jerkingOff = pressed;
@@ -67,12 +64,12 @@ public class JerkOffAbility extends Ability {
         if (this.jerkingOff) {
             float f = MathHelper.cos(event.getAgeInTicks()) * 24;
             float rotationX = (float) Math.toRadians(-(event.getPlayer().isCrouching() ? 5F - f : 30F + f));
-            if (event.getPlayer().getPrimaryHand() == HandSide.RIGHT) {
-                event.getPlayerModel().bipedRightArm.rotateAngleX = rotationX;
-                event.getPlayerModel().bipedRightArm.rotateAngleZ = (float) Math.toRadians(-45F);
+            if (event.getPlayer().getMainArm() == HandSide.RIGHT) {
+                event.getPlayerModel().rightArm.xRot = rotationX;
+                event.getPlayerModel().rightArm.zRot = (float) Math.toRadians(-45F);
             } else {
-                event.getPlayerModel().bipedLeftArm.rotateAngleX = rotationX;
-                event.getPlayerModel().bipedLeftArm.rotateAngleZ = (float) Math.toRadians(45F);
+                event.getPlayerModel().leftArm.xRot = rotationX;
+                event.getPlayerModel().leftArm.zRot = (float) Math.toRadians(45F);
             }
             HUClientUtil.copyAnglesToWear(event.getPlayerModel());
         }

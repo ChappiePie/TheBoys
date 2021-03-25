@@ -15,7 +15,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.client.events.HUSetRotationAnglesEvent;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
-import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
 import xyz.heroesunited.heroesunited.util.HUClientUtil;
 import xyz.heroesunited.heroesunited.util.HUJsonUtils;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
@@ -30,13 +29,13 @@ public class LightningFromArmsAbility extends Ability {
 
     @Override
     public void onUpdate(PlayerEntity player) {
-        if (!JSONUtils.hasField(this.getJsonObject(), "key")) {
+        if (!JSONUtils.isValidNode(this.getJsonObject(), "key")) {
             if (shootsFromArm == false) {
                 shootsFromArm = true;
             }
         } else {
-            JsonObject key = JSONUtils.getJsonObject(this.getJsonObject(), "key");
-            if (JSONUtils.getString(key, "pressType").equals("action") && this.cooldownTicks == 0) {
+            JsonObject key = JSONUtils.getAsJsonObject(this.getJsonObject(), "key");
+            if (JSONUtils.getAsString(key, "pressType").equals("action") && this.cooldownTicks == 0) {
                 shootsFromArm = false;
             }
         }
@@ -47,11 +46,11 @@ public class LightningFromArmsAbility extends Ability {
 
     @Override
     public void toggle(PlayerEntity player, int id, boolean pressed) {
-        if (JSONUtils.hasField(this.getJsonObject(), "key")) {
-            JsonObject key = JSONUtils.getJsonObject(this.getJsonObject(), "key");
-            String pressType = JSONUtils.getString(key, "pressType", "toggle");
+        if (JSONUtils.isValidNode(this.getJsonObject(), "key")) {
+            JsonObject key = JSONUtils.getAsJsonObject(this.getJsonObject(), "key");
+            String pressType = JSONUtils.getAsString(key, "pressType", "toggle");
 
-            if (id == JSONUtils.getInt(key, "id")) {
+            if (id == JSONUtils.getAsInt(key, "id")) {
                 if (pressType.equals("toggle")) {
                     if (pressed) {
                         shootsFromArm = !shootsFromArm;
@@ -59,7 +58,7 @@ public class LightningFromArmsAbility extends Ability {
                 } else if (pressType.equals("action")) {
                     if (pressed && this.cooldownTicks == 0) {
                         shootsFromArm = true;
-                        this.cooldownTicks = JSONUtils.getInt(key, "cooldown", 2);
+                        this.cooldownTicks = JSONUtils.getAsInt(key, "cooldown", 2);
                     }
                 } else if (pressType.equals("held")) {
                     shootsFromArm = pressed;
@@ -72,15 +71,15 @@ public class LightningFromArmsAbility extends Ability {
     @Override
     public void render(PlayerRenderer renderer, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (shootsFromArm) {
-            double distance = player.getPositionVec().add(0, player.getEyeHeight(), 0).distanceTo(Minecraft.getInstance().objectMouseOver.getHitVec());
+            double distance = player.position().add(0, player.getEyeHeight(), 0).distanceTo(Minecraft.getInstance().hitResult.getLocation());
             for (int i = 0; i < 3; i++) {
-                matrix.push();
-                renderer.getEntityModel().translateHand(player.getPrimaryHand(), matrix);
+                matrix.pushPose();
+                renderer.getModel().translateToHand(player.getMainArm(), matrix);
                 matrix.scale(0.05F, 0.06F, 0.05F);
-                matrix.translate(i * (player.getPrimaryHand() == HandSide.LEFT ? 1 : -1), 10, 0);
-                matrix.rotate(new Quaternion(90, 0, 0, true));
-                HUClientUtil.renderLightning(player.world.rand, matrix, bufferIn, packedLightIn, distance, i, HUJsonUtils.getColor(this.getJsonObject()));
-                matrix.pop();
+                matrix.translate(i * (player.getMainArm() == HandSide.LEFT ? 1 : -1), 10, 0);
+                matrix.mulPose(new Quaternion(90, 0, 0, true));
+                HUClientUtil.renderLightning(player.level.random, matrix, bufferIn, packedLightIn, distance, i, HUJsonUtils.getColor(this.getJsonObject()));
+                matrix.popPose();
             }
         }
     }
@@ -90,20 +89,20 @@ public class LightningFromArmsAbility extends Ability {
     public void setRotationAngles(HUSetRotationAnglesEvent event) {
         super.setRotationAngles(event);
         if (shootsFromArm) {
-            if (event.getPlayer().getPrimaryHand() == HandSide.RIGHT) {
-                event.getPlayerModel().bipedRightArm.rotateAngleX = (float) Math.toRadians(event.getPlayer().rotationPitch - 90);
+            if (event.getPlayer().getMainArm() == HandSide.RIGHT) {
+                event.getPlayerModel().rightArm.xRot = (float) Math.toRadians(event.getPlayer().xRot - 90);
 
-                event.getPlayerModel().bipedRightArm.rotateAngleY = event.getPlayerModel().bipedHead.rotateAngleY;
-                event.getPlayerModel().bipedRightArm.rotateAngleZ = 0;
+                event.getPlayerModel().rightArm.yRot = event.getPlayerModel().head.yRot;
+                event.getPlayerModel().rightArm.zRot = 0;
 
-                event.getPlayerModel().bipedRightArmwear.rotateAngleX = event.getPlayerModel().bipedRightArm.rotateAngleX;
+                event.getPlayerModel().rightSleeve.xRot = event.getPlayerModel().rightArm.xRot;
             } else {
-                event.getPlayerModel().bipedLeftArm.rotateAngleX = (float) Math.toRadians(event.getPlayer().rotationPitch - 90);
+                event.getPlayerModel().leftArm.xRot = (float) Math.toRadians(event.getPlayer().xRot - 90);
 
-                event.getPlayerModel().bipedLeftArm.rotateAngleY = event.getPlayerModel().bipedHead.rotateAngleY;
-                event.getPlayerModel().bipedLeftArm.rotateAngleZ = 0;
+                event.getPlayerModel().leftArm.yRot = event.getPlayerModel().head.yRot;
+                event.getPlayerModel().leftArm.zRot = 0;
 
-                event.getPlayerModel().bipedLeftArmwear.rotateAngleX = event.getPlayerModel().bipedLeftArm.rotateAngleX;
+                event.getPlayerModel().leftSleeve.xRot = event.getPlayerModel().leftArm.xRot;
             }
         }
         HUClientUtil.copyAnglesToWear(event.getPlayerModel());

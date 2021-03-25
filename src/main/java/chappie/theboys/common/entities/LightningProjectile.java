@@ -28,24 +28,24 @@ public class LightningProjectile extends ThrowableEntity {
     }
 
     @Override
-    protected void registerData() {}
+    protected void defineSynchedData() {}
 
     @Override
-    protected void onEntityHit(EntityRayTraceResult rtr) {
-        if (!this.world.isRemote) {
-            LightningBoltEntity bolt = EntityType.LIGHTNING_BOLT.create(world);
-            bolt.setPosition(rtr.getEntity().getPosX(), rtr.getEntity().getPosY(), rtr.getEntity().getPosZ());
-            this.world.addEntity(bolt);
+    protected void onHitEntity(EntityRayTraceResult rtr) {
+        if (!this.level.isClientSide) {
+            LightningBoltEntity bolt = EntityType.LIGHTNING_BOLT.create(level);
+            bolt.setPos(rtr.getEntity().getX(), rtr.getEntity().getY(), rtr.getEntity().getZ());
+            this.level.addFreshEntity(bolt);
         }
     }
 
     @Override
-    public IPacket<?> createSpawnPacket() {
+    public IPacket<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Override
-    protected float getGravityVelocity() {
+    protected float getGravity() {
         return 0.01F;
     }
 }
