@@ -4,7 +4,7 @@
 			"ability": "theboys:speed",
 			"active": true, "hidden": true,
 			"color": [24, 76, 153],
-			"lifeTimeTrail": 5,
+			"lifeTimeTrail": 15,
 			"maxSpeedLevel": 25,
 			"title": {
 				"translate": "ability.theboys.speed"

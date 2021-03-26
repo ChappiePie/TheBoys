@@ -1,21 +1,26 @@
 package chappie.theboys.common.capability;
 
 import chappie.theboys.network.TBNetworking;
-import chappie.theboys.network.client.ClientSetCompoundV;
+import chappie.theboys.network.client.ClientSyncBoysCap;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class BoysCap implements IBoys {
 
+    @CapabilityInject(IBoys.class)
+    public static Capability<IBoys> CAPABILITY;
+    private final PlayerEntity player;
     private boolean compoundV;
+
+    public BoysCap(PlayerEntity player) {
+        this.player = player;
+    }
 
     @Override
     public boolean haveCompoundV() {
@@ -25,10 +30,28 @@ public class BoysCap implements IBoys {
     @Override
     public void setCompoundV(boolean compoundV) {
         this.compoundV = compoundV;
-        if (!player.level.isClientSide)
-            TBNetworking.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ClientSetCompoundV(player.getId(), compoundV));
+        this.syncToAll();
     }
 
+    @Override
+    public IBoys sync() {
+        player.refreshDimensions();
+        if (player instanceof ServerPlayerEntity) {
+            TBNetworking.INSTANCE.sendTo(new ClientSyncBoysCap(player.getId(), this.serializeNBT()), ((ServerPlayerEntity) player).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+        }
+        return this;
+    }
+
+    @Override
+    public IBoys syncToAll() {
+        this.sync();
+        for (PlayerEntity player : this.player.level.players()) {
+            if (player instanceof ServerPlayerEntity) {
+                TBNetworking.INSTANCE.sendTo(new ClientSyncBoysCap(this.player.getId(), this.serializeNBT()), ((ServerPlayerEntity) player).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+            }
+        }
+        return this;
+    }
 
     @Override
     public CompoundNBT serializeNBT() {
@@ -44,33 +67,8 @@ public class BoysCap implements IBoys {
         }
     }
 
-    //-------------------------------------------------------------------------------------
-
-    @CapabilityInject(IBoys.class)
-    public static Capability<IBoys> CAPABILITY;
-    public final PlayerEntity player;
-
-    public BoysCap(PlayerEntity player) {
-        this.player = player;
-    }
-
     @Nonnull
     public static IBoys getCap(PlayerEntity player) {
-        IBoys cap = player.getCapability(CAPABILITY).orElse(null);
-        return cap != null ? cap : null;
-    }
-
-    public static class BoysStorage implements Capability.IStorage<IBoys> {
-
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<IBoys> capability, IBoys instance, Direction side) {
-            return instance.serializeNBT();
-        }
-
-        @Override
-        public void readNBT(Capability<IBoys> capability, IBoys instance, Direction side, INBT nbt) {
-            instance.deserializeNBT(nbt instanceof CompoundNBT ? (CompoundNBT) nbt : new CompoundNBT());
-        }
+        return player.getCapability(CAPABILITY).orElse(null);
     }
 }

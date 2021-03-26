@@ -6,7 +6,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.item.UseAction;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
@@ -21,8 +20,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class VialItem extends Item {
-    public VialItem(Properties propertiesIn) {
+public class InjectionItem extends Item {
+    public InjectionItem(Properties propertiesIn) {
         super(propertiesIn);
     }
 
@@ -58,16 +57,18 @@ public class VialItem extends Item {
             PlayerEntity player = (PlayerEntity) livingEntity;
             player.getCapability(BoysCap.CAPABILITY).ifPresent(a -> {
                 if (!getCompoundV(stack)) {
-                    if (player.getOffhandItem().getItem() == Items.WATER_BUCKET) {
+                    if (player.getOffhandItem().getItem() == TBItems.COMPOUND_V) {
                         setCompoundV(stack, true);
                         player.getOffhandItem().shrink(1);
                     } else if (a.haveCompoundV()) {
                         setCompoundV(stack, true);
                         a.setCompoundV(false);
                     }
-                } else if (!a.haveCompoundV() && getCompoundV(stack)) {
-                    a.setCompoundV(true);
-                    setCompoundV(stack, false);
+                } else {
+                    if (!a.haveCompoundV()) {
+                        a.setCompoundV(true);
+                        setCompoundV(stack, false);
+                    }
                 }
             });
         }

@@ -10,15 +10,12 @@ buildscript {
 }
 
 apply plugin: 'java'
-apply plugin: "idea"
 apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
 
 version = "${minecraft_version}-${build_version}"
 group = "chappie.theboys"
 archivesBaseName = "TheBoys"
-
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
     mappings channel: 'official', version: "${minecraft_version}"

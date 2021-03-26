@@ -2,7 +2,7 @@ package chappie.theboys.common.capability;
 
 import chappie.theboys.TheBoys;
 import chappie.theboys.network.TBNetworking;
-import chappie.theboys.network.client.ClientSetCompoundV;
+import chappie.theboys.network.client.ClientSyncBoysCap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -20,7 +20,7 @@ public class TBCapabilityEvents {
     @SubscribeEvent
     public static void attachCap(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof PlayerEntity) {
-            event.addCapability(new ResourceLocation(TheBoys.MODID, "boyscap"), new BoysProvider((PlayerEntity) event.getObject()));
+            event.addCapability(new ResourceLocation(TheBoys.MODID, "theboys"), new BoysProvider((PlayerEntity) event.getObject()));
         }
     }
 
@@ -28,25 +28,23 @@ public class TBCapabilityEvents {
     public static void clonePlayer(PlayerEvent.Clone event) {
         IBoys newCap = BoysCap.getCap(event.getPlayer());
         IBoys oldCap = BoysCap.getCap(event.getOriginal());
-        syncDeath(newCap, oldCap);
+        newCap.deserializeNBT(oldCap.serializeNBT());
+        newCap.setCompoundV(oldCap.haveCompoundV());
     }
 
     @SubscribeEvent
-    public static void onStartTracking(PlayerEvent.StartTracking e) {
-        e.getTarget().getCapability(BoysCap.CAPABILITY).ifPresent(a -> syncServerMessages(e.getPlayer(), a));
+    public void onStartTracking(PlayerEvent.StartTracking e) {
+        if (e.getPlayer() instanceof ServerPlayerEntity) {
+            e.getTarget().getCapability(BoysCap.CAPABILITY).ifPresent(a -> {
+                TBNetworking.INSTANCE.sendTo(new ClientSyncBoysCap(e.getTarget().getId(), a.serializeNBT()), ((ServerPlayerEntity) e.getPlayer()).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+            });
+        }
     }
 
     @SubscribeEvent
-    public static void onJoinWorld(EntityJoinWorldEvent e) {
-        e.getEntity().getCapability(BoysCap.CAPABILITY).ifPresent(a -> syncServerMessages(e.getEntity(), a));
-    }
-
-    public static void syncDeath(IBoys newCap, IBoys oldCap) {
-        newCap.setCompoundV(false);
-    }
-
-    public static void syncServerMessages(Entity entity, IBoys cap) {
-        if (!(entity instanceof ServerPlayerEntity)) return;
-        TBNetworking.INSTANCE.sendTo(new ClientSetCompoundV(entity.getId(), cap.haveCompoundV()), ((ServerPlayerEntity) entity).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+    public void onJoinWorld(EntityJoinWorldEvent e) {
+        if (e.getEntity() instanceof ServerPlayerEntity) {
+            e.getEntity().getCapability(BoysCap.CAPABILITY).ifPresent(a -> a.syncToAll());
+        }
     }
 }

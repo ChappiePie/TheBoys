@@ -34,7 +34,7 @@
 		},
 		"homelander_fire_immunity": {
 			"ability": "heroesunited:damage_immunity",
-			"damage_sources": ["lava", "onFire", "inFire", "onFire", "hotFloor"]
+			"damage_sources": ["lava", "onFire", "inFire", "hotFloor"]
 		},
 		"homelander_health": {
 			"ability": "heroesunited:attribute_modifier",

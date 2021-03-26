@@ -24,6 +24,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
+import xyz.heroesunited.heroesunited.common.capabilities.HUCapStorage;
 import xyz.heroesunited.heroesunited.hupacks.HUPackSuit;
 
 @Mod(TheBoys.MODID)
@@ -35,9 +36,8 @@ public class TheBoys {
         final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.register(this);
 
-        TBItems.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        bus.addListener(this::setup);
-        MinecraftForge.EVENT_BUS.register(this);
+        TBItems.ITEMS.register(bus);
+
         MinecraftForge.EVENT_BUS.register(new TBEventHandler());
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new TBClientEventHandler()));
     }
@@ -46,9 +46,10 @@ public class TheBoys {
         HUPackSuit.registerSuitType(new ResourceLocation(TheBoys.MODID, "speedster"), SpeedsterSuit::new);
     }
 
-    private void setup(final FMLCommonSetupEvent event) {
+    @SubscribeEvent
+    public void setup(final FMLCommonSetupEvent event) {
         TBNetworking.registerMessages();
-        CapabilityManager.INSTANCE.register(IBoys.class, new BoysCap.BoysStorage(), () -> new BoysCap(null));
+        CapabilityManager.INSTANCE.register(IBoys.class, new HUCapStorage(), () -> new BoysCap(null));
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -57,9 +58,7 @@ public class TheBoys {
         TBEntities.EntityRenderers();
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
-
-        ItemModelsProperties.register(TBItems.VIAL, new ResourceLocation(TheBoys.MODID, "vial"),
-                (stack, clientWorld, livingEntity) ->
-                        TBItems.VIAL.getCompoundV(stack) ? 1.0F : 0F);
+        ItemModelsProperties.register(TBItems.INJECTION, new ResourceLocation(TheBoys.MODID, "injection"),
+                (stack, clientWorld, livingEntity) -> TBItems.INJECTION.getCompoundV(stack) ? 1.0F : 0F);
     }
 }

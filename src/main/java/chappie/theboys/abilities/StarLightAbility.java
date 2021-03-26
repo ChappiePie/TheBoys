@@ -50,7 +50,6 @@ public class StarLightAbility extends Ability {
         if (this.blocksWithEnergyEated > 10 && !this.powersActivated) {
             this.powersActivated = true;
             this.blocksWithEnergyEated = this.blocksWithEnergyEated - 10;
-            HUPlayer.getCap(player).sync();
         }
     }
 
