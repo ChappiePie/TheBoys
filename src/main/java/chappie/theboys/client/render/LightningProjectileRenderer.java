@@ -3,12 +3,14 @@ package chappie.theboys.client.render;
 import chappie.theboys.common.entities.LightningProjectile;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3f;
 import xyz.heroesunited.heroesunited.util.HUClientUtil;
 
 public class LightningProjectileRenderer extends EntityRenderer<LightningProjectile> {
@@ -18,21 +20,23 @@ public class LightningProjectileRenderer extends EntityRenderer<LightningProject
     }
 
     @Override
-    public void render(LightningProjectile entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-        float r = 0.15F;
-        AxisAlignedBB box = new AxisAlignedBB(-r, -r, -r, r, r, r);
-        matrixStackIn.pushPose();
-        for (int i = 0; i < 5; i++) {
-            float angle = entityIn.tickCount * 4 + i * 180;
-            matrixStackIn.mulPose(new Quaternion(angle, -angle, angle, true));
-            HUClientUtil.renderFilledBox(matrixStackIn, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box, 0f, 1f, 0f, 0.5f, packedLightIn);
-            for (int j = 0; j < 5; j++) {
-                float angleJ = entityIn.tickCount * 4 + j * 180;
-                matrixStackIn.mulPose(new Quaternion(angleJ, -angleJ, angleJ, true));
-                HUClientUtil.renderFilledBox(matrixStackIn, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box.deflate(0.025F), 1f, 1f, 1f, 1f, packedLightIn);
+    public void render(LightningProjectile entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int packedLightIn) {
+        if (entity.tickCount >= 2 || !(this.entityRenderDispatcher.camera.getEntity().distanceToSqr(entity) < 6.125D)) {
+            matrixStack.pushPose();
+            matrixStack.scale(0.05F, 0.06F, 0.05F);
+            matrixStack.translate(0, 10, 0);
+            matrixStack.mulPose(Vector3f.YP.rotationDegrees(MathHelper.lerp(partialTicks, entity.yRotO, entity.yRot) - 90.0F));
+            matrixStack.mulPose(Vector3f.ZP.rotationDegrees(MathHelper.lerp(partialTicks, entity.xRotO, entity.xRot) + 90.0F));
+            matrixStack.translate(0.25, -0.5, 0);
+            if (entity.getLightningType() != null && entity.getLightningType().equals(LightningProjectile.Type.STARLIGHT)) {
+                float r = 0.15F;
+                AxisAlignedBB box = new AxisAlignedBB(-r, -r, -r, r, r, r);
+                HUClientUtil.renderAura(matrixStack, bufferIn.getBuffer(RenderType.lightning()), box, 0.0625F / 2, entity.getColor(), packedLightIn, entity.tickCount);
+            } else {
+                HUClientUtil.renderLightning(entity.level.random, matrixStack, bufferIn, packedLightIn, 5, 1, entity.getColor());
             }
+            matrixStack.popPose();
         }
-        matrixStackIn.popPose();
     }
 
     @Override

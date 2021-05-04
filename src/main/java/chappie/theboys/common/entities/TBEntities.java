@@ -23,7 +23,7 @@ public class TBEntities {
     @SubscribeEvent
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> e) {
         e.getRegistry().register(EntityType.Builder.<TrailEntity>of(TrailEntity::new, EntityClassification.MISC).sized(1F, 1F).setCustomClientFactory((spawnEntity, world) -> TRAIL.create(world)).build(TheBoys.MODID + ":trail").setRegistryName("trail"));
-        e.getRegistry().register(EntityType.Builder.<LightningProjectile>of(LightningProjectile::new, EntityClassification.MISC).setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true).build(TheBoys.MODID + ":lightning_projectile").setRegistryName("lightning_projectile"));
+        e.getRegistry().register(EntityType.Builder.<LightningProjectile>of(LightningProjectile::new, EntityClassification.MISC).sized(0.5F, 0.5F).setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true).build(TheBoys.MODID + ":lightning_projectile").setRegistryName("lightning_projectile"));
     }
 
     public static void EntityRenderers() {

@@ -4,6 +4,7 @@ import chappie.theboys.client.render.TrailRenderer;
 import chappie.theboys.common.capability.BoysCap;
 import chappie.theboys.common.entities.TrailEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
@@ -14,10 +15,13 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.JSONUtils;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
@@ -53,11 +57,12 @@ public class SpeedAbility extends Ability {
                     player.setSecondsOnFire(10);
                 }
             }
-            if (!player.isInWater() && player.walkDist / 0.6F != player.walkDistO / 0.6F && player.level.getFluidState(player.blockPosition().offset(0, -0.1, 0)).is(FluidTags.WATER)) {
-                Vector3d vec = player.getDeltaMovement();
-                player.setDeltaMovement(vec.x, 0, vec.z);
-                player.fallDistance = 0.0F;
-                player.setOnGround(true);
+            if (!player.isInWater() && player.walkDist / 0.6F != player.walkDistO / 0.6F) {
+                if (player.level.getBlockState(new BlockPos(player.position().add(0, -0.3, 0))).is(Blocks.WATER)) {
+                    player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
+                    player.fallDistance = 0.0F;
+                    player.setOnGround(true);
+                }
             }
 
             if (speedLevel > 20) {

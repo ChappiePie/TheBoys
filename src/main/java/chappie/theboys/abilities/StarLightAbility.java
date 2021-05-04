@@ -22,6 +22,7 @@ import xyz.heroesunited.heroesunited.util.HUClientUtil;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 
 import java.awt.*;
+import java.util.Map;
 
 public class StarLightAbility extends Ability {
     private boolean powersActivated;
@@ -54,28 +55,28 @@ public class StarLightAbility extends Ability {
     }
 
     @Override
-    public void toggle(PlayerEntity player, int id, boolean pressed) {
-        super.toggle(player, id, pressed);
-        switch (id) {
-            case 5:
-                if (pressed) {
-                    BlockPos.betweenClosedStream(HUPlayerUtil.getCollisionBoxWithRange(HUPlayerUtil.getPlayerPos(player), 5)).forEach(pos -> {
-                        if (!player.level.isClientSide) {
-                            BlockState state = player.level.getBlockState(pos);
-                            BooleanProperty property = state.getBlock() instanceof RedstoneLampBlock ? RedstoneLampBlock.LIT : BlockStateProperties.POWERED;
-                            IntegerProperty property1 = BlockStateProperties.POWER;
-                            if (state.getOptionalValue(property1).isPresent() && state.getOptionalValue(property1).get() != 0) {
-                                player.level.setBlock(pos, state.setValue(property1, 0), 2);
-                                blocksWithEnergyEated++;
-                            }
-                            if (state.getOptionalValue(property).isPresent() && state.getOptionalValue(property).get()) {
-                                player.level.setBlock(pos, state.setValue(property, false), 2);
-                                blocksWithEnergyEated++;
-                            }
-                            HUPlayer.getCap(player).sync();
-                        }
-                    });
+    public void onKeyInput(PlayerEntity player, Map<Integer, Boolean> map) {
+        super.onKeyInput(player, map);
+        if (map.get(1)) {
+
+        }
+        if (map.get(5)) {
+            BlockPos.betweenClosedStream(HUPlayerUtil.getCollisionBoxWithRange(HUPlayerUtil.getPlayerPos(player), 5)).forEach(pos -> {
+                if (!player.level.isClientSide) {
+                    BlockState state = player.level.getBlockState(pos);
+                    BooleanProperty property = state.getBlock() instanceof RedstoneLampBlock ? RedstoneLampBlock.LIT : BlockStateProperties.POWERED;
+                    IntegerProperty property1 = BlockStateProperties.POWER;
+                    if (state.getOptionalValue(property1).isPresent() && state.getOptionalValue(property1).get() != 0) {
+                        player.level.setBlock(pos, state.setValue(property1, 0), 2);
+                        blocksWithEnergyEated++;
+                    }
+                    if (state.getOptionalValue(property).isPresent() && state.getOptionalValue(property).get()) {
+                        player.level.setBlock(pos, state.setValue(property, false), 2);
+                        blocksWithEnergyEated++;
+                    }
+                    HUPlayer.getCap(player).sync();
                 }
+            });
         }
     }
 

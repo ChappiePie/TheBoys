@@ -2,6 +2,22 @@
 	"abilities": {
 		"starlight_powers": {
 			"ability": "theboys:starlight"
+		},
+		"starlight_projectile": {
+			"ability": "heroesunited:projectile",
+			"entity": "theboys:lightning_projectile",
+			"nbt": {
+				"color": [255, 255, 0],
+				"type": "starlight",
+				"gravity": 0,
+				"damage": 5,
+				"lifetime": 60
+			},
+			"cooldown": 40,
+			"key": {
+				"id": 2,
+				"pressType": "action"
+			}
 		}
 	}
 }

@@ -9,8 +9,15 @@
 			}
 		},
 		"stormfront_lightning_projectile": {
-			"ability": "theboys:lightning_projectile",
-			"color": [129, 48, 156],
+			"ability": "heroesunited:projectile",
+			"entity": "theboys:lightning_projectile",
+			"nbt": {
+				"color": [129, 48, 156],
+				"type": "lightning",
+				"gravity": 0,
+				"damage": 4,
+				"lifetime": 60
+			},
 			"cooldown": 40,
 			"key": {
 				"id": 2,
@@ -23,7 +30,7 @@
 			"color": [129, 48, 156],
 			"key": {
 				"id": 3,
-				"pressType": "action"
+				"pressType": "held"
 			}
 		}
 	}
