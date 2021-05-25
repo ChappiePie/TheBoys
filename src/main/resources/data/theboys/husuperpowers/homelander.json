@@ -4,7 +4,7 @@
 			"title": {
 				"translate": "ability.theboys.lasers_from_eyes"
 			},
-			"ability": "theboys:lasers_from_eyes",
+			"ability": "heroesunited:heat_vision",
 			"color": [255, 0, 0, 255],
 			"active": true, "hidden": true,
 			"key": {
@@ -34,6 +34,7 @@
 		},
 		"homelander_fire_immunity": {
 			"ability": "heroesunited:damage_immunity",
+			"active": true, "hidden": true,
 			"damage_sources": ["lava", "onFire", "inFire", "hotFloor"]
 		},
 		"homelander_health": {

@@ -30,7 +30,7 @@ public class LightningFromArmsAbility extends JSONAbility {
     @Override
     public void action(PlayerEntity player) {
         super.action(player);
-        if (enabled) {
+        if (getEnabled()) {
             HUPlayerUtil.makeLaserLooking(player, 3);
         }
     }
@@ -38,7 +38,7 @@ public class LightningFromArmsAbility extends JSONAbility {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void render(PlayerRenderer renderer, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (enabled) {
+        if (getEnabled()) {
             double distance = player.position().add(0, player.getEyeHeight(), 0).distanceTo(player.getLookAngle().scale(3));
             for (int i = 0; i < 3; i++) {
                 matrix.pushPose();
@@ -55,7 +55,7 @@ public class LightningFromArmsAbility extends JSONAbility {
     @Override
     public void setRotationAngles(HUSetRotationAnglesEvent event) {
         super.setRotationAngles(event);
-        if (enabled) {
+        if (getEnabled()) {
             if (event.getPlayer().getMainArm() == HandSide.RIGHT) {
                 event.getPlayerModel().rightArm.xRot = (float) Math.toRadians(event.getPlayer().xRot - 90);
 
@@ -78,7 +78,7 @@ public class LightningFromArmsAbility extends JSONAbility {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void renderFirstPersonArm(PlayerRenderer renderer, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn, AbstractClientPlayerEntity player, HandSide side) {
-        if (enabled) {
+        if (getEnabled()) {
             HUClientUtil.drawArmWithLightning(matrix, bufferIn, renderer, player, side, 4, packedLightIn, HUJsonUtils.getColor(this.getJsonObject()));
         }
     }

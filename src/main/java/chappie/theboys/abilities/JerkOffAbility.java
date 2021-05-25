@@ -17,7 +17,7 @@ public class JerkOffAbility extends JSONAbility {
     @OnlyIn(Dist.CLIENT)
     @Override
     public void setRotationAngles(HUSetRotationAnglesEvent event) {
-        if (this.enabled) {
+        if (this.getEnabled()) {
             float f = MathHelper.cos(event.getAgeInTicks()) * 24;
             float rotationX = (float) Math.toRadians(-(event.getPlayer().isCrouching() ? 5F - f : 30F + f));
             if (event.getPlayer().getMainArm() == HandSide.RIGHT) {
