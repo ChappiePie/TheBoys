@@ -21,6 +21,14 @@
 				"pressType": "held"
 			}
 		},
+		"homelander_jerk_off": {
+			"ability": "theboys:super_hearing",
+			"active": true, "hidden": true,
+			"key": {
+				"id": 4,
+				"pressType": "held"
+			}
+		},
 		"homelander_flight": {
 			"ability": "heroesunited:flight",
 			"title": {

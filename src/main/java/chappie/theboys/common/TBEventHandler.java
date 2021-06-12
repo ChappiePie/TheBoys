@@ -1,10 +1,12 @@
 package chappie.theboys.common;
 
+import chappie.theboys.abilities.IAbilityTick;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
@@ -12,6 +14,17 @@ import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
 import xyz.heroesunited.heroesunited.common.abilities.FlightAbility;
 
 public class TBEventHandler {
+
+    @SubscribeEvent
+    public void playerTick(TickEvent.PlayerTickEvent e) {
+        if (e.phase == TickEvent.Phase.END) {
+            AbilityHelper.getAbilities(e.player).forEach(type -> {
+                if (type instanceof IAbilityTick) {
+                    ((IAbilityTick) type).tick(e.player, e.side);
+                }
+            });
+        }
+    }
 
     @SubscribeEvent
     public void livingFall(LivingFallEvent e) {
