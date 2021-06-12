@@ -6,6 +6,7 @@ import chappie.theboys.common.TBEventHandler;
 import chappie.theboys.common.capability.BoysCap;
 import chappie.theboys.common.capability.IBoys;
 import chappie.theboys.common.entities.TBEntities;
+import chappie.theboys.common.items.InjectionItem;
 import chappie.theboys.common.items.TBItems;
 import chappie.theboys.network.TBNetworking;
 import net.minecraft.item.ItemModelsProperties;
@@ -59,6 +60,6 @@ public class TheBoys {
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
         ItemModelsProperties.register(TBItems.INJECTION, new ResourceLocation(TheBoys.MODID, "injection"),
-                (stack, clientWorld, livingEntity) -> TBItems.INJECTION.getCompoundV(stack) ? 1.0F : 0F);
+                (stack, clientWorld, livingEntity) -> InjectionItem.getCompoundV(stack) ? 1.0F : 0F);
     }
 }

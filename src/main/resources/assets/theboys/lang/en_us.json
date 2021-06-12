@@ -1,19 +1,24 @@
 {
-  "item.theboys.atrain_head": "A-Train's helmet",
-  "item.theboys.atrain_chest": "A-Train's chest",
-  "item.theboys.atrain_legs": "A-Train's legs",
-  "item.theboys.atrain_feet": "A-Train's boots",
-  "item.theboys.homelander_chest": "Homelander chest",
-  "item.theboys.homelander_legs": "Homelander legs",
-  "item.theboys.homelander_feet": "Homelander boots",
+  "item.theboys.atrain_head": "A-Train Helmet",
+  "item.theboys.atrain_chest": "A-Train Chest",
+  "item.theboys.atrain_legs": "A-Train Leggings",
+  "item.theboys.atrain_feet": "A-Train Boots",
+  "item.theboys.homelander_chest": "Homelander Chest",
+  "item.theboys.homelander_legs": "Homelander Leggings",
+  "item.theboys.homelander_feet": "Homelander Boots",
+  "item.theboys.starlight_chest": "Starlight Chest",
+  "item.theboys.starlight_feet": "Starlight Boots",
 
   "theseven.motto": "The Seven: Let justice be done though the heavens fall.",
 
   "suits.theboys.atrain": "A-Train's",
   "suits.theboys.homelander": "Homelander",
+  "suits.theboys.starlight": "Starlight",
 
   "superpower.theboys.homelander": "Homelander",
   "superpower.theboys.atrain": "A-Train",
+  "superpower.theboys.starlight": "Starlight",
+  "superpower.theboys.stormfront": "A-",
 
   "ability.theboys.lasers_from_eyes": "Lasers from eyes",
   "ability.theboys.flight": "Flight",

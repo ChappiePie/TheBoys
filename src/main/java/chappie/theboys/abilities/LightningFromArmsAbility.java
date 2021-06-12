@@ -1,21 +1,16 @@
 package chappie.theboys.abilities;
 
-import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.HandSide;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.client.events.HUSetRotationAnglesEvent;
-import xyz.heroesunited.heroesunited.common.abilities.Ability;
-import xyz.heroesunited.heroesunited.common.abilities.EnergyLaserAbility;
 import xyz.heroesunited.heroesunited.common.abilities.JSONAbility;
 import xyz.heroesunited.heroesunited.util.HUClientUtil;
 import xyz.heroesunited.heroesunited.util.HUJsonUtils;
@@ -39,7 +34,8 @@ public class LightningFromArmsAbility extends JSONAbility {
     @Override
     public void render(PlayerRenderer renderer, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (getEnabled()) {
-            double distance = player.position().add(0, player.getEyeHeight(), 0).distanceTo(player.getLookAngle().scale(3));
+            Vector3d vec = new Vector3d(Math.max(4, player.getLookAngle().x), Math.max(4, player.getLookAngle().y), Math.max(4, player.getLookAngle().z));
+            double distance = player.position().add(0, player.getEyeHeight(), 0).distanceTo(vec);
             for (int i = 0; i < 3; i++) {
                 matrix.pushPose();
                 renderer.getModel().translateToHand(player.getMainArm(), matrix);
@@ -79,7 +75,18 @@ public class LightningFromArmsAbility extends JSONAbility {
     @Override
     public void renderFirstPersonArm(PlayerRenderer renderer, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn, AbstractClientPlayerEntity player, HandSide side) {
         if (getEnabled()) {
-            HUClientUtil.drawArmWithLightning(matrix, bufferIn, renderer, player, side, 4, packedLightIn, HUJsonUtils.getColor(this.getJsonObject()));
+            matrix.pushPose();
+            ModelRenderer modelRenderer = side == HandSide.LEFT ? renderer.getModel().leftArm : renderer.getModel().rightArm;
+            modelRenderer.xRot = modelRenderer.yRot = modelRenderer.zRot = 0;
+            renderer.getModel().translateToHand(side, matrix);
+            for (int i = 0; i < 3; i++) {
+                matrix.pushPose();
+                matrix.scale(0.05F, 0.06F, 0.05F);
+                matrix.translate(i * (side == HandSide.LEFT ? 1 : -1), 10, 0);
+                HUClientUtil.renderLightning(player.level.random, matrix, bufferIn, packedLightIn, 4, i, HUJsonUtils.getColor(this.getJsonObject()));
+                matrix.popPose();
+            }
+            matrix.popPose();
         }
     }
 }

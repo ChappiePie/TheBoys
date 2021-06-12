@@ -29,9 +29,9 @@ public class LightningProjectileRenderer extends EntityRenderer<LightningProject
             matrixStack.mulPose(Vector3f.ZP.rotationDegrees(MathHelper.lerp(partialTicks, entity.xRotO, entity.xRot) + 90.0F));
             matrixStack.translate(0.25, -0.5, 0);
             if (entity.getLightningType() != null && entity.getLightningType().equals(LightningProjectile.Type.STARLIGHT)) {
-                float r = 0.15F;
+                float r = 2F;
                 AxisAlignedBB box = new AxisAlignedBB(-r, -r, -r, r, r, r);
-                HUClientUtil.renderAura(matrixStack, bufferIn.getBuffer(RenderType.lightning()), box, 0.0625F / 2, entity.getColor(), packedLightIn, entity.tickCount);
+                HUClientUtil.renderAura(matrixStack, bufferIn.getBuffer(RenderType.lightning()), box, 0.5F, entity.getColor(), packedLightIn, entity.tickCount);
             } else {
                 HUClientUtil.renderLightning(entity.level.random, matrixStack, bufferIn, packedLightIn, 5, 1, entity.getColor());
             }

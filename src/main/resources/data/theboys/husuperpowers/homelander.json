@@ -6,6 +6,7 @@
 			},
 			"ability": "heroesunited:heat_vision",
 			"color": [255, 0, 0, 255],
+			"distance": 20,
 			"active": true, "hidden": true,
 			"key": {
 				"id": 1,

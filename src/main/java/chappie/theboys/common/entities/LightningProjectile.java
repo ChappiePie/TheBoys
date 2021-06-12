@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.IntNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.IPacket;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -18,12 +19,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
 
-public class LightningProjectile extends ThrowableEntity {
+public class LightningProjectile extends ThrowableEntity implements IEntityAdditionalSpawnData {
 
     private Type lightningType;
     private int damage;
@@ -99,8 +101,8 @@ public class LightningProjectile extends ThrowableEntity {
             }
 
         }
-        this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.CAMPFIRE_CRACKLE, SoundCategory.WEATHER, 10000.0F, 0.8F + this.random.nextFloat() * 0.2F);
-        this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundCategory.WEATHER, 2.0F, 0.5F + this.random.nextFloat() * 0.2F);
+        this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_HURT_ON_FIRE, SoundCategory.AMBIENT, 10000.0F, 0.5F + this.random.nextFloat() * 0.2F);
+        //this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundCategory.WEATHER, 2.0F, 0.5F + this.random.nextFloat() * 0.2F);
 
     }
 
@@ -130,6 +132,18 @@ public class LightningProjectile extends ThrowableEntity {
         super.addAdditionalSaveData(compound);
         compound.putFloat("damage", this.damage);
         compound.putFloat("gravity", this.gravity);
+        serialize(compound);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundNBT compound) {
+        super.readAdditionalSaveData(compound);
+        this.damage = compound.getInt("damage");
+        this.gravity = compound.getFloat("gravity");
+        deserialize(compound);
+    }
+
+    public void serialize(CompoundNBT compound) {
         compound.putInt("lifetime", lifetime);
         ListNBT listNBT = new ListNBT();
         listNBT.add(IntNBT.valueOf(this.color.getRed()));
@@ -139,15 +153,21 @@ public class LightningProjectile extends ThrowableEntity {
         compound.putString("lightningType", lightningType.name);
     }
 
-    @Override
-    public void readAdditionalSaveData(CompoundNBT compound) {
-        super.readAdditionalSaveData(compound);
+    private void deserialize(CompoundNBT compound) {
         ListNBT listNBT = compound.getList("color", Constants.NBT.TAG_INT);
-        this.damage = compound.getInt("damage");
-        this.gravity = compound.getFloat("gravity");
         this.lifetime = compound.getInt("lifetime");
         this.color = new Color(listNBT.getInt(0), listNBT.getInt(1), listNBT.getInt(2));
         this.lightningType = Type.getByName(compound.getString("lightningType"));
+    }
+
+    @Override
+    public void writeSpawnData(PacketBuffer buffer) {
+        buffer.writeNbt(this.serializeNBT());
+    }
+
+    @Override
+    public void readSpawnData(PacketBuffer additionalData) {
+        this.deserialize(additionalData.readNbt());
     }
 
     public enum Type {
