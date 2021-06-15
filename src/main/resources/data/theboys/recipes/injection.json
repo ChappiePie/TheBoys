@@ -1,0 +1,26 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "  #",
+        " G ",
+        "I i"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:flint"
+        },
+        "G": {
+            "item": "minecraft:glass"
+        },
+        "I": {
+            "item": "minecraft:iron_nugget"
+        },
+        "i": {
+            "item": "minecraft:iron_ingot"
+        }
+    },
+    "result": {
+        "item": "theboys:injection",
+        "count": 1
+    }
+}
