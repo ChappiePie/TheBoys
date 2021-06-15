@@ -21,7 +21,7 @@
 				"pressType": "held"
 			}
 		},
-		"homelander_jerk_off": {
+		"homelander_super_hearing": {
 			"ability": "theboys:super_hearing",
 			"active": true, "hidden": true,
 			"key": {
@@ -45,6 +45,20 @@
 			"ability": "heroesunited:damage_immunity",
 			"active": true, "hidden": true,
 			"damage_sources": ["lava", "onFire", "inFire", "hotFloor"]
+		},
+		"homelander_overlay": {
+			"ability": "theboys:overlay",
+			"active": true, "hidden": true,
+			"layer": "theboys:homelander",
+			"inflate": 0.01,
+			"visibility_parts": ["head"],
+			"conditions": [
+				{
+					"type": "theboys:ability_enabled",
+					"method": "canBeEnabled",
+					"ability": "homelander_lasers"
+				}
+			]
 		},
 		"homelander_health": {
 			"ability": "heroesunited:attribute_modifier",
