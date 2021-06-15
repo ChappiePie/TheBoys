@@ -61,7 +61,7 @@
 			]
 		},
 		"homelander_health": {
-			"ability": "heroesunited:attribute_modifier",
+			"ability": "theboys:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
 				"name": "minecraft:generic.max_health",
@@ -70,7 +70,7 @@
 			}
 		},
 		"homelander_jump_boost": {
-			"ability": "heroesunited:attribute_modifier",
+			"ability": "theboys:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
 				"name": "heroesunited:jump_boost",
@@ -79,7 +79,7 @@
 			}
 		},
 		"homelander_strength": {
-			"ability": "heroesunited:attribute_modifier",
+			"ability": "theboys:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
 				"name": "minecraft:generic.attack_damage",
@@ -88,7 +88,7 @@
 			}
 		},
 		"homelander_fall_resistance": {
-			"ability": "heroesunited:attribute_modifier",
+			"ability": "theboys:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
 				"name": "heroesunited:fall_resistance",

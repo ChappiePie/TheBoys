@@ -11,7 +11,7 @@
 			}
 		},
 		"atrain_health": {
-			"ability": "heroesunited:attribute_modifier",
+			"ability": "theboys:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
 				"name": "minecraft:generic.max_health",
@@ -20,7 +20,7 @@
 			}
 		},
 		"atrain_strength": {
-			"ability": "heroesunited:attribute_modifier",
+			"ability": "theboys:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
 				"name": "minecraft:generic.attack_damage",
@@ -29,7 +29,7 @@
 			}
 		},
 		"atrain_fall_resistance": {
-			"ability": "heroesunited:attribute_modifier",
+			"ability": "theboys:attribute_modifier",
 			"active": true, "hidden": true,
 			"attribute": {
 				"name": "heroesunited:fall_resistance",

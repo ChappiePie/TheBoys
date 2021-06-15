@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class ScrapItem extends ToolItem implements IAnimatable {
 
-    public static final HUItemTier IRON_SCRAP = new HUItemTier(2, 350, 8.0F, 6.0F, 12, () -> Ingredient.of(Items.IRON_INGOT));
+    public static final HUItemTier IRON_SCRAP = new HUItemTier(2, 350, 8.0F, 3.0F, 12, () -> Ingredient.of(Items.IRON_INGOT));
     private static final Set<Block> DIGGABLES = ImmutableSet.of(Blocks.ACTIVATOR_RAIL, Blocks.DETECTOR_RAIL, Blocks.POWERED_RAIL, Blocks.RAIL, Blocks.STONE_BUTTON, Blocks.STONE_PRESSURE_PLATE, Blocks.PISTON, Blocks.STICKY_PISTON, Blocks.PISTON_HEAD);
 
     public ScrapItem(float attackDamageBaseline, float attackSpeed, Item.Properties properties) {

@@ -12,7 +12,7 @@ public class TBItems {
 
     public static final Item COMPOUND_V = register("compound_v", new Item(new Item.Properties().tab(ItemGroup.TAB_TOOLS).stacksTo(1)));
     public static final InjectionItem INJECTION = register("injection", new InjectionItem(new Item.Properties().tab(ItemGroup.TAB_TOOLS).stacksTo(1)));
-    public static final ScrapItem SCRAP = register("scrap", new ScrapItem(6.0F, -3.1F, new Item.Properties()));
+    public static final ScrapItem SCRAP = register("scrap", new ScrapItem(3.0F, -3.1F, new Item.Properties()));
 
     private static <T extends Item> T register(String name, T item) {
         ITEMS.register(name, () -> item);
