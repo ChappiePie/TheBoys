@@ -9,6 +9,7 @@ import chappie.theboys.common.entities.TBEntities;
 import chappie.theboys.common.items.InjectionItem;
 import chappie.theboys.common.items.TBItems;
 import chappie.theboys.network.TBNetworking;
+import chappie.theboys.util.TBRecipeSerializer;
 import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -38,6 +39,7 @@ public class TheBoys {
         bus.register(this);
 
         TBItems.ITEMS.register(bus);
+        TBRecipeSerializer.RECIPE_SERIALIZERS.register(bus);
 
         MinecraftForge.EVENT_BUS.register(new TBEventHandler());
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new TBClientEventHandler()));
