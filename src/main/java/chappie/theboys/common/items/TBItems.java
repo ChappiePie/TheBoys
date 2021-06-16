@@ -10,7 +10,7 @@ public class TBItems {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, TheBoys.MODID);
 
-    public static final Item COMPOUND_V = register("compound_v", new Item(new Item.Properties().tab(ItemGroup.TAB_TOOLS).stacksTo(1)));
+    public static final VialItem VIAL = register("vial", new VialItem(new Item.Properties().tab(ItemGroup.TAB_TOOLS).stacksTo(1)));
     public static final InjectionItem INJECTION = register("injection", new InjectionItem(new Item.Properties().tab(ItemGroup.TAB_TOOLS).stacksTo(1)));
     public static final ScrapItem SCRAP = register("scrap", new ScrapItem(3.0F, -3.1F, new Item.Properties()));
 

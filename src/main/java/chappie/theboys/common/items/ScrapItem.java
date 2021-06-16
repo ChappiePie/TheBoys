@@ -8,7 +8,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.*;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraftforge.common.ToolType;
 import software.bernie.HU.geckolib3.core.IAnimatable;
 import software.bernie.HU.geckolib3.core.manager.AnimationData;
 import software.bernie.HU.geckolib3.core.manager.AnimationFactory;
@@ -22,7 +21,7 @@ public class ScrapItem extends ToolItem implements IAnimatable {
     private static final Set<Block> DIGGABLES = ImmutableSet.of(Blocks.ACTIVATOR_RAIL, Blocks.DETECTOR_RAIL, Blocks.POWERED_RAIL, Blocks.RAIL, Blocks.STONE_BUTTON, Blocks.STONE_PRESSURE_PLATE, Blocks.PISTON, Blocks.STICKY_PISTON, Blocks.PISTON_HEAD);
 
     public ScrapItem(float attackDamageBaseline, float attackSpeed, Item.Properties properties) {
-        super(attackDamageBaseline, attackSpeed, IRON_SCRAP, DIGGABLES, properties.addToolType(ToolType.PICKAXE, IRON_SCRAP.getLevel()).tab(ItemGroup.TAB_TOOLS).stacksTo(1).setISTER(() -> ScrapRenderer::new));
+        super(attackDamageBaseline, attackSpeed, IRON_SCRAP, DIGGABLES, properties.tab(ItemGroup.TAB_TOOLS).stacksTo(1).setISTER(() -> ScrapRenderer::new));
     }
 
     public boolean isCorrectToolForDrops(BlockState state) {

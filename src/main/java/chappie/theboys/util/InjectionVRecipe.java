@@ -25,7 +25,7 @@ public class InjectionVRecipe extends SpecialRecipe {
                 if (itemstack.getItem() instanceof InjectionItem) {
                     ++i;
                 } else {
-                    if (itemstack.getItem() != TBItems.COMPOUND_V) {
+                    if (itemstack.getItem() != TBItems.VIAL || !(itemstack.getOrCreateTag().getString("Injection").equals("compound_v"))) {
                         return false;
                     }
 
