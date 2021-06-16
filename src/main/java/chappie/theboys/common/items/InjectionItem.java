@@ -6,11 +6,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.UseAction;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
+import xyz.heroesunited.heroesunited.hupacks.HUPackSuperpowers;
 
 public class InjectionItem extends Item {
     public InjectionItem(Properties propertiesIn) {
@@ -43,25 +41,33 @@ public class InjectionItem extends Item {
         if (livingEntity instanceof PlayerEntity && timeLeft <= 35980) {
             PlayerEntity player = (PlayerEntity) livingEntity;
             player.getCapability(BoysCap.CAPABILITY).ifPresent(a -> {
-                if (!getCompoundV(stack) && a.haveCompoundV()) {
-                    setCompoundV(stack, true);
-                    a.setCompoundV(false);
-                } else if (getCompoundV(stack) && !a.haveCompoundV()) {
+                if (StringUtils.isNullOrEmpty(getInjection(stack))) {
+                    if (a.haveCompoundV()) {
+                        setInjection(stack, "compound_v");
+                        a.setCompoundV(false);
+                    } else if (HUPackSuperpowers.hasSuperpowers(player)) {
+                        setInjection(stack, HUPackSuperpowers.getSuperpower(player).toString());
+                        HUPackSuperpowers.removeSuperpower(player);
+                    }
+                } else if (getInjection(stack).equals("compound_v") && !a.haveCompoundV()) {
                     a.setCompoundV(true);
-                    setCompoundV(stack, false);
+                    setInjection(stack, "");
+                }else if (!getInjection(stack).equals("compound_v") && !HUPackSuperpowers.hasSuperpowers(player)) {
+                    if (!worldIn.isClientSide) {
+                        HUPackSuperpowers.setSuperpower(player, HUPackSuperpowers.getSuperpower(new ResourceLocation(getInjection(stack))));
+                    }
+                    setInjection(stack, "");
                 }
             });
         }
     }
 
-    public static boolean getCompoundV(ItemStack stack) {
-        CompoundNBT nbt = stack.getTag();
-        return nbt != null && nbt.getBoolean("compound_v");
+    public static String getInjection(ItemStack stack) {
+        return stack.getOrCreateTag().getString("Injection");
     }
 
-    public static ItemStack setCompoundV(ItemStack stack, boolean compound_v) {
-        CompoundNBT nbt = stack.getOrCreateTag();
-        nbt.putBoolean("compound_v", compound_v);
+    public static ItemStack setInjection(ItemStack stack, String injection) {
+        stack.getOrCreateTag().putString("Injection", injection);
         return stack;
     }
 }

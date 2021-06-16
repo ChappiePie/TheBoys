@@ -6,16 +6,14 @@ import chappie.theboys.common.TBEventHandler;
 import chappie.theboys.common.capability.BoysCap;
 import chappie.theboys.common.capability.IBoys;
 import chappie.theboys.common.entities.TBEntities;
-import chappie.theboys.common.items.InjectionItem;
 import chappie.theboys.common.items.TBItems;
 import chappie.theboys.common.items.VialItem;
 import chappie.theboys.network.TBNetworking;
 import chappie.theboys.util.TBRecipeSerializer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemModelsProperties;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -63,8 +61,12 @@ public class TheBoys {
         TBEntities.EntityRenderers();
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
         AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
-        ItemModelsProperties.register(TBItems.INJECTION, new ResourceLocation(TheBoys.MODID, "injection"),
-                (stack, clientWorld, livingEntity) -> InjectionItem.getCompoundV(stack) ? 1.0F : 0F);
-        Minecraft.getInstance().getItemColors().register((stack, color) -> ((VialItem) stack.getItem()).getColor(stack, color), TBItems.VIAL);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public void registerItemColor(ColorHandlerEvent.Item event) {
+        event.getItemColors().register((stack, color) -> VialItem.getColor(stack, color), TBItems.INJECTION);
+        event.getItemColors().register((stack, color) -> VialItem.getColor(stack, color), TBItems.VIAL);
     }
 }

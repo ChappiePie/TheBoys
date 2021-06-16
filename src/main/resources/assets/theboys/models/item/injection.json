@@ -1,20 +1,7 @@
 {
 	"parent": "minecraft:item/handheld",
 	"textures": {
-		"layer0": "theboys:items/injection"
-	},
-	"overrides": [
-		{
-			"predicate": {
-				"theboys:injection": 0.0
-			},
-			"model": "theboys:item/injection"
-		},
-		{
-			"predicate": {
-				"theboys:injection": 1.0
-			},
-			"model": "theboys:item/injection_compound_v"
-		}
-	]
+		"layer0": "theboys:items/injection_fluid",
+		"layer1": "theboys:items/injection"
+	}
 }

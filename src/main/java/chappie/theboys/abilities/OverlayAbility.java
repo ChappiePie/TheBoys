@@ -14,7 +14,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.common.abilities.JSONAbility;
-import xyz.heroesunited.heroesunited.hupacks.HUPackLayers;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 import xyz.heroesunited.heroesunited.util.PlayerPart;
 
@@ -29,8 +28,8 @@ public class OverlayAbility extends JSONAbility {
     public void render(PlayerRenderer renderer, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         super.render(renderer, matrix, bufferIn, packedLightIn, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
         if (getEnabled()) {
-            HUPackLayers.Layer layer = HUPackLayers.getInstance().getLayer(new ResourceLocation(JSONUtils.getAsString(getJsonObject(), "layer")));
-            IVertexBuilder builder = bufferIn.getBuffer(RenderType.entityTranslucent(layer.getTexture("overlay")));
+            ResourceLocation location = new ResourceLocation(JSONUtils.getAsString(getJsonObject(), "texture"));
+            IVertexBuilder builder = bufferIn.getBuffer(RenderType.entityTranslucent(location));
             PlayerModel model = new PlayerModel(JSONUtils.getAsFloat(getJsonObject(), "inflate", 0), HUPlayerUtil.haveSmallArms(player));
             renderer.getModel().copyPropertiesTo(model);
             model.jacket.copyFrom(renderer.getModel().jacket);

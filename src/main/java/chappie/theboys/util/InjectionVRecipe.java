@@ -2,11 +2,13 @@ package chappie.theboys.util;
 
 import chappie.theboys.common.items.InjectionItem;
 import chappie.theboys.common.items.TBItems;
+import chappie.theboys.common.items.VialItem;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 
 public class InjectionVRecipe extends SpecialRecipe {
@@ -25,7 +27,7 @@ public class InjectionVRecipe extends SpecialRecipe {
                 if (itemstack.getItem() instanceof InjectionItem) {
                     ++i;
                 } else {
-                    if (itemstack.getItem() != TBItems.VIAL || !(itemstack.getOrCreateTag().getString("Injection").equals("compound_v"))) {
+                    if (itemstack.getItem() != TBItems.VIAL || StringUtils.isNullOrEmpty(itemstack.getOrCreateTag().getString("Injection"))) {
                         return false;
                     }
 
@@ -41,7 +43,13 @@ public class InjectionVRecipe extends SpecialRecipe {
 
     @Override
     public ItemStack assemble(CraftingInventory inv) {
-        return InjectionItem.setCompoundV(TBItems.INJECTION.getDefaultInstance(), true);
+        for(int i = 0; i < inv.getContainerSize(); ++i) {
+            ItemStack stack = inv.getItem(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof VialItem) {
+                return InjectionItem.setInjection(TBItems.INJECTION.getDefaultInstance(), stack.getOrCreateTag().getString("Injection"));
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     @Override

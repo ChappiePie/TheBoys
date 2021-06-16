@@ -8,7 +8,7 @@ import xyz.heroesunited.heroesunited.common.abilities.AttributeModifierAbility;
 public class TBAttributeModifierAbility extends AttributeModifierAbility {
 
     public TBAttributeModifierAbility() {
-       super(TBAbilityTypes.OVERLAY);
+       super(TBAbilityTypes.TB_ATTRIBUTE);
     }
 
     @Override

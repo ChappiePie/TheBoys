@@ -48,10 +48,10 @@
 		},
 		"homelander_overlay": {
 			"ability": "theboys:overlay",
-			"active": true, "hidden": true,
-			"layer": "theboys:homelander",
+			"texture": "theboys:textures/models/red_eyes.png",
 			"inflate": 0.01,
 			"visibility_parts": ["head"],
+			"active": true, "hidden": true,
 			"conditions": [
 				{
 					"type": "theboys:ability_enabled",
