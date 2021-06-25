@@ -6,7 +6,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.client.events.HUSetRotationAnglesEvent;
 import xyz.heroesunited.heroesunited.common.abilities.JSONAbility;
-import xyz.heroesunited.heroesunited.util.HUClientUtil;
 
 public class JerkOffAbility extends JSONAbility {
 
@@ -27,7 +26,6 @@ public class JerkOffAbility extends JSONAbility {
                 event.getPlayerModel().leftArm.xRot = rotationX;
                 event.getPlayerModel().leftArm.zRot = (float) Math.toRadians(45F);
             }
-            HUClientUtil.copyAnglesToWear(event.getPlayerModel());
         }
     }
 }

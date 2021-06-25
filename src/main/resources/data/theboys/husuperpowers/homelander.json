@@ -13,11 +13,23 @@
 				"pressType": "held"
 			}
 		},
-		"homelander_jerk_off": {
-			"ability": "theboys:jerk_off",
+		"homelander_flight": {
+			"ability": "heroesunited:flight",
+			"title": {
+				"translate": "ability.theboys.flight"
+			},
+			"rotateArms": true, "active": true,
+			"hidden": true, "break_blocks": true,
+			"key": {
+				"id": 2,
+				"pressType": "toggle"
+			}
+		},
+		"homelander_super_lift": {
+			"ability": "theboys:super_lift",
 			"active": true, "hidden": true,
 			"key": {
-				"id": 5,
+				"id": 3,
 				"pressType": "held"
 			}
 		},
@@ -29,16 +41,12 @@
 				"pressType": "held"
 			}
 		},
-		"homelander_flight": {
-			"ability": "heroesunited:flight",
-			"title": {
-				"translate": "ability.theboys.flight"
-			},
-			"rotateArms": true, "active": true,
-			"hidden": true, "break_blocks": true,
+		"homelander_jerk_off": {
+			"ability": "theboys:jerk_off",
+			"active": true, "hidden": true,
 			"key": {
-				"id": 2,
-				"pressType": "toggle"
+				"id": 5,
+				"pressType": "held"
 			}
 		},
 		"homelander_fire_immunity": {
