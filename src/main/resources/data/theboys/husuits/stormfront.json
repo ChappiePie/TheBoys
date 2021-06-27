@@ -1,0 +1,42 @@
+{
+	"type": "heroesunited:default",
+	"armor_material": "leather",
+	"description": {
+		"translate": "theseven.motto"
+	},
+	"slots": {
+		"chest": "chest",
+		"legs": "legs",
+		"feet": "feet"
+	},
+	"visibility_parts": {
+		"body_wear": {
+			"show": false,
+			"slot": "chest"
+		},
+		"right_arm_wear": {
+			"show": false,
+			"slot": "chest"
+		},
+		"left_arm_wear": {
+			"show": false,
+			"slot": "chest"
+		},
+		"right_leg_wear": {
+			"show": false,
+			"slot": "feet"
+		},
+		"left_leg_wear": {
+			"show": false,
+			"slot": "feet"
+		},
+		"right_leg_wear": {
+			"show": false,
+			"slot": "legs"
+		},
+		"left_leg_wear": {
+			"show": false,
+			"slot": "legs"
+		}
+	}
+}
