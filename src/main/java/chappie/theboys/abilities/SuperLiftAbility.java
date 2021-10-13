@@ -37,7 +37,7 @@ public class SuperLiftAbility extends JSONAbility {
     public void action(PlayerEntity player) {
         super.action(player);
         if (this.dataManager.<Integer>getValue("cooldownLift") > 0) {
-            this.dataManager.set(player, "cooldownLift", this.dataManager.<Integer>getValue("cooldownLift") - 1);
+            this.dataManager.set("cooldownLift", this.dataManager.<Integer>getValue("cooldownLift") - 1);
         }
 
         if (this.getEnabled() && this.dataManager.<Integer>getValue("cooldownLift") == 0 && player.level instanceof ServerWorld) {
@@ -128,7 +128,7 @@ public class SuperLiftAbility extends JSONAbility {
         }
 
         world.getBlockTicks().copy(box, pos2);
-        this.dataManager.set(player, "cooldownLift", 20);
+        this.dataManager.set("cooldownLift", 20);
     }
 
     @OnlyIn(Dist.CLIENT)

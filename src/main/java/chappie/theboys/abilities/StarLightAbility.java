@@ -41,21 +41,21 @@ public class StarLightAbility extends Ability {
     public void onUpdate(PlayerEntity player) {
         super.onUpdate(player);
         if (this.dataManager.<Boolean>getValue("enabled")) {
-            this.dataManager.set(player, "ticks", this.dataManager.<Integer>getValue("ticks") + 1);
-        } else this.dataManager.set(player, "ticks", 0);
+            this.dataManager.set("ticks", this.dataManager.<Integer>getValue("ticks") + 1);
+        } else this.dataManager.set("ticks", 0);
 
         if (this.dataManager.<Integer>getValue("ticks") >= 1200 && this.dataManager.<Integer>getValue("energy_eated") > 50) {
-            this.dataManager.set(player, "energy_eated", this.dataManager.<Integer>getValue("energy_eated") - 50);
-            this.dataManager.set(player, "ticks", this.dataManager.<Integer>getValue("ticks") - 1200);
+            this.dataManager.set("energy_eated", this.dataManager.<Integer>getValue("energy_eated") - 50);
+            this.dataManager.set("ticks", this.dataManager.<Integer>getValue("ticks") - 1200);
         }
 
         if (this.dataManager.<Integer>getValue("ticks") >= 6000) {
-            this.dataManager.set(player, "enabled", false);
+            this.dataManager.set("enabled", false);
         }
 
         if (this.dataManager.<Integer>getValue("energy_eated") > 10 && !this.dataManager.<Boolean>getValue("enabled")) {
-            this.dataManager.set(player, "enabled", true);
-            this.dataManager.set(player, "energy_eated", this.dataManager.<Integer>getValue("energy_eated") - 10);
+            this.dataManager.set("enabled", true);
+            this.dataManager.set("energy_eated", this.dataManager.<Integer>getValue("energy_eated") - 10);
         }
     }
 
@@ -70,11 +70,11 @@ public class StarLightAbility extends Ability {
                     IntegerProperty property1 = BlockStateProperties.POWER;
                     if (state.getOptionalValue(property1).isPresent() && state.getOptionalValue(property1).get() != 0) {
                         player.level.setBlock(pos, state.setValue(property1, 0), 2);
-                        this.dataManager.set(player, "energy_eated", this.dataManager.<Integer>getValue("energy_eated") + 1);
+                        this.dataManager.set("energy_eated", this.dataManager.<Integer>getValue("energy_eated") + 1);
                     }
                     if (state.getOptionalValue(property).isPresent() && state.getOptionalValue(property).get()) {
                         player.level.setBlock(pos, state.setValue(property, false), 2);
-                        this.dataManager.set(player, "energy_eated", this.dataManager.<Integer>getValue("energy_eated") + 1);
+                        this.dataManager.set("energy_eated", this.dataManager.<Integer>getValue("energy_eated") + 1);
                     }
                     HUPlayer.getCap(player).sync();
                 }

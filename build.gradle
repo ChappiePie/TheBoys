@@ -69,10 +69,10 @@ minecraft {
 }
 
 repositories {
-    maven { url 'https://repo.repsy.io/mvn/heroesunited/default' }
+    maven { url 'https://maven.explodingcreeper.me/' }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:$minecraft_version-$forge_version"
-    compile "xyz.heroesunited:hu-core:$core_version"
+    implementation "xyz.heroesunited:hu-core:$core_version"
 }

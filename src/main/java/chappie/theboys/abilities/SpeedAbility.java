@@ -22,6 +22,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
 import xyz.heroesunited.heroesunited.common.abilities.suit.Suit;
 import xyz.heroesunited.heroesunited.util.HUJsonUtils;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
@@ -116,24 +117,20 @@ public class SpeedAbility extends Ability {
             resetSpeed(player);
         } else {
             setSpeedModifier(player, 1);
-            this.dataManager.set(player, "enabled", true);
+            this.dataManager.set("enabled", true);
         }
     }
 
     protected void resetSpeed(PlayerEntity player) {
-        this.dataManager.set(player, "speed_level", 0);
-        this.dataManager.set(player, "enabled", false);
-        if (player.getAttribute(Attributes.MOVEMENT_SPEED) != null && player.getAttribute(Attributes.MOVEMENT_SPEED).getModifier(UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409")) != null) {
-            player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"));
-        }
-        if (player.getAttribute(Attributes.ATTACK_SPEED) != null && player.getAttribute(Attributes.ATTACK_SPEED).getModifier(UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409")) != null) {
-            player.getAttribute(Attributes.ATTACK_SPEED).removeModifier(UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"));
-        }
+        this.dataManager.set("speed_level", 0);
+        this.dataManager.set("enabled", false);
+        AbilityHelper.setAttribute(player, "Speed", Attributes.MOVEMENT_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), 0, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        AbilityHelper.setAttribute(player, "Speed", Attributes.ATTACK_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), 0, AttributeModifier.Operation.MULTIPLY_TOTAL);
         player.maxUpStep = 0.6F;
     }
 
     protected void setSpeedModifier(PlayerEntity player, int amount) {
-        this.dataManager.set(player, "speed_level", amount);
+        this.dataManager.set("speed_level", amount);
         setAttribute(player, "Speed", Attributes.MOVEMENT_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), amount, AttributeModifier.Operation.MULTIPLY_TOTAL);
         setAttribute(player, "Speed", Attributes.ATTACK_SPEED, UUID.fromString("ab6f6cc0-4900-45ff-8e91-d35990e79409"), amount, AttributeModifier.Operation.MULTIPLY_TOTAL);
         player.maxUpStep = amount != 0 ? (int) MathHelper.clamp(this.dataManager.<Integer>getValue("speed_level"), 0, 5F) : 0.6F;
