@@ -25,7 +25,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
+import xyz.heroesunited.heroesunited.client.gui.AbilitiesScreen;
 import xyz.heroesunited.heroesunited.common.capabilities.HUCapStorage;
 import xyz.heroesunited.heroesunited.hupacks.HUPackSuit;
 
@@ -59,8 +59,8 @@ public class TheBoys {
     @SubscribeEvent
     public void setupClient(FMLClientSetupEvent event) {
         TBEntities.EntityRenderers();
-        AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
-        AbilityHelper.addTheme(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
+        AbilitiesScreen.themes.add(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
+        AbilitiesScreen.themes.add(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
     }
 
     @OnlyIn(Dist.CLIENT)

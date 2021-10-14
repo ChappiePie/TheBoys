@@ -26,8 +26,8 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
-            property "mixin.env.disableRefMap", "true"
-            arg "-mixin.config=heroesunited.mixins.json"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
                 theboys {
                     source sourceSets.main
@@ -37,15 +37,17 @@ minecraft {
 
         clientWithCredentials {
             parent runs.client
-            args '--username', 'ChappiePlayYT', '--uuid', '8464971c-f5ac-4eb5-87aa-511a0eec65f6', "-mixin.config=heroesunited.mixins.json"
+            args '--username', 'ChappiePie', '--uuid', '8464971c-f5ac-4eb5-87aa-511a0eec65f6'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
         }
 
         server {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
-            property "mixin.env.disableRefMap", "true"
-            arg "-mixin.config=heroesunited.mixins.json"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
                 theboys {
                     source sourceSets.main
@@ -57,7 +59,8 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
-            property "mixin.env.disableRefMap", "true"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             args '--mod', 'theboys', '--all', '--output', file('src/generated/resources/'), "-mixin.config=heroesunited.mixins.json"
             mods {
                 theboys {

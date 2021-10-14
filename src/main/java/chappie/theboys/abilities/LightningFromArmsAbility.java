@@ -26,7 +26,7 @@ public class LightningFromArmsAbility extends JSONAbility {
     public void action(PlayerEntity player) {
         super.action(player);
         if (getEnabled()) {
-            HUPlayerUtil.makeLaserLooking(player, 3);
+            HUPlayerUtil.makeLaserLooking(player, 3, 1);
         }
     }
 
