@@ -2,11 +2,11 @@ package chappie.theboys.client.render;
 
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.items.ScrapItem;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import software.bernie.HU.geckolib3.model.AnimatedGeoModel;
 import software.bernie.HU.geckolib3.renderers.geo.GeoItemRenderer;
 
@@ -34,7 +34,7 @@ public class ScrapRenderer extends GeoItemRenderer<ScrapItem> {
     }
 
     @Override
-    public RenderType getRenderType(ScrapItem animatable, float partialTicks, MatrixStack stack, @Nullable IRenderTypeBuffer renderTypeBuffer, @Nullable IVertexBuilder vertexBuilder, int packedLightIn, ResourceLocation textureLocation) {
+    public RenderType getRenderType(ScrapItem animatable, float partialTicks, PoseStack stack, @Nullable MultiBufferSource renderTypeBuffer, @Nullable VertexConsumer vertexBuilder, int packedLightIn, ResourceLocation textureLocation) {
         return RenderType.entityCutoutNoCull(textureLocation);
     }
 }

@@ -1,8 +1,8 @@
 package chappie.theboys.common.capability;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -12,11 +12,11 @@ import javax.annotation.Nullable;
 
 import static chappie.theboys.common.capability.BoysCap.CAPABILITY;
 
-public class BoysProvider implements ICapabilitySerializable<CompoundNBT> {
+public class BoysProvider implements ICapabilitySerializable<CompoundTag> {
 
     public LazyOptional<IBoys> instance;
 
-    public BoysProvider(PlayerEntity player) {
+    public BoysProvider(Player player) {
         instance = LazyOptional.of(() -> new BoysCap(player));
     }
 
@@ -27,12 +27,12 @@ public class BoysProvider implements ICapabilitySerializable<CompoundNBT> {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        return (CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, instance.orElseThrow(NullPointerException::new), null);
+    public CompoundTag serializeNBT() {
+        return instance.orElseThrow(() -> new IllegalArgumentException("HUPlayer must not be empty")).serializeNBT();
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
-        CAPABILITY.getStorage().readNBT(CAPABILITY, instance.orElseThrow(NullPointerException::new), null, nbt);
+    public void deserializeNBT(CompoundTag nbt) {
+        instance.orElseThrow(() -> new IllegalArgumentException("HUPlayer must not be empty!")).deserializeNBT(nbt);
     }
 }

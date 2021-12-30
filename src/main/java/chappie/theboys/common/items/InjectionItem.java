@@ -1,13 +1,17 @@
 package chappie.theboys.common.items;
 
 import chappie.theboys.common.capability.BoysCap;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringUtil;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 import xyz.heroesunited.heroesunited.hupacks.HUPackSuperpowers;
 
 public class InjectionItem extends Item {
@@ -16,8 +20,8 @@ public class InjectionItem extends Item {
     }
 
     @Override
-    public UseAction getUseAnimation(ItemStack stack) {
-        return UseAction.BOW;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BOW;
     }
 
     @Override
@@ -26,22 +30,22 @@ public class InjectionItem extends Item {
     }
 
     @Override
-    public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity playerIn) {
+    public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity playerIn) {
         return stack;
     }
 
     @Override
-    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+    public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
         playerIn.startUsingItem(hand);
-        return new ActionResult(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
+        return new InteractionResultHolder(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));
     }
 
     @Override
-    public void releaseUsing(ItemStack stack, World worldIn, LivingEntity livingEntity, int timeLeft) {
-        if (livingEntity instanceof PlayerEntity && timeLeft <= 35980) {
-            PlayerEntity player = (PlayerEntity) livingEntity;
+    public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity livingEntity, int timeLeft) {
+        if (livingEntity instanceof Player && timeLeft <= 35980) {
+            Player player = (Player) livingEntity;
             player.getCapability(BoysCap.CAPABILITY).ifPresent(a -> {
-                if (StringUtils.isNullOrEmpty(getInjection(stack))) {
+                if (StringUtil.isNullOrEmpty(getInjection(stack))) {
                     if (a.haveCompoundV()) {
                         setInjection(stack, "compound_v");
                         a.setCompoundV(false);

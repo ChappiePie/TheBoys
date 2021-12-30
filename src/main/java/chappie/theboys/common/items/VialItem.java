@@ -1,11 +1,11 @@
 package chappie.theboys.common.items;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringUtil;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import xyz.heroesunited.heroesunited.hupacks.HUPackSuperpowers;
 
 public class VialItem extends Item {
@@ -15,7 +15,7 @@ public class VialItem extends Item {
     }
 
     @Override
-    public void fillItemCategory(ItemGroup itemGroup, NonNullList<ItemStack> items) {
+    public void fillItemCategory(CreativeModeTab itemGroup, NonNullList<ItemStack> items) {
         if (this.allowdedIn(itemGroup)) {
             items.add(new ItemStack(this));
             items.add(setInjection(new ItemStack(this), "compound_v"));
@@ -29,7 +29,7 @@ public class VialItem extends Item {
 
     public static int getColor(ItemStack stack, int color) {
         int id = getInjection(stack).hashCode();
-        if (color > 0 || StringUtils.isNullOrEmpty(getInjection(stack))) {
+        if (color > 0 || StringUtil.isNullOrEmpty(getInjection(stack))) {
             return 16777215;
         }
 

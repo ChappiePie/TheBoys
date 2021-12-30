@@ -1,7 +1,7 @@
 package chappie.theboys.abilities;
 
 import com.google.gson.JsonObject;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import xyz.heroesunited.heroesunited.common.abilities.suit.JsonSuit;
 
 import java.util.Map;

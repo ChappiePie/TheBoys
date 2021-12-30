@@ -3,21 +3,21 @@ package chappie.theboys.util;
 import chappie.theboys.common.items.InjectionItem;
 import chappie.theboys.common.items.TBItems;
 import chappie.theboys.common.items.VialItem;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StringUtils;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringUtil;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 
-public class InjectionVRecipe extends SpecialRecipe {
+public class InjectionVRecipe extends CustomRecipe {
     public InjectionVRecipe(ResourceLocation resourceLocation) {
         super(resourceLocation);
     }
 
     @Override
-    public boolean matches(CraftingInventory inv, World world) {
+    public boolean matches(CraftingContainer inv, Level world) {
         int i = 0;
         int j = 0;
 
@@ -27,7 +27,7 @@ public class InjectionVRecipe extends SpecialRecipe {
                 if (itemstack.getItem() instanceof InjectionItem) {
                     ++i;
                 } else {
-                    if (itemstack.getItem() != TBItems.VIAL || StringUtils.isNullOrEmpty(itemstack.getOrCreateTag().getString("Injection"))) {
+                    if (itemstack.getItem() != TBItems.VIAL || StringUtil.isNullOrEmpty(itemstack.getOrCreateTag().getString("Injection"))) {
                         return false;
                     }
 
@@ -42,7 +42,7 @@ public class InjectionVRecipe extends SpecialRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory inv) {
+    public ItemStack assemble(CraftingContainer inv) {
         for(int i = 0; i < inv.getContainerSize(); ++i) {
             ItemStack stack = inv.getItem(i);
             if (!stack.isEmpty() && stack.getItem() instanceof VialItem) {
@@ -58,7 +58,7 @@ public class InjectionVRecipe extends SpecialRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return TBRecipeSerializer.INJECTION_V;
     }
 }

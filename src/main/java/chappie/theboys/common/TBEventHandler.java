@@ -1,10 +1,10 @@
 package chappie.theboys.common;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
@@ -15,10 +15,9 @@ public class TBEventHandler {
 
     @SubscribeEvent
     public void livingFall(LivingFallEvent e) {
-        if (e.getEntityLiving() instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) e.getEntityLiving();
+        if (e.getEntityLiving() instanceof Player player) {
             for (Ability ability : AbilityHelper.getAbilities(player)) {
-                if (ability instanceof FlightAbility && JSONUtils.getAsBoolean(ability.getJsonObject(), "break_blocks", false) && e.getDistance() > 20) {
+                if (ability instanceof FlightAbility && GsonHelper.getAsBoolean(ability.getJsonObject(), "break_blocks", false) && e.getDistance() > 20) {
                     for (int x = 0; x < 5; x++) {
                         for (int y = 0; y < 5; y++) {
                             for (int z = 0; z < 5; z++) {

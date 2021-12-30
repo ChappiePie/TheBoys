@@ -1,41 +1,42 @@
 package chappie.theboys.common.entities;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.world.World;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
+import net.minecraftforge.network.NetworkHooks;
 
 import java.awt.*;
 
 public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     @OnlyIn(Dist.CLIENT)
-    public final BipedModel<AbstractClientPlayerEntity> model = new BipedModel<>(0);
+    public final HumanoidModel<AbstractClientPlayer> model = new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER_INNER_ARMOR));
     public float yBodyRot;
-    public PlayerEntity player;
+    public Player player;
     public int lifeTime;
     public Color color;
 
-    public TrailEntity(EntityType<TrailEntity> entityType, World world) {
+    public TrailEntity(EntityType<TrailEntity> entityType, Level world) {
         super(entityType, world);
         this.noPhysics = true;
         this.color = Color.RED;
         this.noCulling = true;
     }
 
-    public TrailEntity(World worldIn, PlayerEntity player, Color color, int lifeTime) {
+    public TrailEntity(Level worldIn, Player player, Color color, int lifeTime) {
         super(TBEntities.TRAIL, worldIn);
         this.noPhysics = true;
         this.noCulling = true;
@@ -43,11 +44,11 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         this.yBodyRot = player.yBodyRot;
         this.color = color;
         this.lifeTime = lifeTime;
-        this.moveTo(player.getX(), player.getY(), player.getZ(), player.yRot, player.xRot);
+        this.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
     }
 
     @Override
-    public EntitySize getDimensions(Pose poseIn) {
+    public EntityDimensions getDimensions(Pose poseIn) {
         if (player != null) {
             return player.getDimensions(poseIn);
         }
@@ -58,17 +59,17 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     public void tick() {
         super.tick();
         if (this.tickCount >= this.lifeTime) {
-            this.remove();
+            this.remove(RemovalReason.DISCARDED);
         }
     }
 
     @Override
-    public IPacket<?> getAddEntityPacket() {
+    public Packet<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Override
-    public void writeSpawnData(PacketBuffer buffer) {
+    public void writeSpawnData(FriendlyByteBuf buffer) {
         buffer.writeInt(this.lifeTime);
         buffer.writeUUID(this.player.getUUID());
 
@@ -78,14 +79,14 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     }
 
     @Override
-    public void readSpawnData(PacketBuffer additionalData) {
+    public void readSpawnData(FriendlyByteBuf additionalData) {
         this.lifeTime = additionalData.readInt();
         this.player = this.level.getPlayerByUUID(additionalData.readUUID());
 
         this.yBodyRot = player.yBodyRot;
 
-        if (player instanceof AbstractClientPlayerEntity) {
-            ((PlayerRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer((AbstractClientPlayerEntity) player)).getModel().copyPropertiesTo(this.model);
+        if (player instanceof AbstractClientPlayer) {
+            ((PlayerRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer((AbstractClientPlayer) player)).getModel().copyPropertiesTo(this.model);
         }
 
         this.color = new Color(additionalData.readInt(), additionalData.readInt(), additionalData.readInt());
@@ -98,6 +99,6 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     }
 
     protected void defineSynchedData() {}
-    protected void readAdditionalSaveData(CompoundNBT compound) {}
-    protected void addAdditionalSaveData(CompoundNBT compound) {}
+    protected void readAdditionalSaveData(CompoundTag compound) {}
+    protected void addAdditionalSaveData(CompoundTag compound) {}
 }

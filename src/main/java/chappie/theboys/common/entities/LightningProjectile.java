@@ -1,31 +1,31 @@
 package chappie.theboys.common.entities;
 
-import net.minecraft.block.AbstractFireBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.projectile.ThrowableEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.IntNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.entity.IEntityAdditionalSpawnData;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
 
-public class LightningProjectile extends ThrowableEntity implements IEntityAdditionalSpawnData {
+public class LightningProjectile extends ThrowableProjectile implements IEntityAdditionalSpawnData {
 
     private Type lightningType;
     private int damage;
@@ -33,7 +33,7 @@ public class LightningProjectile extends ThrowableEntity implements IEntityAddit
     private float gravity;
     private int lifetime;
 
-    public LightningProjectile(World world, Type lightningType, int damage, Color color, int lifetime) {
+    public LightningProjectile(Level world, Type lightningType, int damage, Color color, int lifetime) {
         super(TBEntities.LIGHTNING_PROJECTILE, world);
         this.lightningType = lightningType;
         this.damage = damage;
@@ -41,7 +41,7 @@ public class LightningProjectile extends ThrowableEntity implements IEntityAddit
         this.lifetime = lifetime;
     }
 
-    public LightningProjectile(EntityType<LightningProjectile> lightningType, World world) {
+    public LightningProjectile(EntityType<LightningProjectile> lightningType, Level world) {
         super(lightningType, world);
         /*this.type = Type.LIGHTNING;
         this.damage = 4;
@@ -63,11 +63,11 @@ public class LightningProjectile extends ThrowableEntity implements IEntityAddit
     }
 
     @Override
-    protected void onHit(RayTraceResult rtr) {
+    protected void onHit(HitResult rtr) {
         if (rtr == null || !isAlive())
             return;
 
-        if (rtr.getType() != RayTraceResult.Type.MISS) {
+        if (rtr.getType() != HitResult.Type.MISS) {
             setFire(damage);
         }
 
@@ -87,21 +87,21 @@ public class LightningProjectile extends ThrowableEntity implements IEntityAddit
         Difficulty difficulty = this.level.getDifficulty();
         if (difficulty != Difficulty.PEACEFUL && !this.level.isClientSide && this.level.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
             BlockPos blockpos = this.blockPosition();
-            BlockState blockstate = AbstractFireBlock.getState(this.level, blockpos);
+            BlockState blockstate = BaseFireBlock.getState(this.level, blockpos);
             if (this.level.getBlockState(blockpos).isAir() && blockstate.canSurvive(this.level, blockpos)) {
                 this.level.setBlockAndUpdate(blockpos, blockstate);
             }
 
             for (int i = 0; i < value; ++i) {
                 BlockPos blockpos1 = blockpos.offset(this.random.nextInt(3) - 1, this.random.nextInt(3) - 1, this.random.nextInt(3) - 1);
-                blockstate = AbstractFireBlock.getState(this.level, blockpos1);
+                blockstate = BaseFireBlock.getState(this.level, blockpos1);
                 if (this.level.getBlockState(blockpos1).isAir() && blockstate.canSurvive(this.level, blockpos1)) {
                     this.level.setBlockAndUpdate(blockpos1, blockstate);
                 }
             }
 
         }
-        this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_HURT_ON_FIRE, SoundCategory.AMBIENT, 10000.0F, 0.5F + this.random.nextFloat() * 0.2F);
+        this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_HURT_ON_FIRE, SoundSource.AMBIENT, 10000.0F, 0.5F + this.random.nextFloat() * 0.2F);
         //this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundCategory.WEATHER, 2.0F, 0.5F + this.random.nextFloat() * 0.2F);
 
     }
@@ -123,12 +123,12 @@ public class LightningProjectile extends ThrowableEntity implements IEntityAddit
 
     @Nonnull
     @Override
-    public IPacket<?> getAddEntityPacket() {
+    public Packet<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundNBT compound) {
+    public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putFloat("damage", this.damage);
         compound.putFloat("gravity", this.gravity);
@@ -136,37 +136,37 @@ public class LightningProjectile extends ThrowableEntity implements IEntityAddit
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundNBT compound) {
+    public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.damage = compound.getInt("damage");
         this.gravity = compound.getFloat("gravity");
         deserialize(compound);
     }
 
-    public void serialize(CompoundNBT compound) {
+    public void serialize(CompoundTag compound) {
         compound.putInt("lifetime", lifetime);
-        ListNBT listNBT = new ListNBT();
-        listNBT.add(IntNBT.valueOf(this.color.getRed()));
-        listNBT.add(IntNBT.valueOf(this.color.getGreen()));
-        listNBT.add(IntNBT.valueOf(this.color.getBlue()));
+        ListTag listNBT = new ListTag();
+        listNBT.add(IntTag.valueOf(this.color.getRed()));
+        listNBT.add(IntTag.valueOf(this.color.getGreen()));
+        listNBT.add(IntTag.valueOf(this.color.getBlue()));
         compound.put("color", listNBT);
         compound.putString("lightningType", lightningType.name);
     }
 
-    private void deserialize(CompoundNBT compound) {
-        ListNBT listNBT = compound.getList("color", Constants.NBT.TAG_INT);
+    private void deserialize(CompoundTag compound) {
+        ListTag listNBT = compound.getList("color", Tag.TAG_INT);
         this.lifetime = compound.getInt("lifetime");
         this.color = new Color(listNBT.getInt(0), listNBT.getInt(1), listNBT.getInt(2));
         this.lightningType = Type.getByName(compound.getString("lightningType"));
     }
 
     @Override
-    public void writeSpawnData(PacketBuffer buffer) {
+    public void writeSpawnData(FriendlyByteBuf buffer) {
         buffer.writeNbt(this.serializeNBT());
     }
 
     @Override
-    public void readSpawnData(PacketBuffer additionalData) {
+    public void readSpawnData(FriendlyByteBuf additionalData) {
         this.deserialize(additionalData.readNbt());
     }
 

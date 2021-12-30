@@ -1,36 +1,38 @@
 package chappie.theboys.common.items;
 
 import chappie.theboys.client.render.ScrapRenderer;
-import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.*;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraftforge.client.IItemRenderProperties;
+import net.minecraftforge.common.ForgeTier;
 import software.bernie.HU.geckolib3.core.IAnimatable;
 import software.bernie.HU.geckolib3.core.manager.AnimationData;
 import software.bernie.HU.geckolib3.core.manager.AnimationFactory;
-import xyz.heroesunited.heroesunited.util.HUItemTier;
 
-import java.util.Set;
+import java.util.function.Consumer;
 
-public class ScrapItem extends ToolItem implements IAnimatable {
+public class ScrapItem extends DiggerItem implements IAnimatable {
 
-    public static final HUItemTier IRON_SCRAP = new HUItemTier(2, 350, 8.0F, 3.0F, 12, () -> Ingredient.of(Items.IRON_INGOT));
-    private static final Set<Block> DIGGABLES = ImmutableSet.of(Blocks.ACTIVATOR_RAIL, Blocks.DETECTOR_RAIL, Blocks.POWERED_RAIL, Blocks.RAIL, Blocks.STONE_BUTTON, Blocks.STONE_PRESSURE_PLATE, Blocks.PISTON, Blocks.STICKY_PISTON, Blocks.PISTON_HEAD);
+    public static final ForgeTier IRON_SCRAP = new ForgeTier(2, 350, 8.0F, 3.0F, 12, BlockTags.MINEABLE_WITH_PICKAXE, () -> Ingredient.of(Items.IRON_INGOT));
 
     public ScrapItem(float attackDamageBaseline, float attackSpeed, Item.Properties properties) {
-        super(attackDamageBaseline, attackSpeed, IRON_SCRAP, DIGGABLES, properties.tab(ItemGroup.TAB_TOOLS).stacksTo(1).setISTER(() -> ScrapRenderer::new));
+        super(attackDamageBaseline, attackSpeed, IRON_SCRAP, BlockTags.MINEABLE_WITH_PICKAXE, properties.tab(CreativeModeTab.TAB_TOOLS).stacksTo(1));
     }
 
-    public boolean isCorrectToolForDrops(BlockState state) {
-        int i = this.getTier().getLevel();
-        if (state.getHarvestTool() == net.minecraftforge.common.ToolType.PICKAXE) {
-            return i >= state.getHarvestLevel();
-        }
-        Material material = state.getMaterial();
-        return material == Material.STONE || material == Material.METAL || material == Material.HEAVY_METAL;
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        super.initializeClient(consumer);
+        consumer.accept(new IItemRenderProperties() {
+            private final BlockEntityWithoutLevelRenderer renderer = new ScrapRenderer();
+            @Override
+            public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
+                return this.renderer;
+            }
+        });
     }
 
     public float getDestroySpeed(ItemStack stack, BlockState state) {

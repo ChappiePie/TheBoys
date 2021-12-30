@@ -1,27 +1,28 @@
 package chappie.theboys.abilities;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RedstoneLampBlock;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.HandSide;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.RedstoneLampBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.AABB;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
+import xyz.heroesunited.heroesunited.common.abilities.IAbilityClientProperties;
 import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
 import xyz.heroesunited.heroesunited.util.HUClientUtil;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 
 import java.awt.*;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class StarLightAbility extends Ability {
 
@@ -38,7 +39,7 @@ public class StarLightAbility extends Ability {
     }
 
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         super.onUpdate(player);
         if (this.dataManager.<Boolean>getValue("enabled")) {
             this.dataManager.set("ticks", this.dataManager.<Integer>getValue("ticks") + 1);
@@ -60,7 +61,7 @@ public class StarLightAbility extends Ability {
     }
 
     @Override
-    public void onKeyInput(PlayerEntity player, Map<Integer, Boolean> map) {
+    public void onKeyInput(Player player, Map<Integer, Boolean> map) {
         super.onKeyInput(player, map);
         if (map.get(5)) {
             BlockPos.betweenClosedStream(HUPlayerUtil.getCollisionBoxWithRange(HUPlayerUtil.getPlayerPos(player), 5)).forEach(pos -> {
@@ -82,21 +83,25 @@ public class StarLightAbility extends Ability {
         }
     }
 
-
-    @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(PlayerRenderer renderer, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (this.dataManager.<Boolean>getValue("enabled")) {
-            for (HandSide side : HandSide.values()) {
-                float r = 0.15F;
-                float i = this.dataManager.<Integer>getValue("ticks") <= 1200 ? 1f : 0.5F;
-                AxisAlignedBB box = new AxisAlignedBB(-r, -r, -r, r, r, r);
-                matrix.pushPose();
-                renderer.getModel().translateToHand(side, matrix);
-                matrix.translate(side == HandSide.LEFT ? 0.06 : -0.06, 0.55, 0);
-                HUClientUtil.renderAura(matrix, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box, 0.025F, new Color(i, i, 0, i), packedLightIn, player.tickCount);
-                matrix.popPose();
+    public void initializeClient(Consumer<IAbilityClientProperties> consumer) {
+        super.initializeClient(consumer);
+        consumer.accept(new IAbilityClientProperties() {
+            @Override
+            public void render(EntityRendererProvider.Context context, PlayerRenderer renderer, PoseStack matrix, MultiBufferSource bufferIn, int packedLightIn, AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+                if (getDataManager().<Boolean>getValue("enabled")) {
+                    for (HumanoidArm side : HumanoidArm.values()) {
+                        float r = 0.15F;
+                        float i = getDataManager().<Integer>getValue("ticks") <= 1200 ? 1f : 0.5F;
+                        AABB box = new AABB(-r, -r, -r, r, r, r);
+                        matrix.pushPose();
+                        renderer.getModel().translateToHand(side, matrix);
+                        matrix.translate(side == HumanoidArm.LEFT ? 0.06 : -0.06, 0.55, 0);
+                        HUClientUtil.renderAura(matrix, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box, 0.025F, new Color(i, i, 0, i), packedLightIn, player.tickCount);
+                        matrix.popPose();
+                    }
+                }
             }
-        }
+        });
     }
 }

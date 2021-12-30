@@ -62,7 +62,7 @@
 			"active": true, "hidden": true,
 			"conditions": [
 				{
-					"type": "theboys:ability_enabled",
+					"type": "heroesunited:ability_enabled",
 					"method": "canBeEnabled",
 					"ability": "homelander_lasers"
 				}
