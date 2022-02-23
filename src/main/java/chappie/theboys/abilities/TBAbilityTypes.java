@@ -1,31 +1,44 @@
 package chappie.theboys.abilities;
 
 import chappie.theboys.TheBoys;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.DeferredRegister;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
 import xyz.heroesunited.heroesunited.common.abilities.AbilityType;
+import xyz.heroesunited.heroesunited.common.abilities.JSONAbility;
 
-@Mod.EventBusSubscriber(modid = TheBoys.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@SuppressWarnings("unused")
 public class TBAbilityTypes {
-    public static final AbilityType SPEED = new AbilityType(SpeedAbility::new, TheBoys.MODID, "speed");
-    public static final AbilityType LIGHTNING_FROM_ARMS = new AbilityType(LightningFromArmsAbility::new, TheBoys.MODID, "lightning_from_arms");
-    public static final AbilityType JERK_OFF = new AbilityType(JerkOffAbility::new, TheBoys.MODID, "jerk_off");
-    public static final AbilityType SUPER_LIFT = new AbilityType(SuperLiftAbility::new, TheBoys.MODID, "super_lift");
-    public static final AbilityType OVERLAY = new AbilityType(OverlayAbility::new, TheBoys.MODID, "overlay");
-    public static final AbilityType TB_ATTRIBUTE = new AbilityType(TBAttributeModifierAbility::new, TheBoys.MODID, "attribute_modifier");
-    public static final AbilityType SUPER_HEARING = new AbilityType(SuperHearingAbility::new, TheBoys.MODID, "super_hearing");
-    public static final AbilityType STARLIGHT = new AbilityType(StarLightAbility::new, TheBoys.MODID, "starlight");
+    
+    public static final DeferredRegister<AbilityType> ABILITIES = DeferredRegister.create(AbilityType.class, TheBoys.MODID);
 
-    @SubscribeEvent
-    public static void registerAbilities(RegistryEvent.Register<AbilityType> e) {
-        e.getRegistry().register(SPEED);
-        e.getRegistry().register(LIGHTNING_FROM_ARMS);
-        e.getRegistry().register(JERK_OFF);
-        e.getRegistry().register(SUPER_LIFT);
-        e.getRegistry().register(OVERLAY);
-        e.getRegistry().register(TB_ATTRIBUTE);
-        e.getRegistry().register(SUPER_HEARING);
-        e.getRegistry().register(STARLIGHT);
+    public static final AbilityType SPEED = register("speed", SpeedAbility::new);
+    public static final AbilityType LIGHTNING_FROM_ARMS = register("lightning_from_arms", LightningFromArmsAbility::new);
+    public static final AbilityType JERK_OFF = register("jerk_off", JerkOffAbility::new);
+    public static final AbilityType SUPER_LIFT = register("super_lift", SuperLiftAbility::new);
+    public static final AbilityType OVERLAY = register("overlay", OverlayAbility::new);
+    public static final AbilityType TB_ATTRIBUTE = register("attribute_modifier", TBAttributeModifierAbility::new);
+    public static final AbilityType SUPER_HEARING = register("super_hearing", JSONAbility::new);
+    public static final AbilityType STARLIGHT = register("starlight", StarLightAbility::new);
+    public static final AbilityType SPEED_CHANGE = register("speed_change", (abilityType, player, jsonObject) -> new ScrollAbility(abilityType, player, jsonObject, (a, delta) -> {
+        for (SpeedAbility ability : AbilityHelper.getListOfType(SpeedAbility.class, AbilityHelper.getAbilities(player))) {
+            if (a.getAdditionalData().equals(ability.getAdditionalData()) && ability.getEnabled()) {
+                ability.increaseDecreaseSpeedLevel(delta);
+                break;
+            }
+        }
+    }));
+    public static final AbilityType LIGHTING_LENGTH_CHANGE = register("lightning_length_change", (abilityType, player, jsonObject) -> new ScrollAbility(abilityType, player, jsonObject, (a, delta) -> {
+        for (LightningFromArmsAbility ability : AbilityHelper.getListOfType(LightningFromArmsAbility.class, AbilityHelper.getAbilities(player))) {
+            if (a.getAdditionalData().equals(ability.getAdditionalData()) && ability.getEnabled()) {
+                ability.changeDistance(delta);
+                break;
+            }
+        }
+    }));
+
+    private static AbilityType register(String name, AbilityType.AbilitySupplier ability) {
+        AbilityType type = new AbilityType(ability);
+        ABILITIES.register(name, () -> type);
+        return type;
     }
 }

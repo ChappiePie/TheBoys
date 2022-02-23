@@ -14,25 +14,25 @@ import static chappie.theboys.common.capability.BoysCap.CAPABILITY;
 
 public class BoysProvider implements ICapabilitySerializable<CompoundTag> {
 
-    public LazyOptional<IBoys> instance;
+    private final LazyOptional<IBoys> instance;
 
     public BoysProvider(Player player) {
-        instance = LazyOptional.of(() -> new BoysCap(player));
+        this.instance = LazyOptional.of(() -> new BoysCap(player));
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return cap == CAPABILITY ? instance.cast() : LazyOptional.empty();
+        return cap == CAPABILITY ? this.instance.cast() : LazyOptional.empty();
     }
 
     @Override
     public CompoundTag serializeNBT() {
-        return instance.orElseThrow(() -> new IllegalArgumentException("HUPlayer must not be empty")).serializeNBT();
+        return this.instance.orElseThrow(() -> new IllegalArgumentException("BoysCap must not be empty")).serializeNBT();
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        instance.orElseThrow(() -> new IllegalArgumentException("HUPlayer must not be empty!")).deserializeNBT(nbt);
+        this.instance.orElseThrow(() -> new IllegalArgumentException("BoysCap must not be empty!")).deserializeNBT(nbt);
     }
 }

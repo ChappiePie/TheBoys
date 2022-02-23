@@ -1,32 +1,40 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://maven.parchmentmc.org' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7.+'
+        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
-apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
+//apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
 
-version = "${minecraft_version}-${build_version}"
+version = "${mc_version}-${build_version}"
 group = "chappie.theboys"
 archivesBaseName = "TheBoys"
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
 minecraft {
-    mappings channel: 'official', version: "${minecraft_version}"
+    //mappings channel: 'official', version: "${mc_version}"
+    mappings channel: 'parchment', version: "2021.12.19-${mc_version}"
+
     //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
+
             mods {
                 theboys {
                     source sourceSets.main
@@ -41,8 +49,7 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
+
             mods {
                 theboys {
                     source sourceSets.main
@@ -52,8 +59,6 @@ minecraft {
 
         data {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
             args '--mod', 'theboys', '--all', '--output', file('src/generated/resources/'), "-mixin.config=heroesunited.mixins.json"
             mods {
                 theboys {
@@ -64,16 +69,49 @@ minecraft {
     }
 }
 
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 minecraft.runs.all {
+    property 'forge.logging.markers', 'SCAN, REGISTRIES, REGISTRYDUMP'
+    property 'forge.logging.console.level', 'debug'
+
     property 'mixin.env.remapRefMap', 'true'
     property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 }
 
 repositories {
     maven { url 'https://maven.explodingcreeper.me/' }
+    mavenLocal()
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:$minecraft_version-$forge_version"
-    implementation "xyz.heroesunited:hu-core:$core_version"
+    minecraft "net.minecraftforge:forge:$mc_version-$forge_version"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation fg.deobf("xyz.heroesunited:hu-core:$core_version")
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : "${archivesBaseName}",
+                "Specification-Vendor"    : "${archivesBaseName}sareus",
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : "${archivesBaseName}sareus",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+mixin {
+    add sourceSets.main, "theboys.refmap.json"
+    config 'theboys.mixins.json'
+
+    debug.verbose = true
+    debug.export = true
+    dumpTargetOnFailure = true
+    quiet
 }

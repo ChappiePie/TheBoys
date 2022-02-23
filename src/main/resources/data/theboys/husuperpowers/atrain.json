@@ -8,6 +8,18 @@
 			"maxSpeedLevel": 25,
 			"title": {
 				"translate": "ability.theboys.speed"
+			},
+			"key": {
+				"id": 1,
+				"pressType": "toggle"
+			}
+		},
+		"speed_change": {
+			"ability": "theboys:speed_change",
+			"active": true, "hidden": true,
+			"key": {
+				"id": 2,
+				"pressType": "held"
 			}
 		},
 		"atrain_health": {

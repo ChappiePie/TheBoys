@@ -20,22 +20,22 @@ public class LightningProjectileRenderer extends EntityRenderer<LightningProject
     }
 
     @Override
-    public void render(LightningProjectile entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int packedLightIn) {
+    public void render(LightningProjectile entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn) {
         if (entity.tickCount >= 2 || !(this.entityRenderDispatcher.camera.getEntity().distanceToSqr(entity) < 6.125D)) {
-            matrixStack.pushPose();
-            matrixStack.scale(0.05F, 0.06F, 0.05F);
-            matrixStack.translate(0, 10, 0);
-            matrixStack.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) - 90.0F));
-            matrixStack.mulPose(Vector3f.ZP.rotationDegrees(Mth.lerp(partialTicks, entity.xRotO, entity.getXRot()) + 90.0F));
-            matrixStack.translate(0.25, -0.5, 0);
+            poseStack.pushPose();
+            poseStack.scale(0.05F, 0.06F, 0.05F);
+            poseStack.translate(0, 10, 0);
+            poseStack.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) - 90.0F));
+            poseStack.mulPose(Vector3f.ZP.rotationDegrees(Mth.lerp(partialTicks, entity.xRotO, entity.getXRot()) + 90.0F));
+            poseStack.translate(0.25, -0.5, 0);
             if (entity.getLightningType() != null && entity.getLightningType().equals(LightningProjectile.Type.STARLIGHT)) {
                 float r = 2F;
                 AABB box = new AABB(-r, -r, -r, r, r, r);
-                HUClientUtil.renderAura(matrixStack, bufferIn.getBuffer(RenderType.lightning()), box, 0.5F, entity.getColor(), packedLightIn, entity.tickCount);
+                HUClientUtil.renderAura(poseStack, bufferIn.getBuffer(RenderType.lightning()), box, 0.5F, entity.getColor(), packedLightIn, entity.tickCount);
             } else {
-                HUClientUtil.renderLightning(entity.level.random, matrixStack, bufferIn, packedLightIn, 5, 1, entity.getColor());
+                HUClientUtil.renderLightning(entity.level.random, poseStack, bufferIn, packedLightIn, 5, 1, entity.getColor());
             }
-            matrixStack.popPose();
+            poseStack.popPose();
         }
     }
 

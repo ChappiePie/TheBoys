@@ -1,6 +1,7 @@
 package chappie.theboys.abilities;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 import xyz.heroesunited.heroesunited.client.events.SetupAnimEvent;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityType;
 import xyz.heroesunited.heroesunited.common.abilities.IAbilityClientProperties;
 import xyz.heroesunited.heroesunited.common.abilities.JSONAbility;
 
@@ -22,8 +24,8 @@ import java.util.function.Consumer;
 
 public class SuperLiftAbility extends JSONAbility {
 
-    public SuperLiftAbility() {
-        super(TBAbilityTypes.SUPER_LIFT);
+    public SuperLiftAbility(AbilityType type, Player player, JsonObject jsonObject) {
+        super(type, player, jsonObject);
     }
 
     @Override
@@ -71,7 +73,7 @@ public class SuperLiftAbility extends JSONAbility {
                         if (blockstate.getMaterial() != Material.AIR && blockstate1.getMaterial() == Material.AIR) {
                             BlockEntity tileentity = world.getBlockEntity(blockPos);
                             if (tileentity != null) {
-                                CompoundTag compoundnbt = tileentity.save(new CompoundTag());
+                                CompoundTag compoundnbt = tileentity.saveWithoutMetadata();
                                 list1.add(new BlockInfo(blockPos1, blockstate, compoundnbt));
                                 deque.addLast(blockPos);
                             } else if (!blockstate.isSolidRender(world, blockPos) && !blockstate.isCollisionShapeFullBlock(world, blockPos)) {

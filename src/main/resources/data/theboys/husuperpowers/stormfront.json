@@ -9,6 +9,14 @@
 				"pressType": "held"
 			}
 		},
+		"lightning_length_change": {
+			"ability": "theboys:lightning_length_change",
+			"active": true, "hidden": true,
+			"key": {
+				"id": 1,
+				"pressType": "held"
+			}
+		},
 		"stormfront_lightning_projectile": {
 			"ability": "heroesunited:projectile",
 			"entity": "theboys:lightning_projectile",

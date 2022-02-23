@@ -1,14 +1,16 @@
 package chappie.theboys;
 
 import chappie.theboys.abilities.SpeedsterSuit;
+import chappie.theboys.abilities.TBAbilityTypes;
 import chappie.theboys.client.TBClientEventHandler;
 import chappie.theboys.client.render.LightningProjectileRenderer;
 import chappie.theboys.client.render.TrailRenderer;
 import chappie.theboys.common.TBEventHandler;
 import chappie.theboys.common.capability.IBoys;
+import chappie.theboys.common.capability.TBCapabilityEvents;
 import chappie.theboys.common.entities.TBEntities;
+import chappie.theboys.common.items.InjectionItem;
 import chappie.theboys.common.items.TBItems;
-import chappie.theboys.common.items.VialItem;
 import chappie.theboys.network.TBNetworking;
 import chappie.theboys.util.TBRecipeSerializer;
 import net.minecraft.resources.ResourceLocation;
@@ -39,10 +41,12 @@ public class TheBoys {
         final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.register(this);
 
+        TBAbilityTypes.ABILITIES.register(bus);
         TBItems.ITEMS.register(bus);
         TBEntities.ENTITIES.register(bus);
         TBRecipeSerializer.RECIPE_SERIALIZERS.register(bus);
 
+        MinecraftForge.EVENT_BUS.register(new TBCapabilityEvents());
         MinecraftForge.EVENT_BUS.register(new TBEventHandler());
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new TBClientEventHandler()));
     }
@@ -79,7 +83,7 @@ public class TheBoys {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public void registerItemColor(ColorHandlerEvent.Item event) {
-        event.getItemColors().register((stack, color) -> VialItem.getColor(stack, color), TBItems.INJECTION);
-        event.getItemColors().register((stack, color) -> VialItem.getColor(stack, color), TBItems.VIAL);
+        event.getItemColors().register(InjectionItem::getColor, TBItems.INJECTION);
+        event.getItemColors().register(InjectionItem::getColor, TBItems.VIAL);
     }
 }

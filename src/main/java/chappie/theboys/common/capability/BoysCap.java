@@ -35,7 +35,6 @@ public class BoysCap implements IBoys {
 
     @Override
     public IBoys sync() {
-        player.refreshDimensions();
         if (player instanceof ServerPlayer) {
             TBNetworking.INSTANCE.sendTo(new ClientSyncBoysCap(player.getId(), this.serializeNBT()), ((ServerPlayer) player).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
         }
@@ -44,7 +43,6 @@ public class BoysCap implements IBoys {
 
     @Override
     public IBoys syncToAll() {
-        this.sync();
         for (Player player : this.player.level.players()) {
             if (player instanceof ServerPlayer) {
                 TBNetworking.INSTANCE.sendTo(new ClientSyncBoysCap(this.player.getId(), this.serializeNBT()), ((ServerPlayer) player).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);

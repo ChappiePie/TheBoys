@@ -1,5 +1,6 @@
 package chappie.theboys.abilities;
 
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -14,7 +15,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
+import xyz.heroesunited.heroesunited.common.abilities.AbilityType;
 import xyz.heroesunited.heroesunited.common.abilities.IAbilityClientProperties;
 import xyz.heroesunited.heroesunited.common.capabilities.HUPlayer;
 import xyz.heroesunited.heroesunited.util.HUClientUtil;
@@ -26,8 +29,8 @@ import java.util.function.Consumer;
 
 public class StarLightAbility extends Ability {
 
-    public StarLightAbility() {
-        super(TBAbilityTypes.STARLIGHT);
+    public StarLightAbility(AbilityType type, Player player, @NotNull JsonObject jsonObject) {
+        super(type, player, jsonObject);
     }
 
     @Override
@@ -88,17 +91,17 @@ public class StarLightAbility extends Ability {
         super.initializeClient(consumer);
         consumer.accept(new IAbilityClientProperties() {
             @Override
-            public void render(EntityRendererProvider.Context context, PlayerRenderer renderer, PoseStack matrix, MultiBufferSource bufferIn, int packedLightIn, AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+            public void render(EntityRendererProvider.Context context, PlayerRenderer renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
                 if (getDataManager().<Boolean>getValue("enabled")) {
                     for (HumanoidArm side : HumanoidArm.values()) {
                         float r = 0.15F;
                         float i = getDataManager().<Integer>getValue("ticks") <= 1200 ? 1f : 0.5F;
                         AABB box = new AABB(-r, -r, -r, r, r, r);
-                        matrix.pushPose();
-                        renderer.getModel().translateToHand(side, matrix);
-                        matrix.translate(side == HumanoidArm.LEFT ? 0.06 : -0.06, 0.55, 0);
-                        HUClientUtil.renderAura(matrix, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box, 0.025F, new Color(i, i, 0, i), packedLightIn, player.tickCount);
-                        matrix.popPose();
+                        poseStack.pushPose();
+                        renderer.getModel().translateToHand(side, poseStack);
+                        poseStack.translate(side == HumanoidArm.LEFT ? 0.06 : -0.06, 0.55, 0);
+                        HUClientUtil.renderAura(poseStack, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), box, 0.025F, new Color(i, i, 0, i), packedLightIn, player.tickCount);
+                        poseStack.popPose();
                     }
                 }
             }

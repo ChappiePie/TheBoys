@@ -1,4 +1,5 @@
 {
+	"color": [10, 120, 255],
 	"abilities": {
 		"homelander_lasers": {
 			"title": {
@@ -35,11 +36,7 @@
 		},
 		"homelander_super_hearing": {
 			"ability": "theboys:super_hearing",
-			"active": true, "hidden": true,
-			"key": {
-				"id": 4,
-				"pressType": "held"
-			}
+			"active": true, "hidden": true
 		},
 		"homelander_jerk_off": {
 			"ability": "theboys:jerk_off",

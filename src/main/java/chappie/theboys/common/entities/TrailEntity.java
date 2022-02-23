@@ -4,14 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,6 +17,10 @@ import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.network.NetworkHooks;
 
 import java.awt.*;
+import java.util.Random;
+import java.util.UUID;
+
+import static net.minecraft.client.renderer.entity.LivingEntityRenderer.isEntityUpsideDown;
 
 public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     @OnlyIn(Dist.CLIENT)
@@ -44,7 +45,9 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         this.yBodyRot = player.yBodyRot;
         this.color = color;
         this.lifeTime = lifeTime;
-        this.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+        this.setYRot(player.getYRot());
+        this.setXRot(player.getXRot());
+        this.moveTo(player.position().add(Mth.sin(-player.getYRot() * ((float)Math.PI / 180F)) * -0.5F, 0.0D, Mth.cos(player.getYRot() * ((float)Math.PI / 180F)) * -0.5F));
     }
 
     @Override
@@ -68,10 +71,14 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
+    public Random getRandom() {
+        return this.random;
+    }
+
     @Override
     public void writeSpawnData(FriendlyByteBuf buffer) {
         buffer.writeInt(this.lifeTime);
-        buffer.writeUUID(this.player.getUUID());
+        buffer.writeUUID(this.player == null ? UUID.randomUUID() : player.getUUID());
 
         buffer.writeInt(this.color.getRed());
         buffer.writeInt(this.color.getGreen());
@@ -83,10 +90,58 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         this.lifeTime = additionalData.readInt();
         this.player = this.level.getPlayerByUUID(additionalData.readUUID());
 
-        this.yBodyRot = player.yBodyRot;
+        if (player instanceof AbstractClientPlayer player) {
+            this.yBodyRot = this.player.yBodyRot;
+            this.model.attackTime = player.getAttackAnim(0);
+            boolean shouldSit = player.isPassenger() && (player.getVehicle() != null && player.getVehicle().shouldRiderSit());
+            this.model.riding = shouldSit;
+            this.model.young = player.isBaby();
+            float f = Mth.rotLerp(0, player.yBodyRotO, player.yBodyRot);
+            float f1 = Mth.rotLerp(0, player.yHeadRotO, player.yHeadRot);
+            float f2 = f1 - f;
+            if (shouldSit && player.getVehicle() instanceof LivingEntity livingentity) {
+                f = Mth.rotLerp(0, livingentity.yBodyRotO, livingentity.yBodyRot);
+                f2 = f1 - f;
+                float f3 = Mth.wrapDegrees(f2);
+                if (f3 < -85.0F) {
+                    f3 = -85.0F;
+                }
 
-        if (player instanceof AbstractClientPlayer) {
-            ((PlayerRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer((AbstractClientPlayer) player)).getModel().copyPropertiesTo(this.model);
+                if (f3 >= 85.0F) {
+                    f3 = 85.0F;
+                }
+
+                f = f1 - f3;
+                if (f3 * f3 > 2500.0F) {
+                    f += f3 * 0.2F;
+                }
+
+                f2 = f1 - f;
+            }
+
+            float f6 = Mth.lerp(0, player.xRotO, player.getXRot());
+            if (isEntityUpsideDown(player)) {
+                f6 *= -1.0F;
+                f2 *= -1.0F;
+            }
+
+            float f8 = 0.0F;
+            float f5 = 0.0F;
+            if (!shouldSit && player.isAlive()) {
+                f8 = Mth.lerp(0, player.animationSpeedOld, player.animationSpeed);
+                f5 = player.animationPosition - player.animationSpeed;
+                if (player.isBaby()) {
+                    f5 *= 3.0F;
+                }
+
+                if (f8 > 1.0F) {
+                    f8 = 1.0F;
+                }
+            }
+
+            this.model.crouching = player.isCrouching();
+            this.model.prepareMobModel(player, f5, f8, 0);
+            this.model.setupAnim(player, f5, f8, player.tickCount, f2, f6);
         }
 
         this.color = new Color(additionalData.readInt(), additionalData.readInt(), additionalData.readInt());
