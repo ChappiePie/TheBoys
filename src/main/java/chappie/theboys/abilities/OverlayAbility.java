@@ -19,6 +19,7 @@ import xyz.heroesunited.heroesunited.client.renderer.IHUModelPart;
 import xyz.heroesunited.heroesunited.common.abilities.AbilityType;
 import xyz.heroesunited.heroesunited.common.abilities.IAbilityClientProperties;
 import xyz.heroesunited.heroesunited.common.abilities.JSONAbility;
+import xyz.heroesunited.heroesunited.util.HUClientUtil;
 import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 import xyz.heroesunited.heroesunited.util.PlayerPart;
 
@@ -57,7 +58,12 @@ public class OverlayAbility extends JSONAbility {
                             part.setVisibility(model, true);
                         }
                     }
-                    model.renderToBuffer(poseStack, bufferIn.getBuffer(RenderType.entityTranslucent(location)), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+                    RenderType type = RenderType.entityTranslucent(location);
+                    if (GsonHelper.getAsBoolean(getJsonObject(), "glow", false)) {
+                        type =  HUClientUtil.HURenderTypes.crumbling(location);
+                    }
+
+                    model.renderToBuffer(poseStack, bufferIn.getBuffer(type), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
                 }
             }
         });

@@ -46,7 +46,7 @@ public class SpeedAbility extends JSONAbility {
         if (this.getEnabled()) {
             float walkDifference = (player.walkDist / 0.6F) - (player.walkDistO / 0.6F);
 
-            if (player.zza > 0.0F && walkDifference > 0.0F && !player.level.isClientSide && player.tickCount % 2 == 0) {
+            if (walkDifference > 0.0F && !player.level.isClientSide && player.tickCount % 2 == 0) {
                 TrailEntity trail = new TrailEntity(player.level, player, HUJsonUtils.getColor(this.getJsonObject()), GsonHelper.getAsInt(this.getJsonObject(), "lifeTimeTrail", 20));
                 player.level.addFreshEntity(trail);
             }

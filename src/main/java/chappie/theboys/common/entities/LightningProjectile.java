@@ -34,7 +34,7 @@ public class LightningProjectile extends ThrowableProjectile implements IEntityA
     private int lifetime;
 
     public LightningProjectile(Level world, Type lightningType, int damage, Color color, int lifetime) {
-        super(TBEntities.LIGHTNING_PROJECTILE, world);
+        super(TBEntities.LIGHTNING_PROJECTILE.get(), world);
         this.lightningType = lightningType;
         this.damage = damage;
         this.color = color;

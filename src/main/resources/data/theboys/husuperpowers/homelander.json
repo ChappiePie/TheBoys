@@ -54,6 +54,7 @@
 		"homelander_overlay": {
 			"ability": "theboys:overlay",
 			"texture": "theboys:textures/models/red_eyes.png",
+			"glow": true,
 			"inflate": 0.01,
 			"visibility_parts": ["head"],
 			"active": true, "hidden": true,

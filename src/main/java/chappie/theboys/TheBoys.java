@@ -68,8 +68,8 @@ public class TheBoys {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(TBEntities.TRAIL, TrailRenderer::new);
-        event.registerEntityRenderer(TBEntities.LIGHTNING_PROJECTILE, LightningProjectileRenderer::new);
+        event.registerEntityRenderer(TBEntities.TRAIL.get(), TrailRenderer::new);
+        event.registerEntityRenderer(TBEntities.LIGHTNING_PROJECTILE.get(), LightningProjectileRenderer::new);
 
     }
 
@@ -83,7 +83,7 @@ public class TheBoys {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public void registerItemColor(ColorHandlerEvent.Item event) {
-        event.getItemColors().register(InjectionItem::getColor, TBItems.INJECTION);
-        event.getItemColors().register(InjectionItem::getColor, TBItems.VIAL);
+        event.getItemColors().register(InjectionItem::getColor, TBItems.INJECTION.get());
+        event.getItemColors().register(InjectionItem::getColor, TBItems.VIAL.get());
     }
 }

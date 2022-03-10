@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import xyz.heroesunited.heroesunited.util.HUClientUtil;
 
 public class TrailRenderer extends EntityRenderer<TrailEntity> {
 
@@ -32,7 +33,7 @@ public class TrailRenderer extends EntityRenderer<TrailEntity> {
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.translate(0.0D, -1.501F, 0.0D);
         poseStack.translate((entityIn.getRandom().nextFloat() - 1F) / 80, 0, (entityIn.getRandom().nextFloat() - 1F) / 80);
-        entityIn.model.renderToBuffer(poseStack, bufferIn.getBuffer(MyRenderTypes.TRAIL), packedLightIn, OverlayTexture.NO_OVERLAY, entityIn.color.getRed() /255F, entityIn.color.getGreen() / 255F, entityIn.color.getBlue() / 255F, Math.max(0.05F, 0.75F - (entityIn.tickCount / (float) entityIn.lifeTime)));
+        entityIn.model.renderToBuffer(poseStack, bufferIn.getBuffer(HUClientUtil.HURenderTypes.LASER), packedLightIn, OverlayTexture.NO_OVERLAY, entityIn.color.getRed() /255F, entityIn.color.getGreen() / 255F, entityIn.color.getBlue() / 255F, (1.0F - (entityIn.tickCount / (float) entityIn.lifeTime)) * 0.5F);
         poseStack.popPose();
         super.render(entityIn, entityYaw, partialTicks, poseStack, bufferIn, packedLightIn);
     }

@@ -27,7 +27,7 @@ public class InjectionVRecipe extends CustomRecipe {
                 if (itemstack.getItem() instanceof InjectionItem) {
                     ++i;
                 } else {
-                    if (itemstack.getItem() != TBItems.VIAL || StringUtil.isNullOrEmpty(itemstack.getOrCreateTag().getString("Injection"))) {
+                    if (itemstack.getItem() != TBItems.VIAL.get() || StringUtil.isNullOrEmpty(itemstack.getOrCreateTag().getString("Injection"))) {
                         return false;
                     }
 
@@ -46,7 +46,7 @@ public class InjectionVRecipe extends CustomRecipe {
         for(int i = 0; i < inv.getContainerSize(); ++i) {
             ItemStack stack = inv.getItem(i);
             if (!stack.isEmpty() && stack.getItem() instanceof VialItem) {
-                return InjectionItem.setInjection(TBItems.INJECTION.getDefaultInstance(), stack.getOrCreateTag().getString("Injection"));
+                return InjectionItem.setInjection(TBItems.INJECTION.get().getDefaultInstance(), stack.getOrCreateTag().getString("Injection"));
             }
         }
         return ItemStack.EMPTY;

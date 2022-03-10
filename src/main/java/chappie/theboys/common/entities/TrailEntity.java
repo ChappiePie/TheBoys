@@ -38,13 +38,13 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     }
 
     public TrailEntity(Level worldIn, Player player, Color color, int lifeTime) {
-        super(TBEntities.TRAIL, worldIn);
+        super(TBEntities.TRAIL.get(), worldIn);
         this.noPhysics = true;
         this.noCulling = true;
         this.player = player;
         this.yBodyRot = player.yBodyRot;
         this.color = color;
-        this.lifeTime = lifeTime;
+        this.lifeTime = 10;
         this.setYRot(player.getYRot());
         this.setXRot(player.getXRot());
         this.moveTo(player.position().add(Mth.sin(-player.getYRot() * ((float)Math.PI / 180F)) * -0.5F, 0.0D, Mth.cos(player.getYRot() * ((float)Math.PI / 180F)) * -0.5F));
