@@ -141,6 +141,7 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
                 }
             }
 
+            this.model.hat.visible = false;
             this.model.crouching = player.isCrouching();
             this.model.prepareMobModel(player, f5, f8, 0);
             this.model.setupAnim(player, f5, f8, player.tickCount, f2, f6);

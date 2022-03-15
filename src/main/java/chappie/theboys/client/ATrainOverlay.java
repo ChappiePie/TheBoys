@@ -48,7 +48,7 @@ public class ATrainOverlay implements IIngameOverlay {
                             f += 11.5;
                         }
                     }
-                    blit(poseStack, left, top, 0, 24, f * 0.75F, 24, 96, 48);
+                    blit(poseStack, left, top, f * 0.75F);
                 }
                 poseStack.popPose();
                 break;
@@ -79,22 +79,15 @@ public class ATrainOverlay implements IIngameOverlay {
         }
     }
 
-    public static void blit(PoseStack pPoseStack, float pX, float pY, float pUOffset, float pVOffset, float pUWidth, float pVHeight, float pTextureHeight, float pTextureWidth) {
-        innerBlit(pPoseStack, pX, pX + pUWidth, pY, pY + pVHeight, pUWidth, pVHeight, pUOffset, pVOffset, pTextureHeight, pTextureWidth);
-    }
-
-    private static void innerBlit(PoseStack pPoseStack, float pX1, float pX2, float pY1, float pY2, float pUWidth, float pVHeight, float pUOffset, float pVOffset, float pTextureWidth, float pTextureHeight) {
-        innerBlit(pPoseStack.last().pose(), pX1, pX2, pY1, pY2, (pUOffset + 0.0F) / pTextureWidth, (pUOffset + pUWidth) / pTextureWidth, (pVOffset + 0.0F) / pTextureHeight, (pVOffset + pVHeight) / pTextureHeight);
-    }
-
-    private static void innerBlit(Matrix4f pMatrix, float pX1, float pX2, float pY1, float pY2, float pMinU, float pMaxU, float pMinV, float pMaxV) {
+    private static void blit(PoseStack pPoseStack, float pX, float pY, float pUWidth) {
+        Matrix4f pMatrix = pPoseStack.last().pose();
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.vertex(pMatrix, pX1, pY2, 1.0F).uv(pMinU, pMaxV).endVertex();
-        bufferbuilder.vertex(pMatrix, pX2, pY2, 1.0F).uv(pMaxU, pMaxV).endVertex();
-        bufferbuilder.vertex(pMatrix, pX2, pY1, 1.0F).uv(pMaxU, pMinV).endVertex();
-        bufferbuilder.vertex(pMatrix, pX1, pY1, 1.0F).uv(pMinU, pMinV).endVertex();
+        bufferbuilder.vertex(pMatrix, pX, pY + 24F, 1.0F).uv(0.0F, 1.0F).endVertex();
+        bufferbuilder.vertex(pMatrix, pX + pUWidth, pY + 24F, 1.0F).uv(pUWidth / 96F, 1.0F).endVertex();
+        bufferbuilder.vertex(pMatrix, pX + pUWidth, pY, 1.0F).uv(pUWidth / 96F, 0.5F).endVertex();
+        bufferbuilder.vertex(pMatrix, pX, pY, 1.0F).uv(0.0F, 0.5F).endVertex();
         bufferbuilder.end();
         BufferUploader.end(bufferbuilder);
     }

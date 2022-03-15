@@ -45,28 +45,26 @@ public class SpeedAbility extends JSONAbility {
             this.setAttribute(this.player, this.name, Attributes.MOVEMENT_SPEED, speedLevel);
             this.setAttribute(this.player, this.name, Attributes.ATTACK_SPEED, speedLevel);
 
-            if (walkDifference > 0.0F && !player.level.isClientSide) {
-                TrailEntity trail = new TrailEntity(player.level, player, HUJsonUtils.getColor(this.getJsonObject()), GsonHelper.getAsInt(this.getJsonObject(), "lifeTimeTrail", 20));
-                player.level.addFreshEntity(trail);
-            }
+            if (!player.level.isClientSide) {
+                if (walkDifference > 0.0F || player.xOld != player.getX() || player.zOld != player.getZ()) {
+                    player.level.addFreshEntity(new TrailEntity(player.level, player, HUJsonUtils.getColor(this.getJsonObject()), GsonHelper.getAsInt(this.getJsonObject(), "lifeTimeTrail", 20)));
 
-            if (walkDifference > 0.0F) {
-                if (this.upgradeCooldown > 0) {
-                    --this.upgradeCooldown;
-                } else {
-                    if (speedLevel < this.getMaxSpeedLevel()) {
-                        this.dataManager.set("speedLevel", speedLevel + 1);
-                        this.upgradeCooldown = this.dataManager.getAsInt("speedLevel") * 5;
+                    if (this.upgradeCooldown > 0) {
+                        --this.upgradeCooldown;
+                    } else {
+                        if (speedLevel < this.getMaxSpeedLevel()) {
+                            this.dataManager.set("speedLevel", speedLevel + 1);
+                            this.upgradeCooldown = this.dataManager.getAsInt("speedLevel") * 5;
+                        }
                     }
-                }
-            } else {
-                if (this.cooldown > 0) {
-                    --this.cooldown;
                 } else {
-                    if (speedLevel > 1) {
-                        this.dataManager.set("speedLevel", speedLevel - 1);
-                        this.upgradeCooldown = 0;
-                        this.cooldown = this.dataManager.getAsInt("speedLevel");
+                    if (this.cooldown > 0) {
+                        --this.cooldown;
+                    } else {
+                        if (speedLevel > 1) {
+                            this.dataManager.set("speedLevel", speedLevel - 1);
+                            this.cooldown = this.dataManager.getAsInt("speedLevel");
+                        }
                     }
                 }
             }
