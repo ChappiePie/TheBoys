@@ -15,6 +15,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.network.NetworkHooks;
+import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 
 import java.awt.*;
 import java.util.Random;
@@ -24,7 +25,7 @@ import static net.minecraft.client.renderer.entity.LivingEntityRenderer.isEntity
 
 public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     @OnlyIn(Dist.CLIENT)
-    public final HumanoidModel<AbstractClientPlayer> model = new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER_INNER_ARMOR));
+    public HumanoidModel<AbstractClientPlayer> model;
     public float yBodyRot;
     public Player player;
     public int lifeTime;
@@ -44,7 +45,7 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         this.player = player;
         this.yBodyRot = player.yBodyRot;
         this.color = color;
-        this.lifeTime = 10;
+        this.lifeTime = lifeTime;
         this.setYRot(player.getYRot());
         this.setXRot(player.getXRot());
         this.moveTo(player.position().add(Mth.sin(-player.getYRot() * ((float)Math.PI / 180F)) * -0.5F, 0.0D, Mth.cos(player.getYRot() * ((float)Math.PI / 180F)) * -0.5F));
@@ -90,8 +91,9 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         this.lifeTime = additionalData.readInt();
         this.player = this.level.getPlayerByUUID(additionalData.readUUID());
 
-        if (player instanceof AbstractClientPlayer player) {
-            this.yBodyRot = this.player.yBodyRot;
+        if (this.player instanceof AbstractClientPlayer player) {
+            this.model = new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(HUPlayerUtil.haveSmallArms(player) ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER));
+            this.yBodyRot = player.yBodyRot;
             this.model.attackTime = player.getAttackAnim(0);
             boolean shouldSit = player.isPassenger() && (player.getVehicle() != null && player.getVehicle().shouldRiderSit());
             this.model.riding = shouldSit;

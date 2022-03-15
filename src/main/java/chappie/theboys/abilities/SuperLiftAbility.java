@@ -37,11 +37,11 @@ public class SuperLiftAbility extends JSONAbility {
     @Override
     public void action(Player player) {
         super.action(player);
-        if (this.dataManager.<Integer>getValue("cooldownLift") > 0) {
-            this.dataManager.set("cooldownLift", this.dataManager.<Integer>getValue("cooldownLift") - 1);
+        if (this.dataManager.getAsInt("cooldownLift") > 0) {
+            this.dataManager.set("cooldownLift", this.dataManager.getAsInt("cooldownLift") - 1);
         }
 
-        if (this.getEnabled() && this.dataManager.<Integer>getValue("cooldownLift") == 0 && player.level instanceof ServerLevel) {
+        if (this.getEnabled() && this.dataManager.getAsInt("cooldownLift") == 0 && player.level instanceof ServerLevel) {
             Vec3 posVc3d = new Vec3(player.getX(), player.getY() + player.getBbHeight(), player.getZ());
             BlockPos pos = new BlockPos(posVc3d.x + 1, posVc3d.y, posVc3d.z + 1);
             BlockPos pos1 = new BlockPos(posVc3d.x - 1, posVc3d.y + 1, posVc3d.z - 1);

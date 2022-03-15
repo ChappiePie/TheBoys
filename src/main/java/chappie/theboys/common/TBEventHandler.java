@@ -1,6 +1,9 @@
 package chappie.theboys.common;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
@@ -10,12 +13,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import xyz.heroesunited.heroesunited.common.abilities.Ability;
 import xyz.heroesunited.heroesunited.common.abilities.AbilityHelper;
 import xyz.heroesunited.heroesunited.common.abilities.FlightAbility;
+import xyz.heroesunited.heroesunited.util.HUPlayerUtil;
 
 public class TBEventHandler {
 
     @SubscribeEvent
     public void livingFall(LivingFallEvent e) {
-        if (e.getEntityLiving() instanceof Player player) {
+        if (e.getEntityLiving() instanceof Player player && !player.level.isClientSide) {
             for (Ability ability : AbilityHelper.getAbilities(player)) {
                 if (ability instanceof FlightAbility && GsonHelper.getAsBoolean(ability.getJsonObject(), "break_blocks", false) && e.getDistance() > 20) {
                     for (int x = 0; x < 5; x++) {
@@ -51,6 +55,13 @@ public class TBEventHandler {
                                     player.level.setBlockAndUpdate(pos, Blocks.STRIPPED_ACACIA_LOG.defaultBlockState());
                                 } else if (block == Blocks.GLASS) {
                                     player.level.destroyBlock(pos, false);
+                                }
+
+                                if (player.level instanceof ServerLevel level) {
+                                    for (ServerPlayer serverPlayer : level.getEntitiesOfClass(ServerPlayer.class, HUPlayerUtil.getCollisionBoxWithRange(player.position(), 30))) {
+                                        float f = e.getDistance() / player.level.getHeight();
+                                        level.sendParticles(serverPlayer, ParticleTypes.EXPLOSION, false, player.getX(), player.getY() + 0.25F, player.getZ(), 0, f*10, 0.0D, 0.0D, 1F);
+                                    }
                                 }
                             }
                         }

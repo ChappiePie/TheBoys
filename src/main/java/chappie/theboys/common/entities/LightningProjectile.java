@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -33,25 +34,32 @@ public class LightningProjectile extends ThrowableProjectile implements IEntityA
     private float gravity;
     private int lifetime;
 
-    public LightningProjectile(Level world, Type lightningType, int damage, Color color, int lifetime) {
-        super(TBEntities.LIGHTNING_PROJECTILE.get(), world);
+    public LightningProjectile(LivingEntity entity, Type lightningType, int damage, Color color, int lifetime) {
+        this(TBEntities.LIGHTNING_PROJECTILE.get(), entity.level);
         this.lightningType = lightningType;
         this.damage = damage;
         this.color = color;
         this.lifetime = lifetime;
+        this.setOwner(entity);
+        this.moveTo(entity.getX(), (entity.getY() + entity.getEyeHeight()) - 0.25D, entity.getZ(), entity.getYRot(), entity.getXRot());
     }
 
     public LightningProjectile(EntityType<LightningProjectile> lightningType, Level world) {
         super(lightningType, world);
-        /*this.type = Type.LIGHTNING;
+        this.lightningType = Type.LIGHTNING;
         this.damage = 4;
         this.color = Color.RED;
         this.gravity = 0;
-        this.lifetime = 60;*/
+        this.lifetime = 60;
     }
 
     public Type getLightningType() {
         return lightningType;
+    }
+
+    @Override
+    public boolean isOnFire() {
+        return false;
     }
 
     @Override
@@ -101,7 +109,7 @@ public class LightningProjectile extends ThrowableProjectile implements IEntityA
             }
 
         }
-        this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.PLAYER_HURT_ON_FIRE, SoundSource.AMBIENT, 10000.0F, 0.5F + this.random.nextFloat() * 0.2F);
+        this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.AMBIENT, 0.5F, 0.5F + this.random.nextFloat() * 0.2F);
         //this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundCategory.WEATHER, 2.0F, 0.5F + this.random.nextFloat() * 0.2F);
 
     }

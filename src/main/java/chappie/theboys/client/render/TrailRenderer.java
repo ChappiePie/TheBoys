@@ -1,16 +1,10 @@
 package chappie.theboys.client.render;
 
 import chappie.theboys.common.entities.TrailEntity;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -41,26 +35,5 @@ public class TrailRenderer extends EntityRenderer<TrailEntity> {
     @Override
     public ResourceLocation getTextureLocation(TrailEntity entity) {
         return InventoryMenu.BLOCK_ATLAS;
-    }
-
-    public static class MyRenderTypes extends RenderType {
-
-        protected static final RenderStateShard.TransparencyStateShard MY_TRANSPARENCY = new RenderStateShard.TransparencyStateShard("my_transparency", () -> {
-            RenderSystem.enableBlend();
-            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-        }, () -> {
-            RenderSystem.disableBlend();
-            RenderSystem.defaultBlendFunc();
-        });
-
-        private static final RenderType TRAIL = create("theboys:trail", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 256, false, true, RenderType.CompositeState.builder()
-                .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
-                .setWriteMaskState(COLOR_DEPTH_WRITE)
-                .setTransparencyState(MY_TRANSPARENCY)
-                .createCompositeState(false));
-
-        public MyRenderTypes(String p_173178_, VertexFormat p_173179_, VertexFormat.Mode p_173180_, int p_173181_, boolean p_173182_, boolean p_173183_, Runnable p_173184_, Runnable p_173185_) {
-            super(p_173178_, p_173179_, p_173180_, p_173181_, p_173182_, p_173183_, p_173184_, p_173185_);
-        }
     }
 }

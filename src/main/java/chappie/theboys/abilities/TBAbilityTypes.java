@@ -19,14 +19,6 @@ public class TBAbilityTypes {
     public static final AbilityType TB_ATTRIBUTE = register("attribute_modifier", TBAttributeModifierAbility::new);
     public static final AbilityType SUPER_HEARING = register("super_hearing", JSONAbility::new);
     public static final AbilityType STARLIGHT = register("starlight", StarLightAbility::new);
-    public static final AbilityType SPEED_CHANGE = register("speed_change", (abilityType, player, jsonObject) -> new ScrollAbility(abilityType, player, jsonObject, (a, delta) -> {
-        for (SpeedAbility ability : AbilityHelper.getListOfType(SpeedAbility.class, AbilityHelper.getAbilities(player))) {
-            if (a.getAdditionalData().equals(ability.getAdditionalData()) && ability.getEnabled()) {
-                ability.increaseDecreaseSpeedLevel(delta);
-                break;
-            }
-        }
-    }));
     public static final AbilityType LIGHTING_LENGTH_CHANGE = register("lightning_length_change", (abilityType, player, jsonObject) -> new ScrollAbility(abilityType, player, jsonObject, (a, delta) -> {
         for (LightningFromArmsAbility ability : AbilityHelper.getListOfType(LightningFromArmsAbility.class, AbilityHelper.getAbilities(player))) {
             if (a.getAdditionalData().equals(ability.getAdditionalData()) && ability.getEnabled()) {

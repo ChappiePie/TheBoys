@@ -11,6 +11,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,12 +28,12 @@ public class TBClientEventHandler {
     public void playSound(PlaySoundEvent event) {
         var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         if (event.getSound() instanceof SimpleSoundInstance soundInstance && camera.getEntity() instanceof Player player) {
-            if (AbilityHelper.getAbilities(player).stream().anyMatch(p -> p.type == TBAbilityTypes.SUPER_HEARING)) {
-                for (Ability ability : AbilityHelper.getAbilities(player)) {
-                    if (ability.type == TBAbilityTypes.SUPER_HEARING && ability.getEnabled()) {
-                        ((ISimpleSoundInstance) soundInstance).setPosition(player.position());
-                        event.setSound(soundInstance);
-                    }
+            if (AbilityHelper.getAbilities(player).stream().anyMatch(p -> p.type == TBAbilityTypes.SUPER_HEARING && p.getEnabled())) {
+                Vec3 vec3 = new Vec3(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ());
+                double distance = vec3.distanceTo(player.position());
+                if (distance < 40) {
+                    ((ISimpleSoundInstance) soundInstance).setPosition(player.position());
+                    event.setSound(soundInstance);
                 }
             }
         }

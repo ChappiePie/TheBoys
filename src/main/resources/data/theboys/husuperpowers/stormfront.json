@@ -3,7 +3,8 @@
 		"stormfront_lightning_from_arms": {
 			"ability": "theboys:lightning_from_arms",
 			"color": [129, 48, 156],
-			"active": true, "hidden": true,
+			"maxCooldown": 20,
+			"active": true,
 			"key": {
 				"id": 1,
 				"pressType": "held"
@@ -17,30 +18,13 @@
 				"pressType": "held"
 			}
 		},
-		"stormfront_lightning_projectile": {
-			"ability": "heroesunited:projectile",
-			"entity": "theboys:lightning_projectile",
-			"active": true, "hidden": true,
-			"nbt": {
-				"color": [129, 48, 156],
-				"lightningType": "lightning",
-				"gravity": 0,
-				"damage": 4,
-				"lifetime": 60
-			},
-			"cooldown": 40,
-			"key": {
-				"id": 2,
-				"pressType": "action"
-			}
-		},
 		"stormfront_flight": {
 			"ability": "heroesunited:flight",
 			"type": "lightnings",
 			"active": true, "hidden": true,
 			"color": [129, 48, 156],
 			"key": {
-				"id": 3,
+				"id": 2,
 				"pressType": "held"
 			}
 		}

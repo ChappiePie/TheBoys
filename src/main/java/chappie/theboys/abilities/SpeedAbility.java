@@ -23,6 +23,7 @@ import java.util.UUID;
 
 public class SpeedAbility extends JSONAbility {
     public static final VoxelShape STABLE_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.25D, 16.0D);
+    private int upgradeCooldown, cooldown;
 
     public SpeedAbility(AbilityType type, Player player, JsonObject jsonObject) {
         super(type, player, jsonObject);
@@ -31,24 +32,43 @@ public class SpeedAbility extends JSONAbility {
     @Override
     public void registerData() {
         super.registerData();
-        this.dataManager.register("speedLevel", 0);
+        this.dataManager.register("speedLevel", 1);
     }
 
     @Override
     public void action(Player player) {
         super.action(player);
-        int speedLevel = this.dataManager.<Integer>getValue("speedLevel");
-        int amount = speedLevel == 0 ? 1 : speedLevel;
-
-        this.setAttribute(this.player, this.name, Attributes.MOVEMENT_SPEED, getEnabled() ? amount : 0.0F);
-        this.setAttribute(this.player, this.name, Attributes.ATTACK_SPEED, getEnabled() ? amount : 0.0F);
-
         if (this.getEnabled()) {
+            int speedLevel = this.dataManager.getAsInt("speedLevel");
             float walkDifference = (player.walkDist / 0.6F) - (player.walkDistO / 0.6F);
 
-            if (walkDifference > 0.0F && !player.level.isClientSide && player.tickCount % 2 == 0) {
+            this.setAttribute(this.player, this.name, Attributes.MOVEMENT_SPEED, speedLevel);
+            this.setAttribute(this.player, this.name, Attributes.ATTACK_SPEED, speedLevel);
+
+            if (walkDifference > 0.0F && !player.level.isClientSide) {
                 TrailEntity trail = new TrailEntity(player.level, player, HUJsonUtils.getColor(this.getJsonObject()), GsonHelper.getAsInt(this.getJsonObject(), "lifeTimeTrail", 20));
                 player.level.addFreshEntity(trail);
+            }
+
+            if (walkDifference > 0.0F) {
+                if (this.upgradeCooldown > 0) {
+                    --this.upgradeCooldown;
+                } else {
+                    if (speedLevel < this.getMaxSpeedLevel()) {
+                        this.dataManager.set("speedLevel", speedLevel + 1);
+                        this.upgradeCooldown = this.dataManager.getAsInt("speedLevel") * 5;
+                    }
+                }
+            } else {
+                if (this.cooldown > 0) {
+                    --this.cooldown;
+                } else {
+                    if (speedLevel > 1) {
+                        this.dataManager.set("speedLevel", speedLevel - 1);
+                        this.upgradeCooldown = 0;
+                        this.cooldown = this.dataManager.getAsInt("speedLevel");
+                    }
+                }
             }
 
             if (player.isSprinting()) {
@@ -58,29 +78,29 @@ public class SpeedAbility extends JSONAbility {
                     }
                 }
 
-                if (speedLevel > 5 && walkDifference > 0.6F) {
+                if (speedLevel > 5 && walkDifference > 0.0F) {
                     for (LivingEntity entity : player.level.getEntitiesOfClass(LivingEntity.class,
-                            HUPlayerUtil.getCollisionBoxWithRange(player.position(), 1.0D))) {
+                            HUPlayerUtil.getCollisionBoxWithRange(player.position(), 1.5D))) {
                         if (entity != player) {
                             entity.hurt(DamageSource.IN_WALL, speedLevel);
                         }
                     }
                 }
             }
+        } else {
+            this.dataManager.set("speedLevel", 1);
+            this.setAttribute(this.player, this.name, Attributes.MOVEMENT_SPEED, 0.0F);
+            this.setAttribute(this.player, this.name, Attributes.ATTACK_SPEED, 0.0F);
+            this.cooldown = this.upgradeCooldown = 0;
         }
     }
 
-    @Override
-    public void setEnabled(Player player, boolean enabled) {
-        super.setEnabled(player, enabled);
-    }
-
-    public void increaseDecreaseSpeedLevel(double faster) {
-        int max = GsonHelper.getAsInt(this.getJsonObject(), "maxSpeedLevel", 10);
-        int speedLevel = (int) (this.dataManager.<Integer>getValue("speedLevel") + faster);
-        if (speedLevel <= (BoysCap.getCap(this.player).haveCompoundV() ? max * 1.25F : max) && speedLevel > 1) {
-            this.dataManager.set("speedLevel", speedLevel);
+    public int getMaxSpeedLevel() {
+        int speedLevel = GsonHelper.getAsInt(this.getJsonObject(), "maxSpeedLevel", 10);
+        if (BoysCap.getCap(this.player).haveCompoundV()) {
+            speedLevel *= 1.5F;
         }
+        return speedLevel;
     }
 
     public void setAttribute(LivingEntity entity, String name, Attribute attribute, double amount) {

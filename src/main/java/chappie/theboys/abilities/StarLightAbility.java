@@ -45,21 +45,21 @@ public class StarLightAbility extends Ability {
     public void onUpdate(Player player) {
         super.onUpdate(player);
         if (this.dataManager.<Boolean>getValue("enabled")) {
-            this.dataManager.set("ticks", this.dataManager.<Integer>getValue("ticks") + 1);
+            this.dataManager.set("ticks", this.dataManager.getAsInt("ticks") + 1);
         } else this.dataManager.set("ticks", 0);
 
-        if (this.dataManager.<Integer>getValue("ticks") >= 1200 && this.dataManager.<Integer>getValue("energy_eated") > 50) {
-            this.dataManager.set("energy_eated", this.dataManager.<Integer>getValue("energy_eated") - 50);
-            this.dataManager.set("ticks", this.dataManager.<Integer>getValue("ticks") - 1200);
+        if (this.dataManager.getAsInt("ticks") >= 1200 && this.dataManager.getAsInt("energy_eated") > 50) {
+            this.dataManager.set("energy_eated", this.dataManager.getAsInt("energy_eated") - 50);
+            this.dataManager.set("ticks", this.dataManager.getAsInt("ticks") - 1200);
         }
 
-        if (this.dataManager.<Integer>getValue("ticks") >= 6000) {
+        if (this.dataManager.getAsInt("ticks") >= 6000) {
             this.dataManager.set("enabled", false);
         }
 
-        if (this.dataManager.<Integer>getValue("energy_eated") > 10 && !this.dataManager.<Boolean>getValue("enabled")) {
+        if (this.dataManager.getAsInt("energy_eated") > 10 && !this.dataManager.<Boolean>getValue("enabled")) {
             this.dataManager.set("enabled", true);
-            this.dataManager.set("energy_eated", this.dataManager.<Integer>getValue("energy_eated") - 10);
+            this.dataManager.set("energy_eated", this.dataManager.getAsInt("energy_eated") - 10);
         }
     }
 
@@ -74,11 +74,11 @@ public class StarLightAbility extends Ability {
                     IntegerProperty property1 = BlockStateProperties.POWER;
                     if (state.getOptionalValue(property1).isPresent() && state.getOptionalValue(property1).get() != 0) {
                         player.level.setBlock(pos, state.setValue(property1, 0), 2);
-                        this.dataManager.set("energy_eated", this.dataManager.<Integer>getValue("energy_eated") + 1);
+                        this.dataManager.set("energy_eated", this.dataManager.getAsInt("energy_eated") + 1);
                     }
                     if (state.getOptionalValue(property).isPresent() && state.getOptionalValue(property).get()) {
                         player.level.setBlock(pos, state.setValue(property, false), 2);
-                        this.dataManager.set("energy_eated", this.dataManager.<Integer>getValue("energy_eated") + 1);
+                        this.dataManager.set("energy_eated", this.dataManager.getAsInt("energy_eated") + 1);
                     }
                     HUPlayer.getCap(player).sync();
                 }
@@ -95,7 +95,7 @@ public class StarLightAbility extends Ability {
                 if (getDataManager().<Boolean>getValue("enabled")) {
                     for (HumanoidArm side : HumanoidArm.values()) {
                         float r = 0.15F;
-                        float i = getDataManager().<Integer>getValue("ticks") <= 1200 ? 1f : 0.5F;
+                        float i = getDataManager().getAsInt("ticks") <= 1200 ? 1f : 0.5F;
                         AABB box = new AABB(-r, -r, -r, r, r, r);
                         poseStack.pushPose();
                         renderer.getModel().translateToHand(side, poseStack);

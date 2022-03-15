@@ -2,6 +2,7 @@ package chappie.theboys;
 
 import chappie.theboys.abilities.SpeedsterSuit;
 import chappie.theboys.abilities.TBAbilityTypes;
+import chappie.theboys.client.ATrainOverlay;
 import chappie.theboys.client.TBClientEventHandler;
 import chappie.theboys.client.render.LightningProjectileRenderer;
 import chappie.theboys.client.render.TrailRenderer;
@@ -18,6 +19,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -78,6 +81,7 @@ public class TheBoys {
     public void setupClient(FMLClientSetupEvent event) {
         AbilitiesScreen.themes.add(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
         AbilitiesScreen.themes.add(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
+        OverlayRegistry.registerOverlayAbove(ForgeIngameGui.HOTBAR_ELEMENT, "A-Train Overlay", new ATrainOverlay());
     }
 
     @OnlyIn(Dist.CLIENT)
