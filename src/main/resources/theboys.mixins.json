@@ -5,10 +5,21 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
-    "AbstractSoundInstanceMixin"
+    "client.AbstractSoundInstanceMixin",
+    "client.HumanoidArmorLayerMixin",
+    "client.HumanoidModelMixin",
+    "client.ItemInHandRendererMixin",
+    "client.ItemRendererMixin",
+    "client.MinecraftMixin",
+    "client.PlayerRendererMixin"
   ],
   "mixins": [
+    "ArmorItemMixin",
+    "EntityAccessor",
+    "EntityMixin",
     "LiquidBlockMixin",
+    "LivingEntityMixin",
+    "LivingEntityRendererAccessor",
     "ServerLevelMixin"
   ],
   "injectors": {

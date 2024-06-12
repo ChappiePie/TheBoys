@@ -6,21 +6,21 @@
   "item.theboys.injection": "Injection Item",
   "item.theboys.scrap": "Scrap Item",
 
-  "item.theboys.atrain_head": "A-Train Helmet",
-  "item.theboys.atrain_chest": "A-Train Chest",
-  "item.theboys.atrain_legs": "A-Train Leggings",
-  "item.theboys.atrain_feet": "A-Train Boots",
+  "item.theboys.atrain_helmet": "A-Train Helmet",
+  "item.theboys.atrain_chestplate": "A-Train Chest",
+  "item.theboys.atrain_leggings": "A-Train Leggings",
+  "item.theboys.atrain_boots": "A-Train Boots",
 
-  "item.theboys.homelander_chest": "Homelander Chest",
-  "item.theboys.homelander_legs": "Homelander Leggings",
-  "item.theboys.homelander_feet": "Homelander Boots",
+  "item.theboys.homelander_chestplate": "Homelander Chest",
+  "item.theboys.homelander_leggings": "Homelander Leggings",
+  "item.theboys.homelander_boots": "Homelander Boots",
 
-  "item.theboys.stormfront_chest": "Stormfront Chest",
-  "item.theboys.stormfront_legs": "Stormfront Leggings",
-  "item.theboys.stormfront_feet": "Stormfront Boots",
+  "item.theboys.stormfront_chestplate": "Stormfront Chest",
+  "item.theboys.stormfront_leggings": "Stormfront Leggings",
+  "item.theboys.stormfront_boots": "Stormfront Boots",
 
   "item.theboys.starlight_chest": "Starlight Chest",
-  "item.theboys.starlight_feet": "Starlight Boots",
+  "item.theboys.starlight_boots": "Starlight Boots",
 
   "theseven.motto": "The Seven: Let justice be done though the heavens fall.",
 
@@ -36,5 +36,17 @@
 
   "ability.theboys.lasers_from_eyes": "Lasers from Eyes",
   "ability.theboys.flight": "Flight",
-  "ability.theboys.speed": "Speed"
+  "ability.theboys.speed": "Speed",
+  "gui.theboys.eyeOptions": "Eye Options",
+  "gui.theboys.eyeOptions.blockedByPreset": "Blocked by preset",
+  "gui.theboys.eyeOptions.eyeLength": "Eyes length: %s",
+  "gui.theboys.eyeOptions.eyeHeight": "Eyes height: %s",
+  "gui.theboys.eyeOptions.layersLength": "Lasers length: %s",
+  "gui.theboys.eyeOptions.playerRotation": "Rotation: %s°",
+  "gui.theboys.eyeOptions.skinPreset": "Skin preset",
+  "gui.theboys.eyeOptions.basicPresets": "Basic presets for lasers",
+  "gui.theboys.eyeOptions.laserOptions": "Lasers Options",
+  "gui.theboys.eyeOptions.profileName": "Profile name",
+  "narrator.button.theBoys": "The Boys",
+  "item.theboys.suit.equip": "To equip part of the suit, pick up the item and press RMB on the armor item"
 }

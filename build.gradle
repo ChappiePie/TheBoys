@@ -1,110 +1,85 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://maven.parchmentmc.org' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7.+'
-        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-//apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+}
 
-version = "${mc_version}-${build_version}"
-group = "chappie.theboys"
-archivesBaseName = "TheBoys"
+apply plugin: 'org.spongepowered.mixin'
+
+version = "${mod_version}"
+group = 'chappie.theboys'
+archivesBaseName = 'theboys'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
 minecraft {
-    //mappings channel: 'official', version: "${mc_version}"
-    mappings channel: 'parchment', version: "1.18.1-2021.12.19-${mc_version}"
+    mappings channel: 'parchment', version: "2023.06.26-1.19.4"
+    //mappings channel: 'parchment', version: "2023.03.12-${minecraft_version}"
+    //mappings channel: 'official', version: '${minecraft_version}'
 
     //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
-        client {
+        all {
             workingDirectory project.file('run')
-
+            property 'forge.logging.markers', 'SCAN, REGISTRIES, REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'theboys'
             mods {
                 theboys {
                     source sourceSets.main
                 }
             }
         }
-
+        client {}
         clientWithCredentials {
             parent runs.client
             args '--username', 'ChappiePie', '--uuid', '8464971c-f5ac-4eb5-87aa-511a0eec65f6'
         }
-
-        server {
-            workingDirectory project.file('run')
-
-            mods {
-                theboys {
-                    source sourceSets.main
-                }
-            }
+        clientWithCredentials2 {
+            parent runs.client
+            args '--username', 'SEMASEM', '--uuid', '33ef476e-f075-45fb-8c22-9ecd6483abd3'
         }
-
+        server {}
         data {
-            workingDirectory project.file('run')
-            args '--mod', 'theboys', '--all', '--output', file('src/generated/resources/'), "-mixin.config=heroesunited.mixins.json"
-            mods {
-                theboys {
-                    source sourceSets.main
-                }
-            }
+            args '--mod', 'theboys', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
         }
     }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-minecraft.runs.all {
-    property 'forge.logging.markers', 'SCAN, REGISTRIES, REGISTRYDUMP'
-    property 'forge.logging.console.level', 'debug'
-
-    property 'mixin.env.remapRefMap', 'true'
-    property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-}
-
 repositories {
-    maven { url 'https://maven.explodingcreeper.me/' }
     mavenLocal()
-}
-
-dependencies {
-    minecraft "net.minecraftforge:forge:$mc_version-$forge_version"
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    implementation fg.deobf("xyz.heroesunited:hu-core:$core_version")
-}
-
-jar {
-    manifest {
-        attributes([
-                "Specification-Title"     : "${archivesBaseName}",
-                "Specification-Vendor"    : "${archivesBaseName}sareus",
-                "Specification-Version"   : "1",
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${version}",
-                "Implementation-Vendor"   : "${archivesBaseName}sareus",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
+    maven { url 'https://jitpack.io' }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
     }
 }
 
-jar.finalizedBy('reobfJar')
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation fg.deobf("chappie.modulus:modulus:${core_version}")
+    compileOnly(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-common:${mixin_extras_version}"))
+    compileOnly(fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}"))
+
+    if (System.getProperty('idea.sync.active') != 'true') {
+        annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+    }
+}
 
 mixin {
     add sourceSets.main, "theboys.refmap.json"
@@ -114,4 +89,37 @@ mixin {
     debug.export = true
     dumpTargetOnFailure = true
     quiet
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : "theboys",
+                "Specification-Vendor"    : "theboyssareus",
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : "theboyssareus",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/mcmodsrepo"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }

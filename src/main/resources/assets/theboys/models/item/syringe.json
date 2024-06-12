@@ -1,0 +1,15 @@
+{
+  "parent": "forge:item/default",
+  "loader": "forge:separate_transforms",
+  "textures": {
+    "particle": "theboys:item/syringe_3d"
+  },
+  "base": {
+    "parent": "theboys:item/syringe_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "theboys:item/syringe_2d"
+    }
+  }
+}

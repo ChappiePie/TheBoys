@@ -1,93 +1,162 @@
 package chappie.theboys;
 
-import chappie.theboys.abilities.SpeedsterSuit;
-import chappie.theboys.abilities.TBAbilityTypes;
+import chappie.modulus.client.gui.ChappModListWidget;
+import chappie.modulus.util.CommonUtil;
 import chappie.theboys.client.ATrainOverlay;
-import chappie.theboys.client.TBClientEventHandler;
-import chappie.theboys.client.render.LightningProjectileRenderer;
-import chappie.theboys.client.render.TrailRenderer;
-import chappie.theboys.common.TBEventHandler;
-import chappie.theboys.common.capability.IBoys;
-import chappie.theboys.common.capability.TBCapabilityEvents;
-import chappie.theboys.common.entities.TBEntities;
-import chappie.theboys.common.items.InjectionItem;
-import chappie.theboys.common.items.TBItems;
-import chappie.theboys.network.TBNetworking;
-import chappie.theboys.util.TBRecipeSerializer;
+import chappie.theboys.client.ClientEvents;
+import chappie.theboys.client.gui.EyeOptionsScreen;
+import chappie.theboys.client.renderer.TrailRenderer;
+import chappie.theboys.common.CommonEvents;
+import chappie.theboys.common.ability.HeatVisionAbility;
+import chappie.theboys.common.ability.base.TBAbilityTypes;
+import chappie.theboys.common.ability.base.TBSuperpowers;
+import chappie.theboys.common.capability.TheBoysCap;
+import chappie.theboys.common.entity.TBEntities;
+import chappie.theboys.common.item.SyringeItem;
+import chappie.theboys.common.item.TBItems;
+import chappie.theboys.common.item.VialItem;
+import chappie.theboys.common.particle.LaserParticle;
+import chappie.theboys.common.particle.TBParticleTypes;
+import chappie.theboys.networking.TBNetworking;
+import chappie.theboys.util.TBClientUtil;
+import chappie.theboys.util.TBCommonUtil;
+import chappie.theboys.util.TBConfig;
+import chappie.theboys.util.tooltip.ArmorTooltip;
+import chappie.theboys.util.tooltip.ClientArmorTooltip;
+import com.mojang.logging.LogUtils;
+import net.minecraft.client.CameraType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.item.ItemColors;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
+import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import xyz.heroesunited.heroesunited.client.gui.AbilitiesScreen;
-import xyz.heroesunited.heroesunited.hupacks.HUPackSuit;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+
+import java.awt.*;
 
 @Mod(TheBoys.MODID)
 public class TheBoys {
+
     public static final String MODID = "theboys";
-    public static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public TheBoys() {
-        final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.register(this);
-
-        TBAbilityTypes.ABILITIES.register(bus);
         TBItems.ITEMS.register(bus);
+        TBAbilityTypes.ABILITIES.register(bus);
+        TBSuperpowers.SUPERPOWERS.register(bus);
         TBEntities.ENTITIES.register(bus);
-        TBRecipeSerializer.RECIPE_SERIALIZERS.register(bus);
+        TBParticleTypes.PARTICLES.register(bus);
 
-        MinecraftForge.EVENT_BUS.register(new TBCapabilityEvents());
-        MinecraftForge.EVENT_BUS.register(new TBEventHandler());
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new TBClientEventHandler()));
+        MinecraftForge.EVENT_BUS.register(new CommonEvents());
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, TBConfig.CLIENT_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TBConfig.COMMON_SPEC);
+
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                MinecraftForge.EVENT_BUS.register(new ClientEvents()));
     }
 
     static {
-        HUPackSuit.registerSuitType(new ResourceLocation(TheBoys.MODID, "speedster"), SpeedsterSuit::new);
+        ChappModListWidget.MOD_CLICKED.put(MODID, (e) -> {
+            Minecraft.getInstance().setScreen(new EyeOptionsScreen(e.parent));
+        });
     }
 
     @SubscribeEvent
-    public void setup(final FMLCommonSetupEvent event) {
+    public void commonSetup(final FMLCommonSetupEvent event) {
         TBNetworking.registerMessages();
     }
 
     @SubscribeEvent
-    public void setup(final RegisterCapabilitiesEvent event) {
-        event.register(IBoys.class);
+    public void gatherComponents(RegisterClientTooltipComponentFactoriesEvent event) {
+        event.register(ArmorTooltip.class, ClientArmorTooltip::new);
+    }
+
+    @SubscribeEvent
+    public void registerCapabilities(final RegisterCapabilitiesEvent event) {
+        event.register(TheBoysCap.class);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public void registerLayerDefinitions(final EntityRenderersEvent.RegisterLayerDefinitions event) {
+        //event.registerLayerDefinition(CapeModel.LAYER_LOCATION, CapeModel::createBodyLayer);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public void clientSetup(final FMLClientSetupEvent event) {
+        event.enqueueWork(() -> ItemProperties.register(TBItems.SYRINGE.get(), new ResourceLocation(TheBoys.MODID, "has_vial"), (pStack, pLevel, pEntity, pSeed) -> {
+            if (pStack.getTag() != null && pStack.getTag().contains("vial")) {
+                return 1;
+            }
+            return 0;
+        }));
+        //event.registerLayerDefinition(CapeModel.LAYER_LOCATION, CapeModel::createBodyLayer);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public void registerColor(RegisterColorHandlersEvent.Item event) {
+        event.register((stack, i) -> i > 0 ? -1 : ((SyringeItem) stack.getItem()).getColor(stack), TBItems.SYRINGE.get());
+        event.register((stack, i) -> i > 0 ? -1 : ((VialItem) stack.getItem()).getColor(stack), TBItems.VIAL.get());
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public void onParticleFactoryRegistration(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(TBParticleTypes.LASER.get(), LaserParticle.LaserParticleFactory::new);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public void registerGuiOverlay(final RegisterGuiOverlaysEvent event) {
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "a-train", new ATrainOverlay());
+        event.registerAbove(VanillaGuiOverlay.FROSTBITE.id(), "glow_eyes", (gui, mStack, partialTicks, width, height) -> {
+            if (TBConfig.CLIENT_SPEC.isLoaded() && !TBConfig.CLIENT.eyesOverlay.get()) return;
+            Entity entity = gui.getMinecraft().getCameraEntity();
+            if (entity != null && entity.isAddedToWorld() && entity.isAlive()) {
+                if (gui.getMinecraft().options.getCameraType() == CameraType.FIRST_PERSON) {
+                    for (HeatVisionAbility a : CommonUtil.listOfType(HeatVisionAbility.class, CommonUtil.getAbilities(entity))) {
+                        Color color = a.dataManager.get(TBCommonUtil.COLOR);
+                        float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F, alpha = a.eyesTimer.value(partialTicks);
+
+                        gui.setupOverlayRenderState(true, false);
+                        TBClientUtil.renderTextureOverlay(TBClientUtil.GLOW_EYES_OVERLAY, height, width, red, green, blue, alpha);
+                    }
+                }
+            }
+        });
     }
 
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(TBEntities.TRAIL.get(), TrailRenderer::new);
-        event.registerEntityRenderer(TBEntities.LIGHTNING_PROJECTILE.get(), LightningProjectileRenderer::new);
-
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public void setupClient(FMLClientSetupEvent event) {
-        AbilitiesScreen.themes.add(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_boys.png"));
-        AbilitiesScreen.themes.add(new ResourceLocation(TheBoys.MODID, "textures/gui/themes/the_seven.png"));
-        OverlayRegistry.registerOverlayAbove(ForgeIngameGui.HOTBAR_ELEMENT, "A-Train Overlay", new ATrainOverlay());
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public void registerItemColor(ColorHandlerEvent.Item event) {
-        event.getItemColors().register(InjectionItem::getColor, TBItems.INJECTION.get());
-        event.getItemColors().register(InjectionItem::getColor, TBItems.VIAL.get());
     }
 }

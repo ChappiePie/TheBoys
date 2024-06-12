@@ -1,0 +1,7 @@
+{
+	"parent": "item/generated",
+	"textures": {
+		"layer0": "theboys:item/vial_fluid",
+		"layer1": "theboys:item/vial"
+	}
+}

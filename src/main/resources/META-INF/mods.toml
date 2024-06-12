@@ -1,17 +1,25 @@
-modLoader="javafml"
-loaderVersion="[34,)"
-license="All right reserved"
+modLoader="javafml" 
+loaderVersion="[44,)"
+license="All rights reserved"
 
 [[mods]]
 modId="theboys"
-version="0.1"
-displayName="Heroes United: The Boys"
+version="${file.jarVersion}"
+displayName="The Boys"
+logoFile="theboys.png"
+credits="Thanks to BizDC for skins"
 authors="Chappie"
-description="The Boys is part of the Amazon Prime series!"
+description='''"The Boys" mod, is based on the series of the same name, allows players to get into the role of superheroes. It includes suits, weapons and abilities inspired by the world of The Boys. This will enrich the gaming experience of fans of the series, allowing them to play as characters from this series.'''
+[[dependencies.theboys]]
+    modId="forge" 
+    mandatory=true
+    versionRange="[44,)"
+    ordering="NONE"
+    side="BOTH"
 
 [[dependencies.theboys]]
-   modId="heroesunited"
-   mandatory=true
-   versionRange="2,"
-   ordering="AFTER"
-   side="BOTH"
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.19.3,1.20)"
+    ordering="NONE"
+    side="BOTH"

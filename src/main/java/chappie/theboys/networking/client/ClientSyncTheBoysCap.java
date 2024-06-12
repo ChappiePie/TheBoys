@@ -1,0 +1,42 @@
+package chappie.theboys.networking.client;
+
+import chappie.theboys.common.capability.TheBoysCap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
+
+public class ClientSyncTheBoysCap {
+
+    public int entityId;
+    private final CompoundTag data;
+
+    public ClientSyncTheBoysCap(int entityId, CompoundTag data) {
+        this.entityId = entityId;
+        this.data = data;
+    }
+
+    public ClientSyncTheBoysCap(FriendlyByteBuf buf) {
+        this.entityId = buf.readInt();
+        this.data = buf.readNbt();
+    }
+
+    public void toBytes(FriendlyByteBuf buf) {
+        buf.writeInt(this.entityId);
+        buf.writeNbt(this.data);
+    }
+
+    public void handle(Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            Entity entity = Minecraft.getInstance().level.getEntity(this.entityId);
+            if (entity instanceof LivingEntity e) {
+                e.getCapability(TheBoysCap.CAPABILITY).ifPresent(data -> data.deserializeNBT(this.data));
+            }
+        });
+        ctx.get().setPacketHandled(true);
+    }
+}

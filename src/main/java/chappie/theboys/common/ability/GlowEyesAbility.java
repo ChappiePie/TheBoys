@@ -1,0 +1,101 @@
+package chappie.theboys.common.ability;
+
+import chappie.modulus.common.ability.base.Ability;
+import chappie.modulus.common.ability.base.AbilityBuilder;
+import chappie.modulus.common.ability.base.AbilityClientProperties;
+import chappie.modulus.util.IHasTimer;
+import chappie.modulus.util.model.ModelProperties;
+import chappie.theboys.TheBoys;
+import chappie.theboys.common.capability.TheBoysCap;
+import chappie.theboys.util.TBCommonUtil;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+
+import java.awt.*;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+public class GlowEyesAbility extends Ability implements IHasTimer {
+
+    public static final ResourceLocation GLOW_EYES = new ResourceLocation(TheBoys.MODID, "textures/models/glow_eyes.png");
+
+    public Timer eyesTimer = new Timer(() -> 4, this::isEnabled);
+
+    public GlowEyesAbility(LivingEntity entity, AbilityBuilder builder) {
+        super(entity, builder);
+    }
+
+    @Override
+    public void defineData() {
+        super.defineData();
+        this.dataManager.define(TBCommonUtil.COLOR, Color.RED);
+    }
+
+    @Override
+    public void initializeClient(Consumer<AbilityClientProperties> consumer) {
+        super.initializeClient(consumer);
+        consumer.accept(new AbilityClientProperties() {
+
+            private final Supplier<HumanoidModel<?>> copyModel = () ->
+                    new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER));
+
+            @Override
+            public void render(EntityRendererProvider.Context context, LivingEntityRenderer<? extends LivingEntity, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
+                if (!modelProperties.root().hasChild("head")) return;
+                Color color = dataManager.get(TBCommonUtil.COLOR);
+                float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
+                boolean humanoid = renderer.getModel() instanceof HumanoidModel || renderer.getModel() instanceof HierarchicalModel;
+                poseStack.pushPose();
+                // Basically that's render of eyes without lasers
+                {
+                    float f = 1.03125f;
+                    float alpha = eyesTimer.value(modelProperties.partialTicks());
+                    poseStack.pushPose();
+                    modelProperties.root().getChild("head").translateAndRotate(poseStack);
+                    if (!humanoid) {
+                        poseStack.translate(0, 0.19, -0.26F);
+                    }
+                    TheBoysCap cap = TheBoysCap.getCap(entity);
+                    if (cap != null) {
+                        float f2 = cap.eyesHeight() - 5;
+                        poseStack.translate(0, f2 * 0.0625F, 0);
+                        float f1 = cap.eyesLength();
+                        float f3 = f1 == 1 ? 0 : f1 == 2 ? 0.0625F * 4F : 0.0625F * (8.25F - (3 - f1) * 4.25F);
+                        poseStack.translate(0F, f3, 0F);
+                        poseStack.scale(1F, f1, 1F);
+                    }
+                    poseStack.scale(f, f, f);
+                    VertexConsumer vertexConsumer = bufferIn.getBuffer(RenderType.beaconBeam(GLOW_EYES, true));
+                    for (int i = 0; i < 3; i++) {
+                        poseStack.pushPose();
+                        poseStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
+                        this.copyModel.get().head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, i == 0 ? alpha : alpha * 0.25F);
+                        poseStack.popPose();
+                    }
+                    poseStack.translate(0, 0, -(Math.cos(entity.tickCount * entity.tickCount) / 100F));
+                    this.copyModel.get().hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
+                    poseStack.popPose();
+                }
+                poseStack.popPose();
+            }
+        });
+    }
+
+    @Override
+    public Iterable<Timer> timers() {
+        return List.of(this.eyesTimer);
+    }
+}

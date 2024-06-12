@@ -1,3 +1,0 @@
-# The Boys
-
-The Boys
