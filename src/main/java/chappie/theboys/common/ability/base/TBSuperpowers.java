@@ -74,6 +74,6 @@ public class TBSuperpowers {
 
             AbilityBuilder.of("bruh", TBAbilityTypes.BRUH.get())
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD)
-                            .action(KeyCondition.Action.ACTION), "enabling")
+                            .action(KeyCondition.Action.HELD), "enabling")
     ));
 }

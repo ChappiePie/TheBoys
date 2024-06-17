@@ -51,7 +51,7 @@ public class VialItem extends Item implements GeoItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        setColor(pPlayer.getItemInHand(pUsedHand), DyeColor.RED.getTextColor());
+        setColor(pPlayer.getItemInHand(pUsedHand), 104166);
         return super.use(pLevel, pPlayer, pUsedHand);
     }
 

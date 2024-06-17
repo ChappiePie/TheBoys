@@ -9,21 +9,13 @@
   },
   "perspectives": {
     "gui": {
-      "parent": "theboys:item/syringe/2d"
+      "parent": "theboys:item/syringe/2d_vial"
     },
     "fixed": {
-      "parent": "theboys:item/syringe/2d"
+      "parent": "theboys:item/syringe/2d_vial"
     },
     "ground": {
-      "parent": "theboys:item/syringe/2d"
+      "parent": "theboys:item/syringe/2d_vial"
     }
-  },
-  "overrides": [
-    {
-      "predicate": {
-        "theboys:has_vial": 1
-      },
-      "model": "theboys:item/syringe_vial"
-    }
-  ]
+  }
 }

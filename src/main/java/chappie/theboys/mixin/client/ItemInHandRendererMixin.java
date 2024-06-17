@@ -1,5 +1,6 @@
 package chappie.theboys.mixin.client;
 
+import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.TBItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -24,7 +25,9 @@ public abstract class ItemInHandRendererMixin {
             at = @At("HEAD"), cancellable = true)
     public void renderOffHand(AbstractClientPlayer pPlayer, float pPartialTicks, float pPitch, InteractionHand pHand, float pSwingProgress, ItemStack pStack, float pEquippedProgress, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pCombinedLight, CallbackInfo ci) {
         if (!pPlayer.isScoping() && !pPlayer.isInvisible()) {
-            if (!pStack.isEmpty() && pStack.getItem() == TBItems.SYRINGE.get()) {
+            TheBoysCap theBoysCap = TheBoysCap.getCap(pPlayer);
+            if (!pStack.isEmpty() && (pStack.getItem() == TBItems.SYRINGE.get() || pStack.getItem() == TBItems.VIAL.get())
+                    || theBoysCap != null && theBoysCap.vialAnim.hideOffHand(pPlayer, theBoysCap, pPartialTicks, pHand)) {
                 pMatrixStack.pushPose();
                 this.renderPlayerArm(pMatrixStack, pBuffer, pCombinedLight, pEquippedProgress, pSwingProgress, pHand == InteractionHand.MAIN_HAND ? pPlayer.getMainArm() : pPlayer.getMainArm().getOpposite());
                 pMatrixStack.popPose();

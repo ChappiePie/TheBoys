@@ -45,10 +45,10 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
             cape.xRot = (float) Math.toRadians(rotation + 10F);
 
             for (FlightAbility a : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
-                this.sprintingTimer.predicate = () -> a.isEnabled() && player.isSprinting();
-                this.sprintingTimer.update();
-                cape.xRot += (float) ((Math.toRadians(10F + Mth.sin((player.tickCount + partialTicks) / 20F) * 5F) - cape.xRot / 2F) * a.timer.value(partialTicks));
-                cape.xRot += (float) ((Math.toRadians(10F) - cape.xRot) * sprintingTimer.value(partialTicks));
+                float t = a.sprintingTimer.value(partialTicks);
+                //cape.xRot += (float) ((Math.toRadians(10F + Mth.sin((player.tickCount + partialTicks) / 20F) * 5F) - cape.xRot / 2F) * a.timer.value(partialTicks));
+                //cape.xRot += (float) ((Math.toRadians(10F) - cape.xRot) * sprintingTimer.value(partialTicks));
+                cape.xRot -= cape.xRot * t;
             }
 
             pPoseStack.pushPose();

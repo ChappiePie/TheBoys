@@ -1,6 +1,6 @@
 package chappie.theboys.mixin;
 
-import chappie.theboys.util.EntitySavingFields;
+import chappie.theboys.util.interfaces.EntitySavingFields;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

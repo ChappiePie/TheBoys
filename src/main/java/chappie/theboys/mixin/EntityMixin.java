@@ -3,7 +3,7 @@ package chappie.theboys.mixin;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.TranslucentAbility;
-import chappie.theboys.util.EntitySavingFields;
+import chappie.theboys.util.interfaces.EntitySavingFields;
 import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import net.minecraft.world.entity.Entity;

@@ -7,7 +7,7 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.networking.server.ServerSetEyeOptions;
-import chappie.theboys.util.ISetupGameProfiles;
+import chappie.theboys.util.interfaces.ISetupGameProfiles;
 import chappie.theboys.util.TBConfig;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.Lighting;

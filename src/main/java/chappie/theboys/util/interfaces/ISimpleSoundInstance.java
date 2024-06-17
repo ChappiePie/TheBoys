@@ -1,4 +1,4 @@
-package chappie.theboys.util;
+package chappie.theboys.util.interfaces;
 
 public interface ISimpleSoundInstance {
 

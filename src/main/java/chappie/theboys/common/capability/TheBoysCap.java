@@ -1,18 +1,23 @@
 package chappie.theboys.common.capability;
 
+import chappie.modulus.util.IHasTimer;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.networking.client.ClientSyncTheBoysCap;
+import chappie.theboys.util.timers.SyringeVialAnim;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.network.NetworkDirection;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class TheBoysCap implements INBTSerializable<CompoundTag> {
 
@@ -21,6 +26,7 @@ public class TheBoysCap implements INBTSerializable<CompoundTag> {
     private final LivingEntity livingEntity;
     private boolean compoundV;
     private int eyesHeight = 5, eyesLength = 1;
+    public final SyringeVialAnim vialAnim = new SyringeVialAnim();
 
     public TheBoysCap(LivingEntity livingEntity) {
         this.livingEntity = livingEntity;
@@ -29,6 +35,12 @@ public class TheBoysCap implements INBTSerializable<CompoundTag> {
     @Nullable
     public static TheBoysCap getCap(Entity entity) {
         return entity.getCapability(TheBoysCap.CAPABILITY).orElse(null);
+    }
+
+    public void tick() {
+        if (this.livingEntity instanceof Player player) {
+            this.vialAnim.tick(player);
+        }
     }
 
     public boolean compoundV() {

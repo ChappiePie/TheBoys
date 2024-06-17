@@ -12,15 +12,20 @@ import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import chappie.theboys.common.capability.TheBoysCap;
+import chappie.theboys.common.item.SyringeItem;
 import chappie.theboys.common.item.TBItems;
+import chappie.theboys.common.item.VialItem;
 import chappie.theboys.common.item.suit.SuitItem;
-import chappie.theboys.util.ISimpleSoundInstance;
+import chappie.theboys.util.interfaces.ISimpleSoundInstance;
+import chappie.theboys.util.TBClientUtil;
 import chappie.theboys.util.TBCommonUtil;
+import chappie.theboys.util.timers.SyringeVialAnim;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
@@ -43,7 +48,6 @@ import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector3f;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.animation.RawAnimation;
@@ -56,17 +60,27 @@ public class ClientEvents {
     @SubscribeEvent
     public void firstPersonAdditionalHand(FirstPersonAdditionalHandEvent event) {
         var player = event.getEntity();
-        var cap = PlayerAnimCap.getCap(player);
-        if (cap != null) {
-            var controller = cap.getController("theboys_syringe_controller", true);
-            if (controller != null && controller.getCurrentAnimation() != null) {
-                if (event.hand() == InteractionHand.MAIN_HAND) {
+        TheBoysCap theBoysCap = TheBoysCap.getCap(player);
+        if (theBoysCap != null) {
+            float t = theBoysCap.vialAnim.timeline.value(event.partialTicks());
+            if (theBoysCap.vialAnim.hideOffHand(player, theBoysCap, event.partialTicks(), event.hand()) && t < 0.2F) {
+                event.equippedProgress().set(1.0F - t * 5F);
+            } else {
+                if (t > 0) {
+                    event.swingProgress().set(0.0F);
                     event.equippedProgress().set(0.0F);
                 }
-                if (event.hand() == InteractionHand.OFF_HAND
-                        && (controller.getCurrentAnimation().animation().name().equals("injecting")
-                        || controller.getCurrentAnimation().animation().name().equals("inject_tick"))
-                        && controller.getAnimationState() != AnimationController.State.STOPPED) {
+            }
+        }
+
+        PlayerAnimCap cap = PlayerAnimCap.getCap(player);
+        if (cap != null) {
+            var controller = cap.getController("theboys_syringe_controller", true);
+            if (controller != null && controller.getCurrentAnimation() != null && controller.getAnimationState() != AnimationController.State.STOPPED) {
+                if (event.hand() == InteractionHand.MAIN_HAND) {
+                    event.equippedProgress().set(0.0F);
+                } else if (controller.getCurrentAnimation().animation().name().equals("injecting")
+                        || controller.getCurrentAnimation().animation().name().equals("inject_tick")) {
                     event.renderArm().set(true);
                 }
             }
@@ -75,6 +89,41 @@ public class ClientEvents {
 
     @SubscribeEvent
     public <T extends LivingEntity, M extends HumanoidModel<T>> void setupAnim(SetupAnimEvent<T, M> event) {
+        TheBoysCap theBoysCap = TheBoysCap.getCap(event.getEntity());
+        float partialTicks = event.getModelProperties().partialTicks();
+        if (theBoysCap != null && event.getEntity() instanceof Player pPlayer) {
+            SyringeVialAnim vialAnim = theBoysCap.vialAnim;
+            float timeline = vialAnim.timeline.value(partialTicks);
+
+            boolean flag1 = pPlayer.getMainArm() == HumanoidArm.RIGHT;
+            int i = flag1 ? 1 : -1;
+            if (pPlayer.getMainHandItem().getItem() == TBItems.SYRINGE.get() && pPlayer.getOffhandItem().getItem() == TBItems.VIAL.get() || timeline > 0) {
+                float t = Math.min(timeline, 0.5F) * 2F;
+                float t1 = Mth.sin(pPlayer.tickCount + partialTicks) * vialAnim.rollVial.value(partialTicks);
+                float t2 = vialAnim.insertVial.value(partialTicks);
+
+                ModelPart mainHand = flag1 ? event.getModel().rightArm : event.getModel().leftArm;
+                ModelPart offHand = flag1 ? event.getModel().leftArm : event.getModel().rightArm;
+
+                float t3 = 1.0F - t;
+                mainHand.xRot *= t3;
+                mainHand.yRot *= t3;
+                mainHand.zRot *= t3;
+
+                offHand.xRot *= t3;
+                offHand.yRot *= t3;
+                offHand.zRot *= t3;
+
+                offHand.xRot -= (float) (Math.toRadians(102.5F + t2 * 2F) * t);
+                offHand.yRot += (float) (Math.toRadians(45F + t1) * t) * i;
+                offHand.zRot -= (float) (Math.toRadians(85F) * t) * i;
+
+                mainHand.xRot -= (float) (Math.toRadians(72.5F) * t);
+                mainHand.yRot -= (float) (Math.toRadians(45F) * t) * i;
+                mainHand.zRot += (float) (Math.toRadians(90F) * t) * i;
+            }
+        }
+
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.isArmor()) {
                 ItemStack stack = event.getEntity().getItemBySlot(slot);
@@ -272,16 +321,13 @@ public class ClientEvents {
         e.registerController(b -> b.name("theboys_syringe_controller").transitionTickTime(15).animationHandler(this::handleSyringe)
                 .animationFile(new ResourceLocation(TheBoys.MODID, "animations/player.animation.json")), c -> {
             c.setAnimationSpeed(1.5F);
-            c.triggerableAnim("inject", RawAnimation.begin().thenPlay("injecting_tick"));
-            c.triggerableAnim("inject_left", RawAnimation.begin().thenPlay("injecting_tick_left"));
+            c.triggerableAnim("inject", RawAnimation.begin().thenPlay("inject_tick"));
+            c.triggerableAnim("inject_left", RawAnimation.begin().thenPlay("inject_tick_left"));
             c.triggerableAnim("injecting", RawAnimation.begin().thenPlay("injecting"));
         });
     }
 
     private PlayState handleSyringe(AnimationState<PlayerAnimCap> event) {
-        if (true) {
-            return PlayState.CONTINUE;
-        }
         Player player = event.getAnimatable().player;
         boolean thirdPerson = !event.getController().getName().contains("first_person");
         String name = thirdPerson ? (player.getMainArm() == HumanoidArm.LEFT ? "_left" : "") : "";
@@ -295,12 +341,7 @@ public class ClientEvents {
                 }
             }
 
-            if (player.getUseItem().getItem() == TBItems.SYRINGE.get() && player.getUseItemRemainingTicks() > 0) {
-                if (event.getController().getCurrentAnimation().animation().name().equals("inject_tick%s".formatted(name))
-                        && event.getController().getAnimationState() == AnimationController.State.STOPPED) {
-                    event.getController().tryTriggerAnimation("injecting");
-                }
-            } else {
+            if (player.getUseItem().getItem() != TBItems.SYRINGE.get() || player.getUseItemRemainingTicks() <= 10) {
                 if (event.getController().getAnimationState() != AnimationController.State.STOPPED) {
                     event.getController().tryTriggerAnimation("injecting");
                 }

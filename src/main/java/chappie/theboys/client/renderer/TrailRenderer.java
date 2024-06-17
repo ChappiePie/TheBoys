@@ -2,7 +2,7 @@ package chappie.theboys.client.renderer;
 
 import chappie.theboys.common.entity.TrailEntity;
 import chappie.theboys.mixin.LivingEntityRendererAccessor;
-import chappie.theboys.util.EntitySavingFields;
+import chappie.theboys.util.interfaces.EntitySavingFields;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;

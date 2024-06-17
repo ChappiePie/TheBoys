@@ -28,12 +28,21 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkDirection;
 
 public class CommonEvents {
+
+    @SubscribeEvent
+    public void livingTick(LivingEvent.LivingTickEvent event) {
+        TheBoysCap cap = TheBoysCap.getCap(event.getEntity());
+        if (cap != null) {
+            cap.tick();
+        }
+    }
 
     @SubscribeEvent
     public void itemAttributeModifier(ItemAttributeModifierEvent event) {

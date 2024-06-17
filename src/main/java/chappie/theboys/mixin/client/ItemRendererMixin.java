@@ -1,6 +1,7 @@
 package chappie.theboys.mixin.client;
 
 import chappie.theboys.common.item.suit.SuitItem;
+import chappie.theboys.util.TBClientUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.ItemRenderer;
