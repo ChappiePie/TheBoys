@@ -1,10 +1,13 @@
 package chappie.theboys.common.item.suit;
 
+import chappie.theboys.TheBoys;
 import chappie.theboys.client.renderer.ClientHeroWithCapeProperties;
 import chappie.theboys.util.ClientSuitProperties;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -26,6 +29,12 @@ public class SuitItem extends Item {
         this.properties = pProperties;
         this.clientSuitProperties = () -> switch (this.properties.type) {
             case "homelander", "stormfront" -> new ClientHeroWithCapeProperties(this);
+            case "starlight" -> new ClientSuitProperties(this) {
+                @Override
+                public ResourceLocation suitTexture(EquipmentSlot slot, LivingEntity entity, ItemStack armorStack, String type) {
+                    return slot == EquipmentSlot.FEET ? new ResourceLocation(TheBoys.MODID, "textures/suits/%s/layer_1.png".formatted(this.type())) : super.suitTexture(slot, entity, armorStack, type);
+                }
+            };
             default -> new ClientSuitProperties(this);
         };
         DispenserBlock.registerBehavior(this, SuitProperties.DISPENSE_ITEM_BEHAVIOR);

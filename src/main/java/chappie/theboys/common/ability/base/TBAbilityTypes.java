@@ -20,5 +20,5 @@ public class TBAbilityTypes {
     public static final RegistryObject<AbilityType> DAMAGE_IMMUNITY = ABILITIES.register("damage_immunity", () -> new AbilityType(DamageImmunityAbility::new));
     public static final RegistryObject<AbilityType> TRANSLUCENT = ABILITIES.register("translucent", () -> new AbilityType(TranslucentAbility::new));
 
-    public static final RegistryObject<AbilityType> BRUH = ABILITIES.register("bruh", () -> new AbilityType(BruhAbility::new));
+    public static final RegistryObject<AbilityType> BRUH = ABILITIES.register("bruh", () -> new AbilityType(LightingAbility::new));
 }

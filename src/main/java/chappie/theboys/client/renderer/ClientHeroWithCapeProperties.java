@@ -2,7 +2,6 @@ package chappie.theboys.client.renderer;
 
 import chappie.modulus.client.model.CapeModel;
 import chappie.modulus.util.CommonUtil;
-import chappie.modulus.util.IHasTimer;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.item.suit.SuitItem;
@@ -23,7 +22,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
-    public final IHasTimer.Timer sprintingTimer = new IHasTimer.Timer(() -> 20, () -> false);
     public CapeModel model;
 
     public ClientHeroWithCapeProperties(SuitItem suitItem) {

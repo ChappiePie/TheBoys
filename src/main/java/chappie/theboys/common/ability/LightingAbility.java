@@ -6,6 +6,7 @@ import chappie.modulus.common.ability.base.AbilityClientProperties;
 import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.model.ModelProperties;
+import chappie.theboys.TheBoys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -30,12 +31,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
-public class BruhAbility extends Ability implements IHasTimer {
-    public static final ResourceLocation WHITE = new ResourceLocation("forge", "textures/white.png");
+public class LightingAbility extends Ability implements IHasTimer {
+    public static final ResourceLocation WHITE = new ResourceLocation(TheBoys.MODID, "textures/models/white.png");
 
     public Timer timer = new Timer(() -> 10, this::isEnabled);
 
-    public BruhAbility(LivingEntity entity, AbilityBuilder builder) {
+    public LightingAbility(LivingEntity entity, AbilityBuilder builder) {
         super(entity, builder);
     }
 
@@ -43,7 +44,6 @@ public class BruhAbility extends Ability implements IHasTimer {
     public void initializeClient(Consumer<AbilityClientProperties> consumer) {
         super.initializeClient(consumer);
         consumer.accept(new AbilityClientProperties() {
-
 
             private List<Vec3> beamVectors;
 
@@ -53,37 +53,36 @@ public class BruhAbility extends Ability implements IHasTimer {
                 Vec3 coreStart = new Vec3(0, 0, 0);
                 int coreLength = random.nextInt(3) + 7;
                 for (int core = 0; core < coreLength; core++) {
-                    Vec3 coreEnd = coreStart.add(0, 0, 1).add(randomVector(.3f).multiply(2.5, 2.5, 2.5));
+                    Vec3 coreEnd = coreStart.add(0, 0, 1).add(randomVector(random,0.3f).multiply(2.5, 2.5, 2.5));
                     beamVectors.add(coreStart);
                     beamVectors.add(coreEnd);
                     coreStart = coreEnd;
 
-                    beamVectors.addAll(generateBranch(coreEnd, 1, 0.5f, 1));
+                    beamVectors.addAll(generateBranch(random, coreEnd, 1, 0.5f, 1));
                 }
             }
 
-            private List<Vec3> generateBranch(Vec3 origin, int maxLength, float splitChance, int recursionCount) {
-                List<Vec3> branchSegements = new ArrayList<>();
-                Random random = new Random();
-                int branches = random.nextInt(maxLength + 1);
+            private List<Vec3> generateBranch(Random random, Vec3 origin, int maxLength, float splitChance, int recursionCount) {
+                List<Vec3> branchSegments = new ArrayList<>();
                 Vec3 branchStart = origin;
+                int branches = random.nextInt(maxLength + 1);
                 int dir = random.nextBoolean() ? 1 : -1;
                 float branchLength = .75f / (recursionCount + 1);
                 for (int i = 0; i < branches; i++) {
-                    Vec3 branchEnd = branchStart.add(dir * branchLength, 0, branchLength).add(randomVector(.3f));
-                    branchSegements.add(branchStart);
-                    branchSegements.add(branchEnd);
+                    Vec3 branchEnd = branchStart.add(dir * branchLength, 0, branchLength).add(randomVector(random,0.3f));
+                    branchSegments.add(branchStart);
+                    branchSegments.add(branchEnd);
                     if (random.nextFloat() <= splitChance)
-                        branchSegements.addAll(generateBranch(branchEnd, maxLength - 1, splitChance * 1.2f, recursionCount + 1));
+                        branchSegments.addAll(generateBranch(random, branchEnd, maxLength - 1, splitChance * 1.2f, recursionCount + 1));
                     branchStart = branchEnd;
                 }
-                return branchSegements;
+                return branchSegments;
             }
 
-            private Vec3 randomVector(float radius) {
-                double x = Math.random() * 2 * radius - radius;
-                double y = Math.random() * 2 * radius - radius;
-                double z = Math.random() * 2 * radius - radius;
+            private Vec3 randomVector(Random random, float radius) {
+                double x = random.nextDouble() * 2 * radius - radius;
+                double y = random.nextDouble() * 2 * radius - radius;
+                double z = random.nextDouble() * 2 * radius - radius;
                 return new Vec3(x, y, z);
             }
 
@@ -92,7 +91,6 @@ public class BruhAbility extends Ability implements IHasTimer {
                     generateLightningBeams();
                 return beamVectors;
             }
-
 
             @Override
             public void render(EntityRendererProvider.Context context, LivingEntityRenderer<? extends LivingEntity, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
@@ -147,8 +145,8 @@ public class BruhAbility extends Ability implements IHasTimer {
                 Matrix4f poseMatrix = poseStack.last().pose();
                 Matrix3f normalMatrix = poseStack.last().normal();
 
-                float halfWidth = width * .5f;
-                float halfHeight = height * .5f;
+                float halfWidth = width * 0.5f;
+                float halfHeight = height * 0.5f;
                 consumer.vertex(poseMatrix, (float) from.x - halfWidth, (float) from.y - halfHeight, (float) from.z).color(r, g, b, a).uv(0f, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(240).normal(normalMatrix, 0f, 1f, 0f).endVertex();
                 consumer.vertex(poseMatrix, (float) from.x + halfWidth, (float) from.y + halfHeight, (float) from.z).color(r, g, b, a).uv(1f, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(240).normal(normalMatrix, 0f, 1f, 0f).endVertex();
                 consumer.vertex(poseMatrix, (float) to.x + halfWidth, (float) to.y + halfHeight, (float) to.z).color(r, g, b, a).uv(1f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(240).normal(normalMatrix, 0f, 1f, 0f).endVertex();
