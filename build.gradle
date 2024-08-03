@@ -58,6 +58,10 @@ repositories {
         name = 'GeckoLib'
         url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
     }
+    maven {
+        name = 'BlameJared Maven (CrT / Bookshelf)'
+        url = 'https://maven.blamejared.com'
+    }
 }
 
 dependencies {
@@ -69,6 +73,12 @@ dependencies {
 //    if (System.getProperty('idea.sync.active') != 'true') {
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 //    }
+
+    /*implementation("foundry.veil:Veil-forge-1.19.2:1.0.0.145") {
+        exclude group: "maven.modrinth"
+    }*/
+
+
 }
 
 mixin {

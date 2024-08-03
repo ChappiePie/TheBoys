@@ -28,14 +28,19 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -45,7 +50,10 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
+import software.bernie.example.registry.ItemRegistry;
+import software.bernie.geckolib.GeckoLib;
 
 import java.awt.*;
 
@@ -87,6 +95,18 @@ public class TheBoys {
     @SubscribeEvent
     public void gatherComponents(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(ArmorTooltip.class, ClientArmorTooltip::new);
+    }
+
+    @SubscribeEvent
+    public void creativeModeTab(CreativeModeTabEvent.Register event) {
+        event.registerCreativeModeTab(new ResourceLocation(MODID, "theboys"), (e) ->
+                e.icon(() -> new ItemStack(TBItems.HOMELANDER_SUIT.get(ArmorItem.Type.CHESTPLATE).get()))
+                .title(Component.translatable("itemGroup.%s.theboys".formatted(MODID)))
+                .displayItems((itemDisplayParameters, output) -> {
+            for (RegistryObject<Item> entry : TBItems.ITEMS.getEntries()) {
+                output.accept(entry.get());
+            }
+        }));
     }
 
     @SubscribeEvent
