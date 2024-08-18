@@ -29,7 +29,7 @@ public class TBCommonUtil {
 
     public static void setAttribute(LivingEntity entity, String name, Attribute attribute, UUID uuid, double amount, AttributeModifier.Operation operation) {
         AttributeInstance instance = entity.getAttribute(attribute);
-        if (instance == null || entity.level.isClientSide) {
+        if (instance == null || entity.getCommandSenderWorld().isClientSide) {
             return;
         }
 

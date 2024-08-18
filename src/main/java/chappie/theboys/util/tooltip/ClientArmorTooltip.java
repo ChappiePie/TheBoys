@@ -1,15 +1,14 @@
 package chappie.theboys.util.tooltip;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientBundleTooltip;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 public class ClientArmorTooltip implements ClientTooltipComponent {
+    private static final ResourceLocation BACKGROUND_SPRITE = new ResourceLocation("container/bundle/background");
+    private static final ResourceLocation SLOT_SPRITE = new ResourceLocation("container/bundle/slot");
     private final ItemStack itemStack;
 
     public ClientArmorTooltip(ArmorTooltip tooltip) {
@@ -27,32 +26,29 @@ public class ClientArmorTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public void renderImage(Font pFont, int pMouseX, int pMouseY, PoseStack pPoseStack, ItemRenderer pItemRenderer) {
+    public void renderImage(Font pFont, int pX, int pY, GuiGraphics pGuiGraphics) {
         int i = this.gridSizeX();
         int j = this.gridSizeY();
         int k = 0;
 
         for(int l = 0; l < j; ++l) {
             for(int i1 = 0; i1 < i; ++i1) {
-                int j1 = pMouseX + i1 * 20;
-                int k1 = pMouseY + l * 20;
-                this.renderSlot(j1, k1, k++, pFont, pPoseStack, pItemRenderer, 0);
+                int j1 = pX + i1 * 18 + 1;
+                int k1 = pY + l * 20 + 1;
+                this.renderSlot(j1, k1, k++, pFont, pGuiGraphics, 0);
             }
         }
     }
 
-    private void renderSlot(int pX, int pY, int pItemIndex, Font pFont, PoseStack pPoseStack, ItemRenderer pItemRenderer, int pBlitOffset) {
-        ItemStack itemstack = this.itemStack;
-        this.blit(pPoseStack, pX, pY, pBlitOffset, false);
-        pItemRenderer.renderAndDecorateItem(pPoseStack, itemstack, pX + 1, pY + 1, pItemIndex);
-        pFont.drawShadow(pPoseStack, itemstack.getHoverName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1);
-        pItemRenderer.renderGuiItemDecorations(pPoseStack, pFont, itemstack, pX + 1, pY + 1);
+    private void renderSlot(int pX, int pY, int pItemIndex, Font pFont, GuiGraphics guiGraphics, int pBlitOffset) {
+        guiGraphics.renderItem(this.itemStack, pX + 1, pY + 1, pItemIndex);
+        this.blit(guiGraphics, pX, pY, pBlitOffset, false);
+        guiGraphics.drawString(pFont, this.itemStack.getHoverName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
+        guiGraphics.renderItemDecorations(pFont, this.itemStack, pX + 1, pY + 1);
     }
 
-    private void blit(PoseStack pPoseStack, int pX, int pY, int pBlitOffset, boolean blocked) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, ClientBundleTooltip.TEXTURE_LOCATION);
-        GuiComponent.blit(pPoseStack, pX, pY, pBlitOffset, 0, blocked ? 40 : 0, 18, 18, 128, 128);
+    private void blit(GuiGraphics guiGraphics, int pX, int pY, int pBlitOffset, boolean blocked) {
+        guiGraphics.blitSprite(SLOT_SPRITE, pX, pY, 0, 18, 20);
     }
 
     private int gridSizeX() {

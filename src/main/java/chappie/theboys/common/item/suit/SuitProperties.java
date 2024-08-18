@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockSource;
+import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.nbt.CompoundTag;
@@ -42,8 +42,8 @@ public class SuitProperties extends Item.Properties {
     public static final DispenseItemBehavior DISPENSE_ITEM_BEHAVIOR = new DefaultDispenseItemBehavior() {
         @Override
         protected @NotNull ItemStack execute(BlockSource pSource, @NotNull ItemStack pStack) {
-            BlockPos blockpos = pSource.getPos().relative(pSource.getBlockState().getValue(DispenserBlock.FACING));
-            List<LivingEntity> list = pSource.getLevel().getEntitiesOfClass(LivingEntity.class, new AABB(blockpos), EntitySelector.NO_SPECTATORS.and(new EntitySelector.MobCanWearArmorEntitySelector(pStack)));
+            BlockPos blockpos = pSource.pos().relative(pSource.state().getValue(DispenserBlock.FACING));
+            List<LivingEntity> list = pSource.level().getEntitiesOfClass(LivingEntity.class, new AABB(blockpos), EntitySelector.NO_SPECTATORS.and(new EntitySelector.MobCanWearArmorEntitySelector(pStack)));
             if (!list.isEmpty() && pStack.getItem() instanceof SuitItem item) {
                 ItemStack armorStack = list.get(0).getItemBySlot(item.properties.getSlot());
                 if (armorStack.getItem() instanceof ArmorItem) {

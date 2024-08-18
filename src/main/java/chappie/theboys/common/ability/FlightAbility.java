@@ -62,7 +62,7 @@ public class FlightAbility extends Ability implements IHasTimer {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (entity.level.isClientSide) {
+        if (entity.getCommandSenderWorld().isClientSide) {
             float f = entity.zza;
             boolean sprinting = entity.isSprinting();
             if (this.dataManager.get(SPRINTING) != sprinting) {
@@ -84,7 +84,7 @@ public class FlightAbility extends Ability implements IHasTimer {
                 vec3 = entity.getDeltaMovement().scale(0.25F).add(entity.getLookAngle().scale(speed));
                 /*if (this.conditionManager.test("boost")) {
                     vec3 = vec3.add(entity.getLookAngle().scale(20F));
-                    TBCommonUtil.spawnParticleForAll(this.entity.level, ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                    TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.CAMPFIRE_COSY_SMOKE,
                             true, this.entity.position(), Vec3.ZERO, 0.05F, 20);
                     this.entity.playSound(SoundEvents.ENDER_PEARL_THROW, 1, 1);
                 }*/

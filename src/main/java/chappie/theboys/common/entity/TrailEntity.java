@@ -12,8 +12,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
@@ -21,7 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.network.NetworkHooks;
 
 import java.awt.*;
 import java.util.Map;
@@ -73,11 +70,6 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
-    }
-
-    @Override
     public void writeSpawnData(FriendlyByteBuf buffer) {
         buffer.writeInt(this.lifeTime);
         buffer.writeInt(this.entity == null ? -1 : this.entity.getId());
@@ -91,7 +83,7 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     @Override
     public void readSpawnData(FriendlyByteBuf additionalData) {
         this.lifeTime = additionalData.readInt();
-        this.entity = (LivingEntity) level.getEntity(additionalData.readInt());
+        this.entity = (LivingEntity) this.getCommandSenderWorld().getEntity(additionalData.readInt());
         this.color = new Color(additionalData.readInt(), additionalData.readInt(), additionalData.readInt());
 
         if (this.entity == null) return;
@@ -106,7 +98,7 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
             model.rightPants.visible = false;
             model.jacket.visible = false;
             this.model = model;
-            this.texture = player.getSkinTextureLocation();
+            this.texture = player.getSkin().texture();
         } else {
             if (EntityRenderersAccessor.providers().get(this.entity.getType()).create(IHasContext.getContext()) instanceof LivingEntityRenderer renderer) {
                 this.model = (EntityModel<LivingEntity>) renderer.getModel();

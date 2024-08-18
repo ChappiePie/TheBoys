@@ -25,7 +25,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SandBlock;
 import net.minecraft.world.phys.*;
 
 import java.awt.*;
@@ -59,7 +58,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (!entity.level.isClientSide && this.enabledTicks >= this.dataManager.get(MAX_TIMER)) {
+        if (!entity.getCommandSenderWorld().isClientSide && this.enabledTicks >= this.dataManager.get(MAX_TIMER)) {
             HitResult hitResult = CommonUtil.pick(entity, this.dataManager.get(DISTANCE));
             if (hitResult.getType() != HitResult.Type.MISS) {
                 if (hitResult instanceof EntityHitResult rtr && rtr.getEntity() != entity) {
@@ -122,10 +121,10 @@ public class HeatVisionAbility extends GlowEyesAbility {
         hitResult.getEntity().setSecondsOnFire((int) (strength * 5));
         hitResult.getEntity().hurt(this.entity.damageSources().mobAttack(entity), strength * 2F);
 
-        TBCommonUtil.spawnParticleForAll(this.entity.level, new LaserParticle.LaserParticleOptions(this.entity.getId()),
+        TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
                 true, hitResult.getLocation(), Vec3.ZERO, 0.05F, 4);
 
-        TBCommonUtil.spawnParticleForAll(this.entity.level,
+        TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
                 ParticleTypes.SMOKE, true, hitResult.getLocation(),
                 new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.15F, 10);
     }
@@ -134,19 +133,19 @@ public class HeatVisionAbility extends GlowEyesAbility {
 
     protected void onHitBlock(BlockHitResult hitResult) {
         BlockPos blockPos = hitResult.getBlockPos();
-        if (this.entity.level.getBlockState(blockPos).getBlock() instanceof SandBlock) {
+        if (this.entity.getCommandSenderWorld().getBlockState(blockPos).getBlock() == Blocks.SAND) {
             if (this.blocksInFire == null || !this.blocksInFire.getKey().equals(blockPos)) {
                 this.blocksInFire = new AbstractMap.SimpleEntry<>(blockPos, 0);
             }
             this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
 
             if (this.blocksInFire.getValue() > 10) {
-                this.entity.level.setBlock(blockPos, Blocks.GLASS.defaultBlockState(), 11);
+                this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.GLASS.defaultBlockState(), 11);
                 this.blocksInFire = null;
             }
         } else {
             blockPos = blockPos.relative(hitResult.getDirection());
-            if (this.entity.level.isEmptyBlock(blockPos)) {
+            if (this.entity.getCommandSenderWorld().isEmptyBlock(blockPos)) {
 
                 if (this.blocksInFire == null || !this.blocksInFire.getKey().equals(blockPos)) {
                     this.blocksInFire = new AbstractMap.SimpleEntry<>(blockPos, 0);
@@ -154,15 +153,15 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
 
                 if (this.blocksInFire.getValue() > 5) {
-                    this.entity.level.setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
+                    this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
                     this.blocksInFire = null;
                 }
             }
         }
-        TBCommonUtil.spawnParticleForAll(this.entity.level, new LaserParticle.LaserParticleOptions(this.entity.getId()),
+        TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
                 true, hitResult.getLocation(), this.entity.getViewVector(0).multiply(0.25, 0, 0.25), 0.001F, 4);
 
-        TBCommonUtil.spawnParticleForAll(this.entity.level,
+        TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
                 ParticleTypes.SMOKE, true, hitResult.getLocation(),
                 new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.05F, 10);
     }

@@ -31,7 +31,7 @@ public class TBSuperpowers {
             AbilityBuilder.of("flight", TBAbilityTypes.FLIGHT.get())
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.TOGGLE), "enabling")
                     //.condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.JUMP).action(KeyCondition.Action.ACTION), "boost")
-                    .condition(a -> new DoubleJumpCondition(a).shouldStop(() -> a.entity.isOnGround() || a.entity.isShiftKeyDown()), "enabling"),
+                    .condition(a -> new DoubleJumpCondition(a).shouldStop(() -> a.entity.onGround() || a.entity.isShiftKeyDown()), "enabling"),
             AbilityBuilder.of("super_hearing", TBAbilityTypes.SUPER_HEARING.get())
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD).action(KeyCondition.Action.HELD), "enabling"),
             AttributeModifierAbility.of("gravity", b -> b.attribute(ForgeMod.ENTITY_GRAVITY.get()).amount(-1.0D).operation(AttributeModifier.Operation.MULTIPLY_TOTAL)).condition(a -> new AbilityEnabledCondition(a).abilityName("flight"), "enabling"),

@@ -38,7 +38,7 @@ public abstract class ArmorItemMixin extends Item {
                     if (pOther.getCount() < pOther.getMaxStackSize()) {
                         CompoundTag tag = pStack.getOrCreateTag().getCompound("Suit");
                         ItemStack suitItem = ItemStack.of(tag.getCompound("Tags"));
-                        if (ItemStack.tagMatches(suitItem, pOther)) {
+                        if (ItemStack.isSameItemSameTags(suitItem, pOther)) {
                             pOther.grow(1);
                         }
                         pStack.getOrCreateTag().remove("Suit");

@@ -31,7 +31,7 @@ public abstract class HumanoidArmorLayerMixin<T extends LivingEntity, A extends 
 
     @Unique private SuitModel<T> theBoys$model;
 
-    @Inject(method = "renderArmorPiece*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;renderModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IZLnet/minecraft/client/model/Model;FFFLnet/minecraft/resources/ResourceLocation;)V"), remap = false)
+    @Inject(method = "renderArmorPiece*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;renderModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/item/ArmorItem;Lnet/minecraft/client/model/Model;ZFFFLnet/minecraft/resources/ResourceLocation;)V"), remap = false)
     private void startRenderArmorPiece(PoseStack pPoseStack, MultiBufferSource pBuffer, T pLivingEntity, EquipmentSlot pSlot, int pPackedLight, A pModel, CallbackInfo ci) {
         if (theBoys$model == null)
             theBoys$model = new SuitModel<>(SuitModel.SUIT);

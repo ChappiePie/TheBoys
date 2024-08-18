@@ -1,6 +1,5 @@
 package chappie.theboys.common.capability;
 
-import chappie.modulus.util.IHasTimer;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.networking.client.ClientSyncTheBoysCap;
 import chappie.theboys.util.timers.SyringeVialAnim;
@@ -13,11 +12,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.network.NetworkDirection;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class TheBoysCap implements INBTSerializable<CompoundTag> {
 
@@ -70,15 +66,15 @@ public class TheBoysCap implements INBTSerializable<CompoundTag> {
 
     public void sync() {
         if (this.livingEntity instanceof ServerPlayer player) {
-            TBNetworking.INSTANCE.sendTo(new ClientSyncTheBoysCap(this.livingEntity.getId(), this.serializeNBT()), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+            TBNetworking.INSTANCE.send(new ClientSyncTheBoysCap(this.livingEntity.getId(), this.serializeNBT()), player.connection.getConnection());
         }
     }
 
     public void syncToAll() {
         this.sync();
-        for (LivingEntity livingEntity : this.livingEntity.level.players()) {
+        for (LivingEntity livingEntity : this.livingEntity.getCommandSenderWorld().players()) {
             if (livingEntity instanceof ServerPlayer player) {
-                TBNetworking.INSTANCE.sendTo(new ClientSyncTheBoysCap(this.livingEntity.getId(), this.serializeNBT()), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                TBNetworking.INSTANCE.send(new ClientSyncTheBoysCap(this.livingEntity.getId(), this.serializeNBT()), player.connection.getConnection());
             }
         }
     }

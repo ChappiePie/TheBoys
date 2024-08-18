@@ -26,7 +26,7 @@ public class SyringeVialAnim implements IHasTimer {
                 && offHandItem.getItem() instanceof VialItem;
         float timeline = this.timeline.value(1);
 
-        if (timeline == 1 && !player.level.isClientSide()) {
+        if (timeline == 1 && !player.getCommandSenderWorld().isClientSide()) {
             mainHandItem.getOrCreateTag().put("vial", offHandItem.save(new CompoundTag()));
             offHandItem.shrink(1);
         }
@@ -48,9 +48,7 @@ public class SyringeVialAnim implements IHasTimer {
         float t = cap.vialAnim.timeline.value(partialTicks);
         if (!cap.vialAnim.triggerAnim && t > 0&& hand == InteractionHand.OFF_HAND) {
             if (player.getMainHandItem().getItem() instanceof SyringeItem && player.getMainHandItem().getTag() != null) {
-                if (player.getMainHandItem().getTag().contains("vial")) {
-                    return true;
-                }
+                return player.getMainHandItem().getTag().contains("vial");
             }
         }
         return false;

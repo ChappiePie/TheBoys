@@ -4,10 +4,10 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.item.suit.SuitItem;
 import chappie.theboys.common.item.suit.SuitProperties;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterials;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -20,6 +20,16 @@ import static net.minecraft.world.item.ArmorItem.Type.*;
 
 public class TBItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, TheBoys.MODID);
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, TheBoys.MODID);
+
+    public static final RegistryObject<CreativeModeTab> THE_BOYS_TAB = TABS.register("theboys", () -> CreativeModeTab.builder().icon(() -> new ItemStack(TBItems.HOMELANDER_SUIT.get(ArmorItem.Type.CHESTPLATE).get()))
+            .title(Component.translatable("itemGroup.%s.theboys".formatted(TheBoys.MODID)))
+            .displayItems((itemDisplayParameters, output) -> {
+                for (RegistryObject<Item> entry : TBItems.ITEMS.getEntries()) {
+                    output.accept(entry.get());
+                }
+            }).build()
+    );
 
     public static final ImmutableMap<ArmorItem.Type, RegistryObject<SuitItem>> HOMELANDER_SUIT = registerSuitParts(SuitItem::new, "homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
     public static final ImmutableMap<ArmorItem.Type, RegistryObject<SuitItem>> ATRAIN_SUIT = registerSuitParts(SuitItem::new, "atrain", (p) -> p.armorScale((e, stack) ->

@@ -5,18 +5,18 @@ import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.IOneScaleScreen;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.HeatVisionAbility;
+import chappie.theboys.mixin.SkullBlockEntityAccessor;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.networking.server.ServerSetEyeOptions;
-import chappie.theboys.util.interfaces.ISetupGameProfiles;
 import chappie.theboys.util.TBConfig;
-import com.mojang.authlib.GameProfile;
+import chappie.theboys.util.interfaces.ISetupGameProfiles;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -35,8 +35,8 @@ import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelPart;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.network.PacketDistributor;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
@@ -78,8 +78,8 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         this.addRenderableWidget(rotationSlider = new ModSlider(this.width / 2 + 80 - 15, this.height / 2 + 75, 128, 20, (slider) -> Component.translatable("gui.theboys.eyeOptions.playerRotation", slider.getValueString()), -180, 180, 0, "0"));
         this.addSkinPresets();
 
-        PlayerInfo playerinfo = new PlayerInfo(this.minecraft.getUser().getGameProfile(), false);
-        playerinfo.getSkinLocation(); // update textures and model
+        PlayerInfo playerinfo = new PlayerInfo(this.minecraft.getGameProfile(), false);
+        playerinfo.getSkin(); // update textures and model
         this.minecraft.getPlayerSocialManager().addPlayer(playerinfo);
         this.playerInfo = playerinfo;
 
@@ -147,13 +147,14 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     }
 
     @Override
-    public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        if (!this.playerInfo.getModelName().equals(this.skinModel)) {
-            this.skinModel = this.playerInfo.getModelName();
+    public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        if (!this.playerInfo.getSkin().model().id().equals(this.skinModel)) {
+            this.skinModel = this.playerInfo.getSkin().model().id();
             this.model = new SuitModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(this.skinModel.equalsIgnoreCase("slim") ? SuitModel.SUIT_SLIM : SuitModel.SUIT));
         }
         this.setModelProperties(this.model, pPartialTick);
-        this.renderDirtBackground(pPoseStack);
+        PoseStack pPoseStack = guiGraphics.pose();
+        this.renderDirtBackground(guiGraphics);
         pPoseStack.pushPose();
 
         int h = this.height / 2 + (laserOptions.isEmpty() ? 35 : laserOptions.size() < 4 ? 15 : 0);
@@ -162,21 +163,21 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             float f = 2.5F;
             pPoseStack.scale(f, f, f);
             pPoseStack.translate((this.width / 2F - 200) / f, (h - 95) / f, 0);
-            font.drawShadow(pPoseStack, Component.literal("The Boys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
-                    FastColor.ARGB32.color(255, 170, 20, 20));
+            guiGraphics.drawString(this.font, Component.literal("The Boys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
+                    FastColor.ARGB32.color(255, 170, 20, 20), true);
             pPoseStack.popPose();
         }
 
-        fill(pPoseStack, this.width / 2 - 200, h - 70, this.lastXofPresets, h + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0), 1979711488);
-        fill(pPoseStack, this.width / 2 - 200, h - 72, this.lastXofPresets, h - 70, 1191182335);
+        guiGraphics.fill(this.width / 2 - 200, h - 70, this.lastXofPresets, h + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0), 1979711488);
+        guiGraphics.fill(this.width / 2 - 200, h - 72, this.lastXofPresets, h - 70, 1191182335);
 
         int i = this.width / 2 + 80;
         int j = this.height / 2 - 70;
-        fill(pPoseStack, i, j - 2, i + 100, j, 1191182335);
-        GuiComponent.enableScissor(i, j, i + 100, j + 140);
-        fill(pPoseStack, i, j, i + 100, j + 140, 1979711488);
-        renderEntityInInventory(pPoseStack, i + 50, j + 130, 60, (float) (i + 50) - pMouseX, (float) (j + 51) - pMouseY);
-        GuiComponent.disableScissor();
+        guiGraphics.fill(i, j - 2, i + 100, j, 1191182335);
+        guiGraphics.enableScissor(i, j, i + 100, j + 140);
+        guiGraphics.fill(i, j, i + 100, j + 140, 1979711488);
+        renderEntityInInventory(guiGraphics, i + 50, j + 130, 60, (float) (i + 50) - pMouseX, (float) (j + 51) - pMouseY);
+        guiGraphics.disableScissor();
         pPoseStack.popPose();
         this.changeYPos.forEach((key, value) -> {
             if (key instanceof AbstractWidget w) {
@@ -186,7 +187,11 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
                 l.setY(value.apply(h));
             }
         });
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+        super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
     }
 
     public void setModelProperties(SuitModel<Player> model, float pPartialTick) {
@@ -207,7 +212,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         AnimationUtils.bobModelPart(model.leftArm, this.tickCount + pPartialTick, -1.0F);
     }
 
-    public void renderEntityInInventory(PoseStack poseStack, int x, int y, int scale, float angleXComponent, float angleYComponent) {
+    public void renderEntityInInventory(GuiGraphics guiGraphics, int x, int y, int scale, float angleXComponent, float angleYComponent) {
         if (this.model == null) return;
         float f = (float) Math.atan(angleXComponent / 40.0F);
         float f1 = (float) Math.atan(angleYComponent / 40.0F);
@@ -216,12 +221,9 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         this.model.head.yRot = (f * 40.0F) * ((float) Math.PI / 180F);
         this.model.head.xRot = (-f1 * 20.0F) * ((float) Math.PI / 180F);
 
-        PoseStack posestack = RenderSystem.getModelViewStack();
-        posestack.pushPose();
-        posestack.translate(0.0D, 0.0D, 1000.0D);
-        RenderSystem.applyModelViewMatrix();
+        PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
-        poseStack.translate(x, y, -950.0D);
+        poseStack.translate(x, y, 950.0D);
         poseStack.mulPoseMatrix((new Matrix4f()).scaling((float) scale, (float) scale, (float) (-scale)));
         poseStack.mulPose(rotation);
         Lighting.setupForEntityInInventory();
@@ -236,15 +238,13 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.translate(0.0F, -1.501F, 0.0F);
         RenderSystem.runAsFancy(() -> {
-            this.model.renderToBuffer(poseStack, multibuffersource$buffersource.getBuffer(RenderType.entityTranslucent(this.playerInfo.getSkinLocation())), 15728880, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
+            this.model.renderToBuffer(poseStack, multibuffersource$buffersource.getBuffer(RenderType.entityTranslucent(this.playerInfo.getSkin().texture())), 15728880, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
             this.renderEyesAndLasers(poseStack, multibuffersource$buffersource, 15728880);
         });
-        multibuffersource$buffersource.endBatch();
+        guiGraphics.flush();
         entityrenderdispatcher.setRenderShadow(true);
         poseStack.popPose();
         Lighting.setupFor3DItems();
-        posestack.popPose();
-        RenderSystem.applyModelViewMatrix();
     }
 
     public void renderEyesAndLasers(PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn) {
@@ -334,14 +334,23 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     private void addLaserOptions() {
         int x = this.width / 2 - 200 + 12, y = this.height / 2 + 35;
         int sliderWidth = 172, sliderHeight = 16;
-        this.eyesHeightSlider = new ModSlider(x, y + 36, sliderWidth, sliderHeight, (slider) -> Component.translatable("gui.theboys.eyeOptions.eyeHeight", slider.getValueString()), 1, 8, this.getEyesHeight()) {
+        this.eyesHeightSlider = new ModSlider(x, y + 36, sliderWidth, sliderHeight, (slider) -> Component.translatable("gui.theboys.eyeOptions.eyeHeight", slider.getValueString()), 1, 8, getEyesHeight()) {
 
             @Override
             protected void applyValue() {
                 super.applyValue();
+                int value = (int) this.getValue();
                 switch (TBConfig.CLIENT.eyesType.get()) {
-                    case 4 -> TBConfig.CLIENT.eyesHeight.set((int) this.getValue());
-                    case 5 -> TBConfig.CLIENT.eyesHeight2.set((int) this.getValue());
+                    case 4 -> {
+                        if (!TBConfig.CLIENT.eyesHeight.get().equals(value)) {
+                            TBConfig.CLIENT.eyesHeight.set(value);
+                        }
+                    }
+                    case 5 -> {
+                        if (!TBConfig.CLIENT.eyesHeight2.get().equals(value)) {
+                            TBConfig.CLIENT.eyesHeight2.set(value);
+                        }
+                    }
                 }
                 EyeOptionsScreen.updateData();
                 if (eyesLengthSlider != null) {
@@ -354,14 +363,23 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
                 return Mth.floor(super.getValue());
             }
         };
-        this.eyesLengthSlider = new ModSlider(x, y + 54, sliderWidth, sliderHeight, (slider) -> Component.translatable("gui.theboys.eyeOptions.eyeLength", slider.getValueString()), 1, 8, this.getEyesLength(), "0") {
+        this.eyesLengthSlider = new ModSlider(x, y + 54, sliderWidth, sliderHeight, (slider) -> Component.translatable("gui.theboys.eyeOptions.eyeLength", slider.getValueString()), 1, 8, getEyesLength(), "0") {
 
             @Override
             protected void applyValue() {
                 super.applyValue();
+                int value = (int) this.getValue();
                 switch (TBConfig.CLIENT.eyesType.get()) {
-                    case 4 -> TBConfig.CLIENT.eyesLength.set((int) this.getValue());
-                    case 5 -> TBConfig.CLIENT.eyesLength2.set((int) this.getValue());
+                    case 4 -> {
+                        if (!TBConfig.CLIENT.eyesLength.get().equals(value)) {
+                            TBConfig.CLIENT.eyesLength.set(value);
+                        }
+                    }
+                    case 5 -> {
+                        if (!TBConfig.CLIENT.eyesLength2.get().equals(value)) {
+                            TBConfig.CLIENT.eyesLength2.set(value);
+                        }
+                    }
                 }
                 EyeOptionsScreen.updateData();
             }
@@ -435,9 +453,9 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
                 || this.playerInfo != null && this.playerInfo.getProfile().getName().equals(name)) return;
         ((ISetupGameProfiles) minecraft).theBoys$setup();
 
-        SkullBlockEntity.updateGameprofile(new GameProfile(null, name), (newProfile) -> {
-            PlayerInfo playerinfo = new PlayerInfo(newProfile, false);
-            playerinfo.getSkinLocation(); // update textures and model
+        SkullBlockEntityAccessor.fetchGameProfile(name).thenAcceptAsync((newProfile) -> {
+            PlayerInfo playerinfo = new PlayerInfo(newProfile.get(), false);
+            playerinfo.getSkin().texture(); // update textures and model
             EyeOptionsScreen.this.minecraft.getPlayerSocialManager().addPlayer(playerinfo);
             EyeOptionsScreen.this.playerInfo = playerinfo;
         });
@@ -450,7 +468,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
 
     public static void updateData() {
         if (Minecraft.getInstance().level != null) {
-            TBNetworking.INSTANCE.sendToServer(new ServerSetEyeOptions(EyeOptionsScreen.getEyesHeight(), EyeOptionsScreen.getEyesLength()));
+            TBNetworking.INSTANCE.send(new ServerSetEyeOptions(EyeOptionsScreen.getEyesHeight(), EyeOptionsScreen.getEyesLength()), PacketDistributor.SERVER.noArg());
         }
     }
 
@@ -515,16 +533,18 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
 
         public BasicSkinPresetButton(EyeOptionsScreen screen, int pX, int pY, int type, OnPress pOnPress) {
-            super(pX, pY, 32, 32, 0, 24, 32, EyeOptionsScreen.TEXTURE_LOCATION, 128, 128, pOnPress, Component.translatable("gui.theboys.eyeOptions.skinPreset"));
+            super(pX, pY, 32,32, new WidgetSprites(EyeOptionsScreen.TEXTURE_LOCATION, EyeOptionsScreen.TEXTURE_LOCATION), pOnPress, Component.translatable("gui.theboys.eyeOptions.skinPreset"));
             this.screen = screen;
             this.type = type;
         }
 
         @Override
-        public void renderWidget(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+        public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
             this.setFocused(TBConfig.CLIENT.eyesType.get() == this.type);
-            super.renderWidget(pPoseStack, pMouseX, pMouseY, pPartialTick);
-            blit(pPoseStack, this.getX() + 4, this.getY() + 4, type > 3 ? 72 : (type - 1) * 24, 0, 24, 24, 128, 128);
+            //super.renderWidget(guiGraphics, pMouseX, pMouseY, pPartialTick);
+            ResourceLocation resourcelocation = this.sprites.get(this.isActive(), this.isHoveredOrFocused());
+            guiGraphics.blit(resourcelocation, this.getX(), this.getY(), 0, 0, 24 + (this.isHoveredOrFocused() ? 32 : 0), 32, 32, 128, 128);
+            guiGraphics.blit(resourcelocation, this.getX() + 4, this.getY() + 4, type > 3 ? 72 : (type - 1) * 24, 0, 24, 24, 128, 128);
         }
     }
 
@@ -549,8 +569,8 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
 
         @Override
-        public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-            GuiComponent.drawString(pPoseStack, Minecraft.getInstance().font, this.text, this.x, this.y, this.color);
+        public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+            guiGraphics.drawString(Minecraft.getInstance().font, this.text, this.x, this.y, this.color);
         }
     }
 }

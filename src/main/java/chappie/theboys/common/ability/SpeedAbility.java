@@ -44,7 +44,7 @@ public class SpeedAbility extends Ability {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (entity.level.isClientSide) return;
+        if (entity.getCommandSenderWorld().isClientSide) return;
         if (enabled && !entity.isSwimming() && !entity.isFallFlying()) {
             int speedLevel = this.dataManager.get(SPEED_LVL);
             boolean isMoving = entity.xOld != entity.getX() || entity.zOld != entity.getZ();
@@ -83,7 +83,7 @@ public class SpeedAbility extends Ability {
                 }*/
 
                 if (speedLevel > 5 && isMoving) {
-                    for (LivingEntity e : entity.level.getEntitiesOfClass(LivingEntity.class,
+                    for (LivingEntity e : entity.getCommandSenderWorld().getEntitiesOfClass(LivingEntity.class,
                             CommonUtil.boxWithRange(entity.position(), 0.5D))) {
                         if (e != entity) {
                             e.hurt(e.damageSources().inWall(), speedLevel);
@@ -110,7 +110,7 @@ public class SpeedAbility extends Ability {
         if (Math.abs(entity.getX() - this.xOld) >= distanceForTrail || Math.abs(entity.getZ() - this.zOld) >= distanceForTrail) {
             this.xOld = entity.xOld;
             this.zOld = entity.zOld;
-            entity.level.addFreshEntity(new TrailEntity(entity.level, entity, Color.WHITE, this.dataManager.get(TRAIL_DURATION)));
+            entity.getCommandSenderWorld().addFreshEntity(new TrailEntity(entity.getCommandSenderWorld(), entity, Color.WHITE, this.dataManager.get(TRAIL_DURATION)));
         }
     }
 

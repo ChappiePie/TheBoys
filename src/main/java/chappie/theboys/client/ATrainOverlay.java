@@ -6,7 +6,7 @@ import chappie.theboys.common.ability.SpeedAbility;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -28,23 +28,23 @@ public class ATrainOverlay implements IGuiOverlay {
     private static int appearAnimTick, appearAnimTickO;
 
     @Override
-    public void render(ForgeGui gui, PoseStack poseStack, float partialTick, int width, int height) {
+    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
         Entity entity = gui.getMinecraft().getCameraEntity();
         int left = width - 96;
         int top = height - 24;
+        PoseStack poseStack = guiGraphics.pose();
         if (entity != null && entity.isAlive()) {
             for (SpeedAbility ability : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
                 float f = Mth.lerp(partialTick, ATrainOverlay.appearAnimTickO, ATrainOverlay.appearAnimTick) / 15F;
                 float f1 = (float) (Math.pow(Math.cos(f * Math.PI / 2), 3) * Math.cos(f * Math.PI));
                 poseStack.pushPose();
                 poseStack.translate(f1 * 140.0F, 0, 0);
-                RenderSystem.setShaderTexture(0, TEXTURE);
-                GuiComponent.blit(poseStack, left, top, 0, 0, 96, 24, 96, 48);
+                guiGraphics.blit(TEXTURE, left, top, 0, 0, 96, 24, 96, 48);
                 if (ability.isEnabled()) {
                     float u = 47.5F;
                     for (float multiplier : new float[]{0.25F, 0.375F, 0.5F, 0.625F, 0.75F, 0.875F, 1.0F}) {
                         if (ability.dataManager.get(SpeedAbility.SPEED_LVL) >= (int) (ability.getMaxSpeedLevel() * multiplier)) {
-                            u += 11.5;
+                            u += 11.5F;
                         }
                     }
                     blit(poseStack, left, top, u * 0.75F);

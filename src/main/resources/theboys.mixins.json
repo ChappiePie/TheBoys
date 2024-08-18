@@ -22,7 +22,9 @@
     "LiquidBlockMixin",
     "LivingEntityMixin",
     "LivingEntityRendererAccessor",
-    "ServerLevelMixin"
+    "PlayerMixin",
+    "ServerLevelMixin",
+    "SkullBlockEntityAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
