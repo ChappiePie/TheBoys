@@ -16,7 +16,7 @@ public class DamageImmunityAbility extends Ability {
     }
 
     public static AbilityBuilder of(String id, String... damageSources) {
-        return AbilityBuilder.of(id, TBAbilityTypes.DAMAGE_IMMUNITY.get()).additionalData(a -> {
+        return AbilityBuilder.of(id, TBAbilityTypes.DAMAGE_IMMUNITY).additionalData(a -> {
             if (a instanceof DamageImmunityAbility ability) {
                 ability.damageSources.addAll(List.of(damageSources));
             }

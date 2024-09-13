@@ -1,15 +1,8 @@
 {
-	"parent": "forge:item/default",
-	"loader": "forge:separate_transforms",
+	"parent": "item/generated",
+	"gui_light": "front",
 	"textures": {
-		"particle": "theboys:item/vial_3d"
-	},
-	"base": {
-		"parent": "theboys:item/vial_3d"
-	},
-	"perspectives": {
-		"gui": {
-			"parent": "theboys:item/vial_2d"
-		}
+		"layer0": "theboys:item/vial_fluid",
+		"layer1": "theboys:item/vial"
 	}
 }

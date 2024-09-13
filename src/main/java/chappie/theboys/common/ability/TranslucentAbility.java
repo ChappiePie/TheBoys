@@ -4,7 +4,7 @@ import chappie.modulus.common.ability.base.Ability;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.AbilityClientProperties;
 import chappie.modulus.util.IHasTimer;
-import chappie.modulus.util.events.RendererChangeEvent;
+import chappie.modulus.util.events.RendererChangeCallback;
 import chappie.theboys.util.TBClientUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
@@ -38,12 +38,11 @@ public class TranslucentAbility extends Ability implements IHasTimer {
         consumer.accept(new AbilityClientProperties() {
 
             @Override
-            public void rendererChange(RendererChangeEvent<? extends LivingEntity, ? extends EntityModel<?>> event) {
-                AbilityClientProperties.super.rendererChange(event);
-                this.alphaChange(event);
+            public boolean rendererChange(RendererChangeCallback.RendererChangeEvent<? extends LivingEntity, ? extends EntityModel<?>> event) {
+                return this.alphaChange(event);
             }
 
-            public <T extends LivingEntity> void alphaChange(RendererChangeEvent<T, ? extends EntityModel<T>> event) {
+            public <T extends LivingEntity> boolean alphaChange(RendererChangeCallback.RendererChangeEvent<T, ? extends EntityModel<T>> event) {
                 AbilityClientProperties.super.rendererChange(event);
 
                 float m = 1.0F;
@@ -56,8 +55,9 @@ public class TranslucentAbility extends Ability implements IHasTimer {
                     RenderType renderType = TBClientUtil.RenderTypes.entityInvisibility(event.renderer().getTextureLocation(event.getEntity()));
                     event.renderer().getModel().renderToBuffer(event.poseStack(), event.multiBufferSource().getBuffer(renderType),
                             event.packedLight(), event.packedOverlay(), event.red(), event.green(), event.blue(), event.alpha() * alpha);
-                    event.setCanceled(true);
+                    return true;
                 }
+                return false;
             }
         });
     }

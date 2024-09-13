@@ -1,12 +1,13 @@
 package chappie.theboys.client.gui;
 
 import chappie.modulus.client.model.SuitModel;
+import chappie.modulus.networking.ModNetworking;
 import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.IOneScaleScreen;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.mixin.SkullBlockEntityAccessor;
-import chappie.theboys.networking.TBNetworking;
+import chappie.theboys.mixin.client.ScreenAccessor;
 import chappie.theboys.networking.server.ServerSetEyeOptions;
 import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.interfaces.ISetupGameProfiles;
@@ -36,11 +37,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -118,14 +118,9 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }).bounds(this.width / 2 - 166, this.height / 2 + 75, 128, 20).build()), y -> y + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0) + 5);
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-        this.tickCount++;
-        for (Renderable renderable : this.renderables) {
-            if (renderable instanceof ModSlider modSlider) {
-                modSlider.tick();
-            }
+    public static void updateData() {
+        if (Minecraft.getInstance().level != null) {
+            ModNetworking.sendToServer(new ServerSetEyeOptions(EyeOptionsScreen.getEyesHeight(), EyeOptionsScreen.getEyesLength()));
         }
     }
 
@@ -437,14 +432,14 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         this.removeObj(renderable, true);
     }
 
-    private void removeObj(Renderable renderable, boolean laserOptions) {
-        this.renderables.remove(renderable);
-        this.changeYPos.remove(renderable);
-        if (laserOptions) {
-            this.laserOptions.remove(renderable);
-        }
-        if (renderable instanceof GuiEventListener listener) {
-            this.removeWidget(listener);
+    @Override
+    public void tick() {
+        super.tick();
+        this.tickCount++;
+        for (GuiEventListener renderable : this.children()) {
+            if (renderable instanceof ModSlider modSlider) {
+                modSlider.tick();
+            }
         }
     }
 
@@ -466,9 +461,14 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         return 3;
     }
 
-    public static void updateData() {
-        if (Minecraft.getInstance().level != null) {
-            TBNetworking.INSTANCE.send(new ServerSetEyeOptions(EyeOptionsScreen.getEyesHeight(), EyeOptionsScreen.getEyesLength()), PacketDistributor.SERVER.noArg());
+    private void removeObj(Renderable renderable, boolean laserOptions) {
+        ((ScreenAccessor) this).renderables().remove(renderable);
+        this.changeYPos.remove(renderable);
+        if (laserOptions) {
+            this.laserOptions.remove(renderable);
+        }
+        if (renderable instanceof GuiEventListener listener) {
+            this.removeWidget(listener);
         }
     }
 

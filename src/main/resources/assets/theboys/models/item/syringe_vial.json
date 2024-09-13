@@ -1,21 +1,7 @@
 {
-  "parent": "forge:item/default",
-  "loader": "forge:separate_transforms",
-  "textures": {
-    "particle": "theboys:item/syringe/3d"
-  },
-  "base": {
-    "parent": "theboys:item/syringe/3d"
-  },
-  "perspectives": {
-    "gui": {
-      "parent": "theboys:item/syringe/2d_vial"
-    },
-    "fixed": {
-      "parent": "theboys:item/syringe/2d_vial"
-    },
-    "ground": {
-      "parent": "theboys:item/syringe/2d_vial"
-    }
-  }
+	"parent": "minecraft:item/handheld",
+	"textures": {
+		"layer0": "theboys:item/syringe/2d_fluid",
+		"layer1": "theboys:item/syringe/2d_vial"
+	}
 }

@@ -6,7 +6,7 @@ import chappie.modulus.common.ability.base.AbilityClientProperties;
 import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.data.DataAccessor;
-import chappie.modulus.util.events.SetupAnimEvent;
+import chappie.modulus.util.events.SetupAnimCallback;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -89,7 +89,7 @@ public class FlightAbility extends Ability implements IHasTimer {
                     this.entity.playSound(SoundEvents.ENDER_PEARL_THROW, 1, 1);
                 }*/
             } else {
-                vec3 = entity.getDeltaMovement().multiply(1.05, 0.8, 1.05); // slight sliding effect
+                vec3 = entity.getDeltaMovement().multiply(1.05, 0.4, 1.05); // slight sliding effect
                 vec3 = vec3.add(0, Math.sin(entity.tickCount / 10F) / 100F, 0); // hover
                 vec3 = vec3.add(inputVector(entity, speed)); // unite two vectors, default and with movements.
             }
@@ -132,11 +132,11 @@ public class FlightAbility extends Ability implements IHasTimer {
     public record FlightClientProperties(FlightAbility ability) implements AbilityClientProperties {
 
         @Override
-        public void setupAnim(SetupAnimEvent<? extends LivingEntity, ? extends HumanoidModel<?>> event) {
+        public void setupAnim(SetupAnimCallback.SetupAnimEvent event) {
             AbilityClientProperties.super.setupAnim(event);
-            LivingEntity entity = event.getEntity();
-            var properties = event.getModelProperties();
-            HumanoidModel<?> model = event.getModel();
+            LivingEntity entity = event.entity();
+            var properties = event.modelProperties();
+            HumanoidModel<?> model = event.model();
             float f = this.ability.timer.value(properties.partialTicks());
             float f1 = this.ability.forwardTimer.value(properties.partialTicks());
             float f2 = this.ability.backwardTimer.value(properties.partialTicks());

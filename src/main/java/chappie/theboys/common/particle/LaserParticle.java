@@ -6,6 +6,8 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -15,13 +17,11 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -114,7 +114,7 @@ public class LaserParticle extends RisingParticle {
         pConsumer.vertex(pVertex.x(), pVertex.y(), pVertex.z(), this.rCol, this.gCol, this.bCol, this.alpha, pU, pV, OverlayTexture.NO_OVERLAY, pPackedLight, 0.0F, 1.0F, 0.0F);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static class LaserParticleFactory implements ParticleProvider<LaserParticleOptions> {
         private final SpriteSet sprite;
 
@@ -157,7 +157,7 @@ public class LaserParticle extends RisingParticle {
 
         @Override
         public ParticleType<?> getType() {
-            return TBParticleTypes.LASER.get();
+            return TBParticleTypes.LASER;
         }
 
         public void writeToNetwork(FriendlyByteBuf pBuffer) {
@@ -165,7 +165,7 @@ public class LaserParticle extends RisingParticle {
         }
 
         public String writeToString() {
-            return String.format(Locale.ROOT, "%s %s", ForgeRegistries.PARTICLE_TYPES.getKey(this.getType()), entityId);
+            return String.format(Locale.ROOT, "%s %s", BuiltInRegistries.PARTICLE_TYPE.getKey(this.getType()), entityId);
         }
     }
 }

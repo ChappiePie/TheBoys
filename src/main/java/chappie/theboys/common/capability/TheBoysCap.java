@@ -1,23 +1,25 @@
 package chappie.theboys.common.capability;
 
-import chappie.theboys.networking.TBNetworking;
-import chappie.theboys.networking.client.ClientSyncTheBoysCap;
+import chappie.theboys.TheBoys;
 import chappie.theboys.util.timers.SyringeVialAnim;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
+import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.util.INBTSerializable;
 
-import javax.annotation.Nullable;
+public class TheBoysCap implements AutoSyncedComponent, CopyableComponent<TheBoysCap>, CommonTickingComponent, ComponentV3 {
 
-public class TheBoysCap implements INBTSerializable<CompoundTag> {
+    public static final ComponentKey<TheBoysCap> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(TheBoys.id("cap"), TheBoysCap.class);
 
-    public static Capability<TheBoysCap> CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
+    public static TheBoysCap getCap(Object provider) {
+        return KEY.maybeGet(provider).orElse(null);
+    }
 
     private final LivingEntity livingEntity;
     private boolean compoundV;
@@ -28,14 +30,18 @@ public class TheBoysCap implements INBTSerializable<CompoundTag> {
         this.livingEntity = livingEntity;
     }
 
-    @Nullable
-    public static TheBoysCap getCap(Entity entity) {
-        return entity.getCapability(TheBoysCap.CAPABILITY).orElse(null);
-    }
-
+    @Override
     public void tick() {
-        if (this.livingEntity instanceof Player player) {
+        if (this.livingEntity.isAlive() && this.livingEntity instanceof Player player) {
             this.vialAnim.tick(player);
+//            if (this.livingEntity.level().isClientSide()) {
+//                PlayerAnimCap cap = PlayerAnimCap.getCap(player);
+//                if (cap != null) {
+//                    if (player.isCrouching()) {
+//                        cap.triggerAnim("theboys_arm_controller", "dab");
+//                    }
+//                }
+//            }
         }
     }
 
@@ -66,7 +72,7 @@ public class TheBoysCap implements INBTSerializable<CompoundTag> {
 
     public void sync() {
         if (this.livingEntity instanceof ServerPlayer player) {
-            TBNetworking.INSTANCE.send(new ClientSyncTheBoysCap(this.livingEntity.getId(), this.serializeNBT()), player.connection.getConnection());
+            KEY.sync(player);
         }
     }
 
@@ -74,29 +80,33 @@ public class TheBoysCap implements INBTSerializable<CompoundTag> {
         this.sync();
         for (LivingEntity livingEntity : this.livingEntity.getCommandSenderWorld().players()) {
             if (livingEntity instanceof ServerPlayer player) {
-                TBNetworking.INSTANCE.send(new ClientSyncTheBoysCap(this.livingEntity.getId(), this.serializeNBT()), player.connection.getConnection());
+                KEY.sync(player);
             }
         }
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
+    public void copyFrom(TheBoysCap other) {
+        this.compoundV = other.compoundV;
+        this.eyesHeight = other.eyesHeight;
+        this.eyesLength = other.eyesLength;
+    }
+
+    @Override
+    public void readFromNbt(CompoundTag tag) {
+        this.compoundV = tag.getBoolean("CompoundV");
+        CompoundTag nbt = tag.getCompound("eyeOptions");
+        this.eyesHeight =  nbt.getInt("eyesHeight");
+        this.eyesLength = nbt.getInt("eyesLength");
+    }
+
+    @Override
+    public void writeToNbt(CompoundTag tag) {
         tag.putBoolean("CompoundV", this.compoundV);
 
         CompoundTag eyeOptions = new CompoundTag();
         eyeOptions.putInt("eyesHeight", this.eyesHeight);
         eyeOptions.putInt("eyesLength", this.eyesLength);
         tag.put("eyeOptions", eyeOptions);
-
-        return tag;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag tag) {
-        this.compoundV = tag.getBoolean("CompoundV");
-        CompoundTag nbt = tag.getCompound("eyeOptions");
-        this.eyesHeight =  nbt.getInt("eyesHeight");
-        this.eyesLength = nbt.getInt("eyesLength");
     }
 }

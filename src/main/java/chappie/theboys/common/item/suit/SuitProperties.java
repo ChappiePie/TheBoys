@@ -145,12 +145,6 @@ public class SuitProperties extends Item.Properties {
 
     @NotNull
     @Override
-    public SuitProperties setNoRepair() {
-        return (SuitProperties) super.setNoRepair();
-    }
-
-    @NotNull
-    @Override
     public SuitProperties requiredFeatures(FeatureFlag @NotNull ... pRequiredFeatures) {
         return (SuitProperties) super.requiredFeatures(pRequiredFeatures);
     }

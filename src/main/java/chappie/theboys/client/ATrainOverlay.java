@@ -6,30 +6,23 @@ import chappie.theboys.common.ability.SpeedAbility;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = TheBoys.MODID, value = Dist.CLIENT)
-public class ATrainOverlay implements IGuiOverlay {
+public class ATrainOverlay {
     private static final ResourceLocation TEXTURE = new ResourceLocation(TheBoys.MODID, "textures/gui/atrain.png");
     private static int appearAnimTick, appearAnimTickO;
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
-        Entity entity = gui.getMinecraft().getCameraEntity();
+    public static void render(Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
+        Entity entity = Minecraft.getInstance().getCameraEntity();
         int left = width - 96;
         int top = height - 24;
         PoseStack poseStack = guiGraphics.pose();
@@ -56,9 +49,8 @@ public class ATrainOverlay implements IGuiOverlay {
         }
     }
 
-    @SubscribeEvent
-    public static void clientTick(TickEvent.ClientTickEvent event) {
-        if (!Minecraft.getInstance().isPaused() && event.phase == TickEvent.Phase.START) {
+    public static void clientTick(Minecraft minecraft) {
+        if (!Minecraft.getInstance().isPaused()) {
             Player player = Minecraft.getInstance().player;
             if (player != null && player.isAlive()) {
                 List<SpeedAbility> abilities = CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(player));

@@ -1,6 +1,7 @@
 package chappie.theboys.client.renderer;
 
 import chappie.modulus.client.model.CapeModel;
+import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.FlightAbility;
@@ -36,7 +37,7 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
         }
 
         if (pLivingEntity instanceof AbstractClientPlayer player && pSlot == EquipmentSlot.CHEST) {
-            float partialTicks = Minecraft.getInstance().getPartialTick();
+            float partialTicks = ClientUtil.getPartialTick();
             float rotation = getRotation(pLivingEntity, player, partialTicks);
 
             ModelPart cape = this.model.main.getChild("cape");

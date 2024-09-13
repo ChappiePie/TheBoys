@@ -1,24 +1,29 @@
 package chappie.theboys.common.ability.base;
 
-import chappie.modulus.Modulus;
 import chappie.modulus.common.ability.base.AbilityType;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.core.Registry;
 
 public class TBAbilityTypes {
-    public static final DeferredRegister<AbilityType> ABILITIES = DeferredRegister.create(new ResourceLocation(Modulus.MODID, "ability_types"), TheBoys.MODID);
 
-    public static final RegistryObject<AbilityType> GLOW_EYES = ABILITIES.register("glow_eyes", () -> new AbilityType(GlowEyesAbility::new));
-    public static final RegistryObject<AbilityType> HEAT_VISION = ABILITIES.register("heat_vision", () -> new AbilityType(HeatVisionAbility::new));
-    public static final RegistryObject<AbilityType> SPEED = ABILITIES.register("speed", () -> new AbilityType(SpeedAbility::new));
-    public static final RegistryObject<AbilityType> FLIGHT = ABILITIES.register("flight", () -> new AbilityType(FlightAbility::new));
-    public static final RegistryObject<AbilityType> SUPER_HEARING = ABILITIES.register("super_hearing", () -> new AbilityType(SuperHearingAbility::new));
-    public static final RegistryObject<AbilityType> ATTRIBUTE_MODIFIER = ABILITIES.register("attribute_modifier", () -> new AbilityType(AttributeModifierAbility::new));
-    public static final RegistryObject<AbilityType> DAMAGE_IMMUNITY = ABILITIES.register("damage_immunity", () -> new AbilityType(DamageImmunityAbility::new));
-    public static final RegistryObject<AbilityType> TRANSLUCENT = ABILITIES.register("translucent", () -> new AbilityType(TranslucentAbility::new));
+    public static final AbilityType GLOW_EYES = register("glow_eyes", new AbilityType(GlowEyesAbility::new));
+    public static final AbilityType HEAT_VISION = register("heat_vision", new AbilityType(HeatVisionAbility::new));
+    public static final AbilityType SPEED = register("speed", new AbilityType(SpeedAbility::new));
+    public static final AbilityType FOCUS_ON_GOAL = register("focus_on_goal", new AbilityType(FocusOnGoalAbility::new));
+    public static final AbilityType FLIGHT = register("flight", new AbilityType(FlightAbility::new));
+    public static final AbilityType SUPER_HEARING = register("super_hearing", new AbilityType(SuperHearingAbility::new));
+    public static final AbilityType ATTRIBUTE_MODIFIER = register("attribute_modifier", new AbilityType(AttributeModifierAbility::new));
+    public static final AbilityType DAMAGE_IMMUNITY = register("damage_immunity", new AbilityType(DamageImmunityAbility::new));
+    public static final AbilityType TRANSLUCENT = register("translucent", new AbilityType(TranslucentAbility::new));
 
-    public static final RegistryObject<AbilityType> BRUH = ABILITIES.register("bruh", () -> new AbilityType(LightingAbility::new));
+    public static final AbilityType BRUH = register("bruh", new AbilityType(LightingAbility::new));
+
+    public static <T extends AbilityType> T register(String id, T item) {
+        return Registry.register(AbilityType.REGISTRY, TheBoys.id(id), item);
+    }
+
+    public static void init() {
+
+    }
 }

@@ -1,11 +1,22 @@
 package chappie.theboys.networking.server;
 
+import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.network.CustomPayloadEvent;
 
-public class ServerSetEyeOptions {
+public class ServerSetEyeOptions implements FabricPacket {
+
+    public static final PacketType<ServerSetEyeOptions> PACKET = PacketType.create(TheBoys.id("server_set_eye_options"), ServerSetEyeOptions::new);
+
+    @Override
+    public PacketType<?> getType() {
+        return PACKET;
+    }
+
     public int eyesHeight;
     public int eyesLength;
 
@@ -19,17 +30,15 @@ public class ServerSetEyeOptions {
         this.eyesLength = buf.readInt();
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeInt(this.eyesHeight);
         buf.writeInt(this.eyesLength);
     }
 
-    public void handle(CustomPayloadEvent.Context ctx) {
-        ServerPlayer player = ctx.getSender();
+    public void handle(ServerPlayer player, PacketSender packetSender) {
         if (player != null) {
-            player.getCapability(TheBoysCap.CAPABILITY).ifPresent(data ->
-                    data.setEyeOptions(this.eyesHeight, this.eyesLength));
+            TheBoysCap.getCap(player).setEyeOptions(this.eyesHeight, this.eyesLength);
         }
-        ctx.setPacketHandled(true);
     }
 }

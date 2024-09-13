@@ -174,7 +174,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
 
     // Basic modifications for nice Heat vision ability
     public static AbilityBuilder of(String id, Function<KeyCondition, KeyCondition> consumer, Function<KeyCondition, KeyCondition> additionalConsumer) {
-        return AbilityBuilder.of(id, TBAbilityTypes.HEAT_VISION.get()).condition(a -> consumer.apply(new KeyCondition(a) {
+        return AbilityBuilder.of(id, TBAbilityTypes.HEAT_VISION).condition(a -> consumer.apply(new KeyCondition(a) {
             @Override
             public boolean get() {
                 if (a.enabledTicks >= a.dataManager.get(HeatVisionAbility.MAX_TIMER)) {

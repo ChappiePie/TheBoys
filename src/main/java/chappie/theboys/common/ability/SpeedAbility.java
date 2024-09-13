@@ -14,7 +14,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ForgeMod;
 
 import java.awt.*;
 import java.util.UUID;
@@ -51,7 +50,8 @@ public class SpeedAbility extends Ability {
 
             this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED, speedLevel, AttributeModifier.Operation.MULTIPLY_TOTAL);
             this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED, speedLevel, AttributeModifier.Operation.MULTIPLY_TOTAL);
-            this.setAttribute(entity, this.builder.id, ForgeMod.STEP_HEIGHT_ADDITION.get(), 1, AttributeModifier.Operation.ADDITION);
+            // TODO
+            //this.setAttribute(entity, this.builder.id, ForgeMod.STEP_HEIGHT_ADDITION.get(), 1, AttributeModifier.Operation.ADDITION);
 
             if (isMoving && !entity.isPassenger()) {
                 this.setupTrail(entity, speedLevel);
@@ -95,7 +95,8 @@ public class SpeedAbility extends Ability {
             this.dataManager.set(SPEED_LVL, 1);
             this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED, 0.0F, AttributeModifier.Operation.MULTIPLY_TOTAL);
             this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED, 0.0F, AttributeModifier.Operation.MULTIPLY_TOTAL);
-            this.setAttribute(entity, this.builder.id, ForgeMod.STEP_HEIGHT_ADDITION.get(), 0, AttributeModifier.Operation.ADDITION);
+            // TODO
+            //this.setAttribute(entity, this.builder.id, ForgeMod.STEP_HEIGHT_ADDITION.get(), 0, AttributeModifier.Operation.ADDITION);
             this.cooldown = this.upgradeCooldown = 0;
         }
     }
@@ -118,7 +119,7 @@ public class SpeedAbility extends Ability {
         int speedLevel = this.dataManager.get(MAX_SPEED_LVL);
         TheBoysCap cap = TheBoysCap.getCap(this.entity);
         if (cap != null && cap.compoundV()) {
-            speedLevel *= 1.5F;
+            speedLevel = (int) (speedLevel * 1.5F);
         }
         return speedLevel;
     }

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "theboys",
+  "version": "${version}",
+  "name": "The Boys",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "accessWidener": "theboys.accesswidener",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/theboys/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "chappie.theboys.TheBoys"
+    ],
+    "client": [
+      "chappie.theboys.TheBoysClient"
+    ],
+    "cardinal-components": [
+      "chappie.theboys.util.TBComponents"
+    ],
+    "modmenu": [
+      "chappie.theboys.util.TBModMenuCompat"
+    ]
+  },
+  "custom": {
+    "cardinal-components": [
+      "theboys:cap"
+    ]
+  },
+  "mixins": [
+    "theboys.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.5",
+    "minecraft": "~1.20.4",
+    "java": ">=17",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

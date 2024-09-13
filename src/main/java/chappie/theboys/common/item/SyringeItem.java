@@ -1,37 +1,35 @@
 package chappie.theboys.common.item;
 
 import chappie.modulus.common.capability.anim.PlayerAnimCap;
-import chappie.theboys.TheBoys;
 import chappie.theboys.client.renderer.SyringeRenderer;
 import chappie.theboys.common.capability.TheBoysCap;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
-import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.registries.ForgeRegistries;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.animatable.client.RenderProvider;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class SyringeItem extends Item implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
 
     public SyringeItem() {
         super(new Item.Properties().stacksTo(1));
@@ -69,7 +67,7 @@ public class SyringeItem extends Item implements GeoItem {
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
         if (pLivingEntity instanceof Player player && !pLevel.isClientSide()) {
             player.getCooldowns().addCooldown(this, 20);
-            var effects = ForgeRegistries.MOB_EFFECTS.getValues().stream().filter(p -> ForgeRegistries.MOB_EFFECTS.getKey(p).getNamespace().equals("minecraft") && p.getCategory().equals(MobEffectCategory.HARMFUL)).toList();
+            var effects = BuiltInRegistries.MOB_EFFECT.stream().filter(p -> BuiltInRegistries.MOB_EFFECT.getKey(p).getNamespace().equals("minecraft") && p.getCategory().equals(MobEffectCategory.HARMFUL)).toList();
             var mobEffect = effects.get(player.getRandom().nextInt(effects.size()));
             player.addEffect(new MobEffectInstance(mobEffect, 200, 3, false, true, true));
             //mainHandItem.getOrCreateTag().put("vial",);
@@ -99,8 +97,18 @@ public class SyringeItem extends Item implements GeoItem {
     }
 
     @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
+    }
+
+    @Override
+    public void createRenderer(Consumer<Object> consumer) {
+        consumer.accept(new RenderProvider() {
             private SyringeRenderer renderer;
 
             @Override
@@ -113,14 +121,8 @@ public class SyringeItem extends Item implements GeoItem {
         });
     }
 
-
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+    public Supplier<Object> getRenderProvider() {
+        return renderProvider;
     }
 }

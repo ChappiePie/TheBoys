@@ -3,6 +3,9 @@ package chappie.theboys.common.entity;
 import chappie.modulus.mixin.client.EntityRenderersAccessor;
 import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.render.IHasContext;
+import chappie.theboys.networking.client.ClientSpawnTrail;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -11,22 +14,20 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 
 import java.awt.*;
 import java.util.Map;
 
 import static net.minecraft.client.renderer.entity.LivingEntityRenderer.isEntityUpsideDown;
 
-public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
-    @OnlyIn(Dist.CLIENT)
+public class TrailEntity extends Entity {
+    @Environment(EnvType.CLIENT)
     public EntityModel<LivingEntity> model;
     public ResourceLocation texture;
     public float yBodyRot;
@@ -43,7 +44,7 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     }
 
     public TrailEntity(Level worldIn, LivingEntity entity, Color color, int lifeTime) {
-        this(TBEntities.TRAIL.get(), worldIn);
+        this(TBEntities.TRAIL, worldIn);
         this.entity = entity;
         this.yBodyRot = entity.yBodyRot;
         this.lifeTime = lifeTime;
@@ -70,21 +71,15 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
     }
 
     @Override
-    public void writeSpawnData(FriendlyByteBuf buffer) {
-        buffer.writeInt(this.lifeTime);
-        buffer.writeInt(this.entity == null ? -1 : this.entity.getId());
-
-        buffer.writeInt(this.color.getRed());
-        buffer.writeInt(this.color.getGreen());
-        buffer.writeInt(this.color.getBlue());
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
+        return new ClientSpawnTrail(this);
     }
 
     @SuppressWarnings("unchecked")
-    @Override
-    public void readSpawnData(FriendlyByteBuf additionalData) {
-        this.lifeTime = additionalData.readInt();
-        this.entity = (LivingEntity) this.getCommandSenderWorld().getEntity(additionalData.readInt());
-        this.color = new Color(additionalData.readInt(), additionalData.readInt(), additionalData.readInt());
+    public void readSpawnData(int lifeTime, LivingEntity entity, Color color) {
+        this.lifeTime = lifeTime;
+        this.entity = entity;
+        this.color = color;
 
         if (this.entity == null) return;
 
@@ -118,13 +113,12 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         {
             this.yBodyRot = this.entity.yBodyRot;
             this.model.attackTime = this.entity.getAttackAnim(0);
-            boolean shouldSit = this.entity.isPassenger() && (entity.getVehicle() != null && this.entity.getVehicle().shouldRiderSit());
-            this.model.riding = shouldSit;
+            this.model.riding = this.entity.isPassenger();
             this.model.young = this.entity.isBaby();
             float f = Mth.rotLerp(0, this.entity.yBodyRotO, this.entity.yBodyRot);
             float f1 = Mth.rotLerp(0, this.entity.yHeadRotO, this.entity.yHeadRot);
             float f2 = f1 - f;
-            if (shouldSit && this.entity.getVehicle() instanceof LivingEntity livingentity) {
+            if (this.entity.isPassenger() && this.entity.getVehicle() instanceof LivingEntity livingentity) {
                 f = Mth.rotLerp(0, livingentity.yBodyRotO, livingentity.yBodyRot);
                 f2 = f1 - f;
                 float f3 = Mth.wrapDegrees(f2);
@@ -152,7 +146,7 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
 
             float f8 = 0.0F;
             float f5 = 0.0F;
-            if (!shouldSit && this.entity.isAlive()) {
+            if (!this.entity.isPassenger() && this.entity.isAlive()) {
                 f8 = this.entity.walkAnimation.speed(1);
                 f5 = this.entity.walkAnimation.position(1);
                 if (this.entity.isBaby()) {
@@ -173,7 +167,7 @@ public class TrailEntity extends Entity implements IEntityAdditionalSpawnData {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public boolean shouldRender(double x, double y, double z) {
         return true;

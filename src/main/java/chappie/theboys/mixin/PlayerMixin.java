@@ -23,7 +23,7 @@ public abstract class PlayerMixin extends LivingEntity {
     @Inject(method = "getDimensions", at = @At("TAIL"), cancellable = true)
     public void mixin$getFallFlying(Pose pPose, CallbackInfoReturnable<EntityDimensions> cir) {
         Player player = (Player) (Object) this;
-        if (player != null && player.isAddedToWorld()) {
+        if (player != null && player.isAlive()) {
             for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
                 if (player.isSprinting() && ability.isEnabled()) {
                     cir.setReturnValue(EntityDimensions.scalable(0.6F, 0.6F));

@@ -48,5 +48,6 @@
   "gui.theboys.eyeOptions.laserOptions": "Lasers Options",
   "gui.theboys.eyeOptions.profileName": "Profile name",
   "narrator.button.theBoys": "The Boys",
-  "item.theboys.suit.equip": "To equip part of the suit, pick up the item and press RMB on the armor item"
+  "item.theboys.suit.equip": "To equip part of the suit, pick up the item and press RMB on the armor item",
+  "title.theboys.config": "The Boys"
 }

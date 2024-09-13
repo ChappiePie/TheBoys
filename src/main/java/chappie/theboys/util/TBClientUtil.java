@@ -13,6 +13,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
@@ -22,6 +23,11 @@ import net.minecraft.world.item.ItemStack;
 
 public class TBClientUtil {
 
+    public static final ModelResourceLocation SYRINGE_MODEL = new ModelResourceLocation(TheBoys.MODID, "syringe", "inventory");
+    public static final ModelResourceLocation SYRINGE_3D_MODEL = new ModelResourceLocation(TheBoys.MODID, "syringe_3d", "inventory");
+
+    public static final ModelResourceLocation VIAL_MODEL = new ModelResourceLocation(TheBoys.MODID, "vial", "inventory");
+    public static final ModelResourceLocation VIAL_3D_MODEL = new ModelResourceLocation(TheBoys.MODID, "vial_3d", "inventory");
     public static final ResourceLocation GLOW_EYES_OVERLAY = new ResourceLocation(TheBoys.MODID, "textures/gui/glow_eyes_overlay.png");
 
     public static void setupArms(PlayerModel<? extends LivingEntity> model, HumanoidArm side, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, AbstractClientPlayer pPlayer, ModelPart pRendererArm, ModelPart pRendererArmwear, float partialTicks) {
@@ -34,8 +40,8 @@ public class TBClientUtil {
         int i = flag1 ? 1 : -1;
         ItemStack stack = pPlayer.getMainArm() == side ? pPlayer.getMainHandItem() : pPlayer.getOffhandItem();
 
-        boolean vial = stack.getItem() == TBItems.VIAL.get() || pPlayer.getMainArm() != side && timeline > 0;
-        if (stack.getItem() == TBItems.SYRINGE.get() || vial) {
+        boolean vial = stack.getItem() == TBItems.VIAL || pPlayer.getMainArm() != side && timeline > 0;
+        if (stack.getItem() == TBItems.SYRINGE || vial) {
             pRendererArm.xRot = (float) Math.toRadians(-12.5F);
             pRendererArm.yRot = (float) Math.toRadians(50F * i);
             pRendererArm.zRot = (float) Math.toRadians(-30.5F * i);

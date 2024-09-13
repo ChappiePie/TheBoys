@@ -2,18 +2,25 @@ package chappie.theboys.common.particle;
 
 import chappie.theboys.TheBoys;
 import com.mojang.serialization.Codec;
+import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class TBParticleTypes {
 
-    public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, TheBoys.MODID);
+    public static final ParticleType<LaserParticle.LaserParticleOptions> LASER = Registry.register(BuiltInRegistries.PARTICLE_TYPE, TheBoys.id("laser"), complex(false, LaserParticle.LaserParticleOptions.DESERIALIZER));
 
-    public static final RegistryObject<ParticleType<LaserParticle.LaserParticleOptions>> LASER = PARTICLES.register("laser", () -> new ParticleType<>(false, LaserParticle.LaserParticleOptions.DESERIALIZER) {
-        public Codec<LaserParticle.LaserParticleOptions> codec() {
-            return LaserParticle.LaserParticleOptions.CODEC;
-        }
-    });
+    public static ParticleType<LaserParticle.LaserParticleOptions> complex(boolean alwaysSpawn, ParticleOptions.Deserializer<LaserParticle.LaserParticleOptions> factory) {
+        return new ParticleType<>(alwaysSpawn, factory) {
+            @Override
+            public Codec<LaserParticle.LaserParticleOptions> codec() {
+                return LaserParticle.LaserParticleOptions.CODEC;
+            }
+        };
+    }
+
+    public static void init() {
+
+    }
 }

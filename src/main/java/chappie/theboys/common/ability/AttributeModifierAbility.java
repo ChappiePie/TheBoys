@@ -27,7 +27,7 @@ public class AttributeModifierAbility extends Ability {
     }
 
     public static AbilityBuilder of(String id, Consumer<AttributeBuilder> consumer) {
-        return AbilityBuilder.of(id, TBAbilityTypes.ATTRIBUTE_MODIFIER.get()).additionalData(a -> {
+        return AbilityBuilder.of(id, TBAbilityTypes.ATTRIBUTE_MODIFIER).additionalData(a -> {
             if (a instanceof AttributeModifierAbility ability) {
                 consumer.accept(ability.attributeBuilder);
             }

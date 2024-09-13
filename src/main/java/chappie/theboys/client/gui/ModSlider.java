@@ -66,7 +66,7 @@ public class ModSlider extends AbstractSliderButton {
 
         int i = this.getX() + 2;
         int j = this.getX() + this.getWidth() - 2;
-        renderScrollingString(guiGraphics, mc.font, this.getMessage(), i, this.getY(), j, this.getY() + this.getHeight(), getFGColor() | Mth.ceil(this.alpha * 255.0F) << 24);
+        renderScrollingString(guiGraphics, mc.font, this.getMessage(), i, this.getY(), j, this.getY() + this.getHeight(), (this.active ? 16777215 : 10526880) | Mth.ceil(this.alpha * 255.0F) << 24);
     }
 
 

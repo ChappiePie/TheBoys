@@ -31,7 +31,7 @@ public abstract class HumanoidArmorLayerMixin<T extends LivingEntity, A extends 
 
     @Unique private SuitModel<T> theBoys$model;
 
-    @Inject(method = "renderArmorPiece*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;renderModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/item/ArmorItem;Lnet/minecraft/client/model/Model;ZFFFLnet/minecraft/resources/ResourceLocation;)V"), remap = false)
+    @Inject(method = "renderArmorPiece*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;renderModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/item/ArmorItem;Lnet/minecraft/client/model/HumanoidModel;ZFFFLjava/lang/String;)V"), remap = false)
     private void startRenderArmorPiece(PoseStack pPoseStack, MultiBufferSource pBuffer, T pLivingEntity, EquipmentSlot pSlot, int pPackedLight, A pModel, CallbackInfo ci) {
         if (theBoys$model == null)
             theBoys$model = new SuitModel<>(SuitModel.SUIT);
@@ -67,7 +67,7 @@ public abstract class HumanoidArmorLayerMixin<T extends LivingEntity, A extends 
     }
 
     @SuppressWarnings("unchecked")
-    @Inject(method = "renderArmorPiece*", at = @At("TAIL"))
+    @Inject(method = "renderArmorPiece(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;)V", at = @At("TAIL"))
     private void stopRenderArmorPiece(PoseStack pPoseStack, MultiBufferSource pBuffer, T pLivingEntity, EquipmentSlot pSlot, int pPackedLight, A pModel, CallbackInfo ci, @Local(ordinal = 0) ItemStack stack) {
         if (stack.getItem() instanceof ArmorItem armoritem && armoritem.getEquipmentSlot() == pSlot) {
             if (stack.getOrCreateTag().contains("Suit")) {

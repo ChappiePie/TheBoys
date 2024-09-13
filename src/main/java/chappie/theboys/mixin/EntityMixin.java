@@ -1,11 +1,13 @@
 package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
+import chappie.theboys.common.ability.DamageImmunityAbility;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.TranslucentAbility;
 import chappie.theboys.util.interfaces.EntitySavingFields;
 import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +24,22 @@ import java.util.Map;
 public class EntityMixin implements EntitySavingFields {
     @Shadow public float xRotO;
     @Shadow public float yRotO;
-    @Unique private Map<String, Object> theBoys$map = Maps.newHashMap();
+    @Unique
+    private final Map<String, Object> theBoys$map = Maps.newHashMap();
+
+    @Inject(method = "isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
+    public void mixin$isInvulnerableTo(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValue()) {
+            Entity entity = (Entity) (Object) this;
+            for (DamageImmunityAbility a : CommonUtil.listOfType(DamageImmunityAbility.class, CommonUtil.getAbilities(entity))) {
+                for (String s : a.damageSources) {
+                    if (s.equals(source.getMsgId()) && a.isEnabled()) {
+                        cir.setReturnValue(true);
+                    }
+                }
+            }
+        }
+    }
 
     @Inject(method = "getXRot", at = @At("TAIL"), cancellable = true)
     public void mixin$getXRot(CallbackInfoReturnable<Float> cir) {
