@@ -89,8 +89,8 @@ public class FlightAbility extends Ability implements IHasTimer {
                     this.entity.playSound(SoundEvents.ENDER_PEARL_THROW, 1, 1);
                 }*/
             } else {
-                vec3 = entity.getDeltaMovement().multiply(1.05, 0.4, 1.05); // slight sliding effect
-                vec3 = vec3.add(0, Math.sin(entity.tickCount / 10F) / 100F, 0); // hover
+                vec3 = entity.getDeltaMovement().multiply(1.05, 0.1F, 1.05); // slight sliding effect
+                vec3 = vec3.add(0, Math.sin(entity.tickCount / 10F) / 50F, 0); // hover
                 vec3 = vec3.add(inputVector(entity, speed)); // unite two vectors, default and with movements.
             }
             entity.setDeltaMovement(vec3);
@@ -114,7 +114,7 @@ public class FlightAbility extends Ability implements IHasTimer {
             Vec3 vec3 = (d0 > 1.0D ? vec.normalize() : vec).scale(speedModifier);
             double f = Math.sin(Math.toRadians(entity.getYRot()));
             double f1 = Math.cos(Math.toRadians(entity.getYRot()));
-            return new Vec3(vec3.x * f1 - vec3.z * f, vec3.y / (speedModifier * 8.0F), vec3.z * f1 + vec3.x * f);
+            return new Vec3(vec3.x * f1 - vec3.z * f, yya * speedModifier * 16, vec3.z * f1 + vec3.x * f);
         }
     }
 

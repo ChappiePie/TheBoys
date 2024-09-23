@@ -64,7 +64,7 @@ public class TBClientUtil {
                 pRendererArm.zRot += (float) (Math.toRadians(45F) * t * i);
             }
 
-            if (!stack.isEmpty()){
+            if (!stack.isEmpty()) {
                 pPoseStack.pushPose();
                 pRendererArm.translateAndRotate(pPoseStack);
                 pPoseStack.mulPose(Axis.XN.rotationDegrees(90F + (vial ? -20 : 0)));

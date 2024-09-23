@@ -51,10 +51,9 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     public static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation(TheBoys.MODID, "textures/gui/eye_options.png");
     private static final HumanoidModel<?> EYES_LAYER_MODEL = new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER));
     private static double LASERS_LENGTH = 5;
-
+    public final Map<Renderable, Function<Integer, Integer>> changeYPos = new HashMap<>();
     private final LinkedList<Renderable> laserOptions = new LinkedList<>();
     private final Screen parent;
-
     private int tickCount, lastXofPresets = this.width / 2;
     @Nullable
     private PlayerInfo playerInfo;
@@ -63,11 +62,34 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     private String skinModel;
     private ModSlider eyesLengthSlider, eyesHeightSlider, rotationSlider;
     private EditBox name;
-    public final Map<Renderable, Function<Integer, Integer>> changeYPos = new HashMap<>();
 
     public EyeOptionsScreen(Screen screen) {
         super(Component.translatable("gui.theboys.eyeOptions"));
         this.parent = screen;
+    }
+
+    public static void updateData() {
+        if (Minecraft.getInstance().level != null) {
+            ModNetworking.sendToServer(new ServerSetEyeOptions(EyeOptionsScreen.getEyesHeight(), EyeOptionsScreen.getEyesLength()));
+        }
+    }
+
+    public static int getEyesHeight() {
+        return switch (TBConfig.CLIENT.eyesType.get()) {
+            case 2 -> 6;
+            case 4 -> TBConfig.CLIENT.eyesHeight.get();
+            case 5 -> TBConfig.CLIENT.eyesHeight2.get();
+            default -> 5;
+        };
+    }
+
+    public static int getEyesLength() {
+        return switch (TBConfig.CLIENT.eyesType.get()) {
+            case 3 -> 2;
+            case 4 -> TBConfig.CLIENT.eyesLength.get();
+            case 5 -> TBConfig.CLIENT.eyesLength2.get();
+            default -> 1;
+        };
     }
 
     @Override
@@ -116,12 +138,6 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         this.changeYPos.put(this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (p_96257_) -> {
             this.minecraft.setScreen(this.parent);
         }).bounds(this.width / 2 - 166, this.height / 2 + 75, 128, 20).build()), y -> y + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0) + 5);
-    }
-
-    public static void updateData() {
-        if (Minecraft.getInstance().level != null) {
-            ModNetworking.sendToServer(new ServerSetEyeOptions(EyeOptionsScreen.getEyesHeight(), EyeOptionsScreen.getEyesLength()));
-        }
     }
 
     @Override
@@ -289,25 +305,6 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
         poseStack.popPose();
     }
-
-    public static int getEyesHeight() {
-        return switch (TBConfig.CLIENT.eyesType.get()) {
-            case 2 -> 6;
-            case 4 -> TBConfig.CLIENT.eyesHeight.get();
-            case 5 -> TBConfig.CLIENT.eyesHeight2.get();
-            default -> 5;
-        };
-    }
-
-    public static int getEyesLength() {
-        return switch (TBConfig.CLIENT.eyesType.get()) {
-            case 3 -> 2;
-            case 4 -> TBConfig.CLIENT.eyesLength.get();
-            case 5 -> TBConfig.CLIENT.eyesLength2.get();
-            default -> 1;
-        };
-    }
-
 
     private void addSkinPresets() {
         int x = this.width / 2 - 200 + 6, y1 = (laserOptions.isEmpty() ? 0 : laserOptions.size() < 3 ? -5 : 0) - 60, y = this.height / 2 + 35 - 60;
@@ -533,7 +530,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
 
         public BasicSkinPresetButton(EyeOptionsScreen screen, int pX, int pY, int type, OnPress pOnPress) {
-            super(pX, pY, 32,32, new WidgetSprites(EyeOptionsScreen.TEXTURE_LOCATION, EyeOptionsScreen.TEXTURE_LOCATION), pOnPress, Component.translatable("gui.theboys.eyeOptions.skinPreset"));
+            super(pX, pY, 32, 32, new WidgetSprites(EyeOptionsScreen.TEXTURE_LOCATION, EyeOptionsScreen.TEXTURE_LOCATION), pOnPress, Component.translatable("gui.theboys.eyeOptions.skinPreset"));
             this.screen = screen;
             this.type = type;
         }
@@ -550,8 +547,8 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
 
     public static class ModLabel implements Renderable {
         private final Component text;
-        private int x, y;
         private final int color;
+        private int x, y;
 
         public ModLabel(Component pText, int pX, int pY, int pColor) {
             this.text = pText;

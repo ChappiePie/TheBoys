@@ -6,6 +6,7 @@ import chappie.theboys.common.item.SyringeItem;
 import chappie.theboys.common.item.VialItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -18,15 +19,15 @@ public class SyringeVialAnim implements IHasTimer {
 
     public boolean triggerAnim;
 
-    public void tick(Player player) {
-        ItemStack mainHandItem = player.getMainHandItem();
-        ItemStack offHandItem = player.getOffhandItem();
+    public void tick(LivingEntity entity) {
+        ItemStack mainHandItem = entity.getMainHandItem();
+        ItemStack offHandItem = entity.getOffhandItem();
         this.timeline.predicate = () -> this.triggerAnim
                 && mainHandItem.getItem() instanceof SyringeItem
                 && offHandItem.getItem() instanceof VialItem;
         float timeline = this.timeline.value(1);
 
-        if (timeline == 1 && !player.getCommandSenderWorld().isClientSide()) {
+        if (timeline == 1 && !entity.getCommandSenderWorld().isClientSide()) {
             mainHandItem.getOrCreateTag().put("vial", offHandItem.save(new CompoundTag()));
             offHandItem.shrink(1);
         }
@@ -46,7 +47,7 @@ public class SyringeVialAnim implements IHasTimer {
 
     public boolean hideOffHand(Player player, TheBoysCap cap, float partialTicks, InteractionHand hand) {
         float t = cap.vialAnim.timeline.value(partialTicks);
-        if (!cap.vialAnim.triggerAnim && t > 0&& hand == InteractionHand.OFF_HAND) {
+        if (!cap.vialAnim.triggerAnim && t > 0 && hand == InteractionHand.OFF_HAND) {
             if (player.getMainHandItem().getItem() instanceof SyringeItem && player.getMainHandItem().getTag() != null) {
                 return player.getMainHandItem().getTag().contains("vial");
             }

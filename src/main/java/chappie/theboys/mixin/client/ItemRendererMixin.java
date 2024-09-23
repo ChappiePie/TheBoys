@@ -7,7 +7,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -25,20 +24,22 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
 
-    @Shadow public abstract BakedModel getModel(ItemStack pStack, @Nullable Level pLevel, @Nullable LivingEntity pEntity, int pSeed);
-    
-    @Shadow public abstract void render(ItemStack pItemStack, ItemDisplayContext pDisplayContext, boolean pLeftHand, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, int pCombinedOverlay, BakedModel pModel);
-
-    @Shadow @Final private Minecraft minecraft;
-
+    @Shadow
+    @Final
+    private Minecraft minecraft;
     @Shadow
     @Final
     private ItemModelShaper itemModelShaper;
+
+    @Shadow
+    public abstract BakedModel getModel(ItemStack pStack, @Nullable Level pLevel, @Nullable LivingEntity pEntity, int pSeed);
+
+    @Shadow
+    public abstract void render(ItemStack pItemStack, ItemDisplayContext pDisplayContext, boolean pLeftHand, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, int pCombinedOverlay, BakedModel pModel);
 
     @Inject(method = "render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderModelLists(Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/item/ItemStack;IILcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V"))
@@ -57,32 +58,16 @@ public abstract class ItemRendererMixin {
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "getModel(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;I)Lnet/minecraft/client/resources/model/BakedModel;", cancellable = true)
-    private void replaceModels(ItemStack stack, Level level, LivingEntity entity, int seed, CallbackInfoReturnable<BakedModel> cir) {
-        BakedModel bakedModel = null;
-        if (stack.is(TBItems.SYRINGE)) {
-            bakedModel = this.itemModelShaper.getModelManager().getModel(TBClientUtil.SYRINGE_3D_MODEL);
-        } else if (stack.is(TBItems.VIAL)) {
-            bakedModel = this.itemModelShaper.getModelManager().getModel(TBClientUtil.VIAL_3D_MODEL);
-        }
-
-        if (bakedModel != null) {
-            ClientLevel clientLevel = level instanceof ClientLevel ? (ClientLevel) level : null;
-            BakedModel bakedModel2 = bakedModel.getOverrides().resolve(bakedModel, stack, clientLevel, entity, seed);
-            cir.setReturnValue(bakedModel2 == null ? this.itemModelShaper.getModelManager().getMissingModel() : bakedModel2);
-        }
-    }
-
     @Inject(method = "render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V", at = @At("HEAD"))
     public void theBoys$model(ItemStack itemStack, ItemDisplayContext displayContext, boolean leftHand, PoseStack poseStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model, CallbackInfo ci, @Local(argsOnly = true) LocalRef<BakedModel> bakedModel) {
         if (!itemStack.isEmpty()) {
             boolean bl = displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.GROUND || displayContext == ItemDisplayContext.FIXED;
             BakedModel bModel = null;
-            if (bl) {
+            if (!bl) {
                 if (itemStack.is(TBItems.SYRINGE)) {
-                    bModel = this.itemModelShaper.getModelManager().getModel(TBClientUtil.SYRINGE_MODEL);
+                    bModel = this.itemModelShaper.getModelManager().getModel(TBClientUtil.SYRINGE_3D_MODEL);
                 } else if (itemStack.is(TBItems.VIAL)) {
-                    bModel = this.itemModelShaper.getModelManager().getModel(TBClientUtil.VIAL_MODEL);
+                    bModel = this.itemModelShaper.getModelManager().getModel(TBClientUtil.VIAL_3D_MODEL);
                 }
             }
             if (bModel != null) {

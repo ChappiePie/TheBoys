@@ -7,6 +7,7 @@ import chappie.modulus.util.data.DataAccessor;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.entity.TrailEntity;
 import chappie.theboys.util.TBCommonUtil;
+import chappie.theboys.util.interfaces.ILivingEntityEx;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -44,14 +45,19 @@ public class SpeedAbility extends Ability {
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
         if (entity.getCommandSenderWorld().isClientSide) return;
-        if (enabled && !entity.isSwimming() && !entity.isFallFlying()) {
+        if (enabled && !entity.isSwimming() && !entity.isFallFlying() && entity instanceof ILivingEntityEx ex) {
             int speedLevel = this.dataManager.get(SPEED_LVL);
-            boolean isMoving = entity.xOld != entity.getX() || entity.zOld != entity.getZ();
+
+            double scale = Math.pow(10, 3);
+            double x = Math.ceil(ex.theBoys$oldPos().x * scale) / scale;
+            double x1 = Math.ceil(entity.getX() * scale) / scale;
+            double z = Math.ceil(ex.theBoys$oldPos().z * scale) / scale;
+            double z1 = Math.ceil(entity.getZ() * scale) / scale;
+
+            boolean isMoving = x != x1 || z != z1;
 
             this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED, speedLevel, AttributeModifier.Operation.MULTIPLY_TOTAL);
             this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED, speedLevel, AttributeModifier.Operation.MULTIPLY_TOTAL);
-            // TODO
-            //this.setAttribute(entity, this.builder.id, ForgeMod.STEP_HEIGHT_ADDITION.get(), 1, AttributeModifier.Operation.ADDITION);
 
             if (isMoving && !entity.isPassenger()) {
                 this.setupTrail(entity, speedLevel);
@@ -95,22 +101,20 @@ public class SpeedAbility extends Ability {
             this.dataManager.set(SPEED_LVL, 1);
             this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED, 0.0F, AttributeModifier.Operation.MULTIPLY_TOTAL);
             this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED, 0.0F, AttributeModifier.Operation.MULTIPLY_TOTAL);
-            // TODO
-            //this.setAttribute(entity, this.builder.id, ForgeMod.STEP_HEIGHT_ADDITION.get(), 0, AttributeModifier.Operation.ADDITION);
             this.cooldown = this.upgradeCooldown = 0;
         }
     }
 
     private void setupTrail(LivingEntity entity, int speedLevel) {
-        if (entity.isInvisible()) return;
-        float distanceForTrail = 1.5F - speedLevel / (this.dataManager.get(MAX_SPEED_LVL) * 2F);
+        if (entity.isInvisible() || !(entity instanceof ILivingEntityEx ex)) return;
+        float distanceForTrail = 2F - speedLevel / (this.dataManager.get(MAX_SPEED_LVL) * 2F);
         if (this.xOld == 0 || this.zOld == 0) {
-            this.xOld = entity.xOld;
-            this.zOld = entity.zOld;
+            this.xOld = ex.theBoys$oldPos().x;
+            this.zOld = ex.theBoys$oldPos().z;
         }
         if (Math.abs(entity.getX() - this.xOld) >= distanceForTrail || Math.abs(entity.getZ() - this.zOld) >= distanceForTrail) {
-            this.xOld = entity.xOld;
-            this.zOld = entity.zOld;
+            this.xOld = ex.theBoys$oldPos().x;
+            this.zOld = ex.theBoys$oldPos().z;
             entity.getCommandSenderWorld().addFreshEntity(new TrailEntity(entity.getCommandSenderWorld(), entity, Color.WHITE, this.dataManager.get(TRAIL_DURATION)));
         }
     }

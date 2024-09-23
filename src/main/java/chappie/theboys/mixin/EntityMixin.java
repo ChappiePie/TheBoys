@@ -3,12 +3,15 @@ package chappie.theboys.mixin;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.DamageImmunityAbility;
 import chappie.theboys.common.ability.SpeedAbility;
+import chappie.theboys.common.ability.SuperHearingAbility;
 import chappie.theboys.common.ability.TranslucentAbility;
 import chappie.theboys.util.interfaces.EntitySavingFields;
 import com.google.common.collect.Maps;
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,13 +22,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 @Mixin(Entity.class)
 public class EntityMixin implements EntitySavingFields {
-    @Shadow public float xRotO;
-    @Shadow public float yRotO;
     @Unique
     private final Map<String, Object> theBoys$map = Maps.newHashMap();
+    @Shadow
+    public float xRotO;
+    @Shadow
+    public float yRotO;
+
+    @Inject(method = "updateDynamicGameEventListener(Ljava/util/function/BiConsumer;)V", at = @At("TAIL"), cancellable = true)
+    public void mixin$updateDynamicGameEventListener(BiConsumer<DynamicGameEventListener<?>, ServerLevel> listenerConsumer, CallbackInfo ci) {
+        Entity entity = (Entity) (Object) this;
+        if (entity.level() instanceof ServerLevel serverLevel) {
+            for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(entity))) {
+                listenerConsumer.accept(a.dynamicGameEventListener, serverLevel);
+            }
+        }
+    }
 
     @Inject(method = "isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
     public void mixin$isInvulnerableTo(DamageSource source, CallbackInfoReturnable<Boolean> cir) {

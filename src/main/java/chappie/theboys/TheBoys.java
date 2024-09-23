@@ -25,6 +25,12 @@ public class TheBoys implements ModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
+    static {
+        ChappModListWidget.MOD_CLICKED.put(MODID, (e) -> {
+            Minecraft.getInstance().setScreen(new EyeOptionsScreen(e.parent));
+        });
+    }
+
     public static ResourceLocation id(String id) {
         return new ResourceLocation(MODID, id);
     }
@@ -46,12 +52,6 @@ public class TheBoys implements ModInitializer {
                 return new ClientArmorTooltip((ArmorTooltip) tooltip);
             }
             return null;
-        });
-    }
-
-    static {
-        ChappModListWidget.MOD_CLICKED.put(MODID, (e) -> {
-            Minecraft.getInstance().setScreen(new EyeOptionsScreen(e.parent));
         });
     }
 }

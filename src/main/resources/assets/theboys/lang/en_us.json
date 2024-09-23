@@ -24,19 +24,16 @@
 
   "theseven.motto": "The Seven: Let justice be done though the heavens fall.",
 
-  "suits.theboys.atrain": "A-Train's",
-  "suits.theboys.homelander": "Homelander",
-  "suits.theboys.starlight": "Starlight",
-  "suits.theboys.stormfront": "Stormfront",
+  "abilities.theboys.heat_vision": "Heat Vision",
+  "abilities.theboys.flight": "Flight",
+  "abilities.theboys.super_hearing": "Super Hearing",
+  "abilities.theboys.speed": "Speed",
 
   "superpower.theboys.homelander": "Homelander",
-  "superpower.theboys.atrain": "A-Train",
+  "superpower.theboys.a_train": "A-Train",
   "superpower.theboys.starlight": "Starlight",
   "superpower.theboys.stormfront": "Stormfront",
 
-  "ability.theboys.lasers_from_eyes": "Lasers from Eyes",
-  "ability.theboys.flight": "Flight",
-  "ability.theboys.speed": "Speed",
   "gui.theboys.eyeOptions": "Eye Options",
   "gui.theboys.eyeOptions.blockedByPreset": "Blocked by preset",
   "gui.theboys.eyeOptions.eyeLength": "Eyes length: %s",
@@ -47,6 +44,11 @@
   "gui.theboys.eyeOptions.basicPresets": "Basic presets for lasers",
   "gui.theboys.eyeOptions.laserOptions": "Lasers Options",
   "gui.theboys.eyeOptions.profileName": "Profile name",
+
+  "theboys.key.overlay": "Abilities Overlay",
+  "theboys.overlay.abilities": "Abilities",
+  "theboys.overlay.superpower": "Superpower",
+
   "narrator.button.theBoys": "The Boys",
   "item.theboys.suit.equip": "To equip part of the suit, pick up the item and press RMB on the armor item",
   "title.theboys.config": "The Boys"

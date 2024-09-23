@@ -69,7 +69,9 @@ public class SyringeItem extends Item implements GeoItem {
             player.getCooldowns().addCooldown(this, 20);
             var effects = BuiltInRegistries.MOB_EFFECT.stream().filter(p -> BuiltInRegistries.MOB_EFFECT.getKey(p).getNamespace().equals("minecraft") && p.getCategory().equals(MobEffectCategory.HARMFUL)).toList();
             var mobEffect = effects.get(player.getRandom().nextInt(effects.size()));
-            player.addEffect(new MobEffectInstance(mobEffect, 200, 3, false, true, true));
+            if (player.getRandom().nextBoolean()) {
+                player.addEffect(new MobEffectInstance(mobEffect, 200, 3, false, true, true));
+            }
             //mainHandItem.getOrCreateTag().put("vial",);
         }
         return super.finishUsingItem(pStack, pLevel, pLivingEntity);

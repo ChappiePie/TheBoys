@@ -16,9 +16,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(HumanoidModel.class)
 public class HumanoidModelMixin<T extends LivingEntity> {
 
-    @Shadow @Final public ModelPart rightArm;
+    @Shadow
+    @Final
+    public ModelPart rightArm;
 
-    @Shadow @Final public ModelPart leftArm;
+    @Shadow
+    @Final
+    public ModelPart leftArm;
 
     @Inject(method = "poseRightArm", at = @At("HEAD"))
     public void slowDownRightArm(T pLivingEntity, CallbackInfo ci) {

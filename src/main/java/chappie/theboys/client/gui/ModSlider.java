@@ -56,11 +56,11 @@ public class ModSlider extends AbstractSliderButton {
     public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         final Minecraft mc = Minecraft.getInstance();
         guiGraphics.blitSprite(this.getSprite(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        guiGraphics.blitSprite(this.getHandleSprite(), this.getX() + (int)(this.value * (double)(this.width - 8)), this.getY(), 8, this.getHeight());
+        guiGraphics.blitSprite(this.getHandleSprite(), this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 8, this.getHeight());
 
         if (isBlocked()) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.6F);
-            guiGraphics.blitSprite(this.getHandleSprite(), this.getX() + (int)(this.value * (double)(this.width - 8)), this.getY(), 8, this.getHeight());
+            guiGraphics.blitSprite(this.getHandleSprite(), this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 8, this.getHeight());
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         }
 
@@ -106,17 +106,17 @@ public class ModSlider extends AbstractSliderButton {
         return Mth.clampedLerp(minValue, this.maxValue(), this.value);
     }
 
+    public void setValue(double value) {
+        this.value = (value - minValue) / (maxValue() - minValue);
+        this.applyValue();
+    }
+
     public String getValueString() {
         return this.format.format(this.getValue());
     }
 
     public double maxValue() {
         return this.maxValue;
-    }
-
-    public void setValue(double value) {
-        this.value = (value - minValue) / (maxValue() - minValue);
-        this.applyValue();
     }
 
     public void valueToInitial() {

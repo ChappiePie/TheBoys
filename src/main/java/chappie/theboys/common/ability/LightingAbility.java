@@ -53,7 +53,7 @@ public class LightingAbility extends Ability implements IHasTimer {
                 Vec3 coreStart = new Vec3(0, 0, 0);
                 int coreLength = random.nextInt(3) + 7;
                 for (int core = 0; core < coreLength; core++) {
-                    Vec3 coreEnd = coreStart.add(0, 0, 1).add(randomVector(random,0.3f).multiply(2.5, 2.5, 2.5));
+                    Vec3 coreEnd = coreStart.add(0, 0, 1).add(randomVector(random, 0.3f).multiply(2.5, 2.5, 2.5));
                     beamVectors.add(coreStart);
                     beamVectors.add(coreEnd);
                     coreStart = coreEnd;
@@ -69,7 +69,7 @@ public class LightingAbility extends Ability implements IHasTimer {
                 int dir = random.nextBoolean() ? 1 : -1;
                 float branchLength = .75f / (recursionCount + 1);
                 for (int i = 0; i < branches; i++) {
-                    Vec3 branchEnd = branchStart.add(dir * branchLength, 0, branchLength).add(randomVector(random,0.3f));
+                    Vec3 branchEnd = branchStart.add(dir * branchLength, 0, branchLength).add(randomVector(random, 0.3f));
                     branchSegments.add(branchStart);
                     branchSegments.add(branchEnd);
                     if (random.nextFloat() <= splitChance)

@@ -25,7 +25,9 @@ import java.util.List;
 @Mixin(ServerLevel.class)
 public class ServerLevelMixin {
 
-    @Shadow @Final List<ServerPlayer> players;
+    @Shadow
+    @Final
+    List<ServerPlayer> players;
 
     @Inject(method = "explode", at = @At("TAIL"))
     public void getDistance(Entity pSource, DamageSource pDamageSource, ExplosionDamageCalculator pDamageCalculator, double pX, double pY, double pZ, float pRadius, boolean pFire, Level.ExplosionInteraction pExplosionInteraction, ParticleOptions pSmallExplosionParticles, ParticleOptions pLargeExplosionParticles, SoundEvent pExplosionSound, CallbackInfoReturnable<Explosion> cir, @Local Explosion explosion) {

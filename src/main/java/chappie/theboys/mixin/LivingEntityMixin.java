@@ -2,28 +2,72 @@ package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.FlightAbility;
+import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.util.interfaces.EntitySavingFields;
+import chappie.theboys.util.interfaces.ILivingEntityEx;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity {
+public abstract class LivingEntityMixin extends Entity implements ILivingEntityEx {
+
+    @Unique
+    private Vec3 oldPos = Vec3.ZERO;
 
     public LivingEntityMixin(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+    }
+
+    @Override
+    public void theBoys$setupOldPos(Vec3 pos) {
+        this.oldPos = pos;
+    }
+
+    @Override
+    public Vec3 theBoys$oldPos() {
+        return this.oldPos;
+    }
+
+    @Inject(method = "tick()V", at = @At("HEAD"))
+    public void mixin$tick(CallbackInfo ci) {
+        this.oldPos = new Vec3(this.position().toVector3f());
+    }
+
+    @Inject(method = "getEyeHeight", at = @At("TAIL"), cancellable = true)
+    public void mixin$getEyeHeight(Pose pose, EntityDimensions dimensions, CallbackInfoReturnable<Float> cir) {
+        LivingEntity player = (LivingEntity) (Object) this;
+        if (player != null && player.isAlive() && !player.position().equals(Vec3.ZERO)) {
+            for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
+                if (player.isSprinting() && ability.isEnabled()) {
+                    cir.setReturnValue(0.51F);
+                }
+            }
+        }
+    }
+
+    @Inject(method = "maxUpStep()F", at = @At("RETURN"), cancellable = true)
+    public void mixin$maxUpStep(CallbackInfoReturnable<Float> cir) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        for (SpeedAbility a : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
+            if (a.isEnabled() && !entity.isSwimming() && !entity.isFallFlying()) {
+                cir.setReturnValue(cir.getReturnValue() + 1);
+                break;
+            }
+        }
     }
 
     @Inject(method = "causeFallDamage", at = @At("TAIL"))

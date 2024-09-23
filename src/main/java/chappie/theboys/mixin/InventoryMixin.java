@@ -1,8 +1,6 @@
 package chappie.theboys.mixin;
 
-import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
-import chappie.theboys.util.TBClientUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Inventory;
 import org.spongepowered.asm.mixin.Mixin;

@@ -41,7 +41,7 @@ public class LaserParticle extends RisingParticle {
 
     @Override
     public void tick() {
-        this.alpha = 1.0F - this.age / (float)this.lifetime;
+        this.alpha = 1.0F - this.age / (float) this.lifetime;
         super.tick();
     }
 
@@ -55,17 +55,17 @@ public class LaserParticle extends RisingParticle {
     }
 
     public float getQuadSize(float pScaleFactor) {
-        float f = ((float)this.age + pScaleFactor) / (float)this.lifetime;
+        float f = ((float) this.age + pScaleFactor) / (float) this.lifetime;
         return this.quadSize * (1.0F - f * f * 0.5F);
     }
 
     public int getLightColor(float pPartialTick) {
-        float f = ((float)this.age + pPartialTick) / (float)this.lifetime;
+        float f = ((float) this.age + pPartialTick) / (float) this.lifetime;
         f = Mth.clamp(f, 0.0F, 1.0F);
         int i = super.getLightColor(pPartialTick);
         int j = i & 255;
         int k = i >> 16 & 255;
-        j += (int)(f * 15.0F * 16.0F);
+        j += (int) (f * 15.0F * 16.0F);
         if (j > 240) {
             j = 240;
         }
@@ -76,11 +76,11 @@ public class LaserParticle extends RisingParticle {
     @Override
     public void render(VertexConsumer pBuffer, Camera pRenderInfo, float pPartialTicks) {
         Vec3 vec3 = pRenderInfo.getPosition();
-        float rot = -Mth.lerp(pPartialTicks, this.rotO, this.rot) * ((float)Math.PI / 180F);
-        float pitch = (float) (Mth.lerp(pPartialTicks, this.pitchO, this.pitch) + Math.PI / 2F) * ((float)Math.PI / 180F);
-        float x = (float)(Mth.lerp(pPartialTicks, this.xo, this.x) - vec3.x());
-        float y = (float)(Mth.lerp(pPartialTicks, this.yo, this.y) - vec3.y());
-        float z = (float)(Mth.lerp(pPartialTicks, this.zo, this.z) - vec3.z());
+        float rot = -Mth.lerp(pPartialTicks, this.rotO, this.rot) * ((float) Math.PI / 180F);
+        float pitch = (float) (Mth.lerp(pPartialTicks, this.pitchO, this.pitch) + Math.PI / 2F) * ((float) Math.PI / 180F);
+        float x = (float) (Mth.lerp(pPartialTicks, this.xo, this.x) - vec3.x());
+        float y = (float) (Mth.lerp(pPartialTicks, this.yo, this.y) - vec3.y());
+        float z = (float) (Mth.lerp(pPartialTicks, this.zo, this.z) - vec3.z());
         Vector3f vec3f = (new Vector3f(0.5F, 0.5F, 0.5F)).normalize();
         Quaternionf quaternionf = (new Quaternionf()).setAngleAxis(0.0F, vec3f.x(), vec3f.y(), vec3f.z());
         quaternionf.rotationYXZ(rot, pitch, 0.0F);

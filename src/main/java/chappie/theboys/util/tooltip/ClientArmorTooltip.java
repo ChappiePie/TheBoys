@@ -31,8 +31,8 @@ public class ClientArmorTooltip implements ClientTooltipComponent {
         int j = this.gridSizeY();
         int k = 0;
 
-        for(int l = 0; l < j; ++l) {
-            for(int i1 = 0; i1 < i; ++i1) {
+        for (int l = 0; l < j; ++l) {
+            for (int i1 = 0; i1 < i; ++i1) {
                 int j1 = pX + i1 * 18 + 1;
                 int k1 = pY + l * 20 + 1;
                 this.renderSlot(j1, k1, k++, pFont, pGuiGraphics, 0);
@@ -52,10 +52,10 @@ public class ClientArmorTooltip implements ClientTooltipComponent {
     }
 
     private int gridSizeX() {
-        return (int)Math.ceil(Math.sqrt(1));
+        return (int) Math.ceil(Math.sqrt(1));
     }
 
     private int gridSizeY() {
-        return (int)Math.ceil(1 / (double)this.gridSizeX());
+        return (int) Math.ceil(1 / (double) this.gridSizeX());
     }
 }

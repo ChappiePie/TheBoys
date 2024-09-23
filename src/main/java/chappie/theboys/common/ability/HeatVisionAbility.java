@@ -42,10 +42,26 @@ public class HeatVisionAbility extends GlowEyesAbility {
     public static final DataAccessor<Float> STRENGTH = new DataAccessor<>("strength", DataAccessor.DataSerializer.FLOAT);
 
     public final Timer timer = new Timer(() -> this.dataManager.get(MAX_TIMER), this::isEnabled);
+    private Map.Entry<BlockPos, Integer> blocksInFire;
 
     public HeatVisionAbility(LivingEntity entity, AbilityBuilder builder) {
         super(entity, builder);
         this.eyesTimer = new Timer(() -> 4, () -> !(this.entity instanceof Player) && isEnabled() || this.conditionManager.test("eyes"));
+    }
+
+    // Basic modifications for nice Heat vision ability
+    public static AbilityBuilder of(String id, Function<KeyCondition, KeyCondition> consumer, Function<KeyCondition, KeyCondition> additionalConsumer) {
+        return AbilityBuilder.of(id, TBAbilityTypes.HEAT_VISION).condition(a -> consumer.apply(new KeyCondition(a) {
+            @Override
+            public boolean get() {
+                if (a.enabledTicks >= a.dataManager.get(HeatVisionAbility.MAX_TIMER)) {
+                    if (a.conditionManager.conditionsFor("enabling").stream().noneMatch(enabling -> enabling != this && !enabling.get())) {
+                        return true;
+                    }
+                }
+                return super.get();
+            }
+        }), "enabling", "eyes").condition(a -> additionalConsumer.apply(new KeyCondition(a)), "enabling");
     }
 
     @Override
@@ -129,8 +145,6 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.15F, 10);
     }
 
-    private Map.Entry<BlockPos, Integer> blocksInFire;
-
     protected void onHitBlock(BlockHitResult hitResult) {
         BlockPos blockPos = hitResult.getBlockPos();
         if (this.entity.getCommandSenderWorld().getBlockState(blockPos).getBlock() == Blocks.SAND) {
@@ -166,24 +180,8 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.05F, 10);
     }
 
-
     @Override
     public Iterable<Timer> timers() {
         return Iterables.concat(super.timers(), List.of(this.timer));
-    }
-
-    // Basic modifications for nice Heat vision ability
-    public static AbilityBuilder of(String id, Function<KeyCondition, KeyCondition> consumer, Function<KeyCondition, KeyCondition> additionalConsumer) {
-        return AbilityBuilder.of(id, TBAbilityTypes.HEAT_VISION).condition(a -> consumer.apply(new KeyCondition(a) {
-            @Override
-            public boolean get() {
-                if (a.enabledTicks >= a.dataManager.get(HeatVisionAbility.MAX_TIMER)) {
-                    if (a.conditionManager.conditionsFor("enabling").stream().noneMatch(enabling -> enabling != this && !enabling.get())) {
-                        return true;
-                    }
-                }
-                return super.get();
-            }
-        }), "enabling", "eyes").condition(a -> additionalConsumer.apply(new KeyCondition(a)), "enabling");
     }
 }

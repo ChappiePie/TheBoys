@@ -8,7 +8,8 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(AbstractSoundInstance.class)
 public class AbstractSoundInstanceMixin implements ISimpleSoundInstance {
 
-    @Shadow protected float volume;
+    @Shadow
+    protected float volume;
 
     @Override
     public void setVolume(float volume) {

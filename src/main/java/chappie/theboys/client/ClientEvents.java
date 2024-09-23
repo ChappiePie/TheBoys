@@ -157,13 +157,14 @@ public class ClientEvents {
         var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         if (sound instanceof SimpleSoundInstance soundInstance && camera.getEntity() instanceof Player player) {
             for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(player))) {
-                if (a.isEnabled()) {
+                if (a.isEnabled()
+                    //        || a.dataManager.get(SuperHearingAbility.RECEIVED) > 0
+                ) {
                     Vec3 vec3 = new Vec3(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ());
                     double distance = vec3.distanceTo(player.position());
                     if (soundInstance instanceof ISimpleSoundInstance iSound && distance < 40) {
-                        float timer = a.timer.value(ClientUtil.getPartialTick());
                         float maxVolume = ((ISimpleSoundInstance) sound).volume() * 100.0F;
-                        iSound.setVolume(1 + timer * maxVolume);
+                        iSound.setVolume(1 + maxVolume);
                         return soundInstance;
                     }
                 }
@@ -275,9 +276,8 @@ public class ClientEvents {
                 .animationFile(new ResourceLocation(TheBoys.MODID, "animations/player_first_person.animation.json")), c -> {
             //c.triggerableAnim("inject", RawAnimation.begin().then("inject", Animation.LoopType.PLAY_ONCE));
             c.setAnimationSpeed(1.5F);
-            c.triggerableAnim("inject", RawAnimation.begin().thenPlay("injecting_start").thenPlay("injecting_tick"));
+            c.triggerableAnim("inject", RawAnimation.begin().thenPlay("inject"));
             c.triggerableAnim("injecting", RawAnimation.begin().thenPlay("injecting"));
-            c.triggerableAnim("idk", RawAnimation.begin().thenPlay("idk"));
         });
         e.registerController(b -> b.name("theboys_syringe_controller").transitionTickTime(15).animationHandler(ClientEvents::handleSyringe)
                 .animationFile(new ResourceLocation(TheBoys.MODID, "animations/player.animation.json")), c -> {
@@ -298,11 +298,12 @@ public class ClientEvents {
                 event.getController().transitionLength(15);
             } else {
                 if (!thirdPerson) {
-                    event.getController().transitionLength(10);
+                    event.getController().transitionLength(2);
                 }
             }
 
-            if (player.getUseItem().getItem() != TBItems.SYRINGE || player.getUseItemRemainingTicks() <= 10) {
+            if (player.getUseItem().getItem() != TBItems.SYRINGE || player.getUseItemRemainingTicks() <= 10
+            ) {
                 if (event.getController().getAnimationState() != AnimationController.State.STOPPED) {
                     event.getController().tryTriggerAnimation("injecting");
                 }

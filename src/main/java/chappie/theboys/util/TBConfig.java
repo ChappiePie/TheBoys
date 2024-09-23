@@ -22,6 +22,7 @@ public class TBConfig {
     public static class Client {
 
         public final ForgeConfigSpec.BooleanValue eyesOverlay;
+        public final ForgeConfigSpec.BooleanValue abilitiesOverlayToggle;
 
         public final ForgeConfigSpec.IntValue eyesType;
         public final ForgeConfigSpec.IntValue eyesHeight, eyesHeight2;
@@ -31,6 +32,7 @@ public class TBConfig {
         Client(ForgeConfigSpec.Builder builder) {
 
             builder.comment("Client Settings").push("client");
+            this.abilitiesOverlayToggle = builder.comment("Should abilities overlay key be toggleable").translation("config.theboys.abilitiesOverlayToggle").define("abilitiesOverlayToggle", false);
             this.eyesOverlay = builder.comment("Should heat vision eyes overlay be shown in first person").translation("config.theboys.eyesOverlay").define("eyesOverlay", true);
 
             builder.push("eyes");

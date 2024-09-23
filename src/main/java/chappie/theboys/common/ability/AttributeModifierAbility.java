@@ -18,6 +18,22 @@ public class AttributeModifierAbility extends Ability {
         super(entity, builder);
     }
 
+    public static AbilityBuilder of(String id, Consumer<AttributeBuilder> consumer) {
+        return of(id, consumer, true);
+    }
+
+    public static AbilityBuilder of(String id, Consumer<AttributeBuilder> consumer, boolean hidden) {
+        AbilityBuilder abilityBuilder = AbilityBuilder.of(id, TBAbilityTypes.ATTRIBUTE_MODIFIER).additionalData(a -> {
+            if (a instanceof AttributeModifierAbility ability) {
+                consumer.accept(ability.attributeBuilder);
+            }
+        });
+        if (hidden) {
+            abilityBuilder.hide();
+        }
+        return abilityBuilder;
+    }
+
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
@@ -26,17 +42,9 @@ public class AttributeModifierAbility extends Ability {
         entity.setHealth(entity.getHealth());
     }
 
-    public static AbilityBuilder of(String id, Consumer<AttributeBuilder> consumer) {
-        return AbilityBuilder.of(id, TBAbilityTypes.ATTRIBUTE_MODIFIER).additionalData(a -> {
-            if (a instanceof AttributeModifierAbility ability) {
-                consumer.accept(ability.attributeBuilder);
-            }
-        });
-    }
-
     public static class AttributeBuilder {
-        protected Attribute attribute;
         protected final UUID uuid = UUID.randomUUID();
+        protected Attribute attribute;
         protected double amount;
         protected AttributeModifier.Operation operation;
 

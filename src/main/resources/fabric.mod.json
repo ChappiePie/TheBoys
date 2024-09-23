@@ -31,7 +31,8 @@
   },
   "custom": {
     "cardinal-components": [
-      "theboys:cap"
+      "theboys:cap",
+      "theboys:entity"
     ]
   },
   "mixins": [

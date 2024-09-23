@@ -51,7 +51,7 @@ public class TrailEntity extends Entity {
         this.color = color;
         this.setYRot(entity.getYRot());
         this.setXRot(entity.getXRot());
-        this.moveTo(entity.position().add(Mth.sin(-entity.getYRot() * ((float)Math.PI / 180F)) * -0.25F, 0.0D, Mth.cos(entity.getYRot() * ((float)Math.PI / 180F)) * -0.25F));
+        this.moveTo(entity.position().add(Mth.sin(-entity.getYRot() * ((float) Math.PI / 180F)) * -0.25F, 0.0D, Mth.cos(entity.getYRot() * ((float) Math.PI / 180F)) * -0.25F));
     }
 
     @Override
@@ -85,7 +85,7 @@ public class TrailEntity extends Entity {
 
         if (this.entity instanceof AbstractClientPlayer player) {
             PlayerModel<LivingEntity> model = new PlayerModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(
-                            CommonUtil.smallArms(player) ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), CommonUtil.smallArms(player));
+                    CommonUtil.smallArms(player) ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), CommonUtil.smallArms(player));
             model.hat.visible = false;
             model.leftSleeve.visible = false;
             model.rightSleeve.visible = false;
@@ -173,7 +173,12 @@ public class TrailEntity extends Entity {
         return true;
     }
 
-    protected void defineSynchedData() {}
-    protected void readAdditionalSaveData(CompoundTag compound) {}
-    protected void addAdditionalSaveData(CompoundTag compound) {}
+    protected void defineSynchedData() {
+    }
+
+    protected void readAdditionalSaveData(CompoundTag compound) {
+    }
+
+    protected void addAdditionalSaveData(CompoundTag compound) {
+    }
 }

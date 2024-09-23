@@ -11,15 +11,8 @@ import net.minecraft.server.level.ServerPlayer;
 public class ServerSetEyeOptions implements FabricPacket {
 
     public static final PacketType<ServerSetEyeOptions> PACKET = PacketType.create(TheBoys.id("server_set_eye_options"), ServerSetEyeOptions::new);
-
-    @Override
-    public PacketType<?> getType() {
-        return PACKET;
-    }
-
     public int eyesHeight;
     public int eyesLength;
-
     public ServerSetEyeOptions(int eyesHeight, int eyesLength) {
         this.eyesHeight = eyesHeight;
         this.eyesLength = eyesLength;
@@ -28,6 +21,11 @@ public class ServerSetEyeOptions implements FabricPacket {
     public ServerSetEyeOptions(FriendlyByteBuf buf) {
         this.eyesHeight = buf.readInt();
         this.eyesLength = buf.readInt();
+    }
+
+    @Override
+    public PacketType<?> getType() {
+        return PACKET;
     }
 
     @Override
