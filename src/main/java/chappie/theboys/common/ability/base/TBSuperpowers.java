@@ -3,17 +3,21 @@ package chappie.theboys.common.ability.base;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.Superpower;
 import chappie.modulus.common.ability.base.condition.KeyCondition;
+import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.KeyMap;
 import chappie.modulus.util.ModRegistries;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.AttributeModifierAbility;
 import chappie.theboys.common.ability.DamageImmunityAbility;
+import chappie.theboys.common.ability.FocusOnGoalAbility;
 import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
 import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.core.Registry;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.phys.EntityHitResult;
 
 import java.awt.*;
 
@@ -37,7 +41,7 @@ public class TBSuperpowers {
                                             KeyMap.KeyType.SECOND : KeyMap.KeyType.JUMP))
                     ),
             AbilityBuilder.of("super_hearing", TBAbilityTypes.SUPER_HEARING)
-                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(0)))
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD).action(KeyCondition.Action.HELD), "enabling"),
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(2.0D).operation(AttributeModifier.Operation.ADDITION)),
             AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(10.0D).operation(AttributeModifier.Operation.ADDITION)),
@@ -49,11 +53,32 @@ public class TBSuperpowers {
     public static final Superpower A_TRAIN = register("a_train", new TBSuperpower(
             AbilityBuilder.of("speed", TBAbilityTypes.SPEED)
                     .change(TBCommonUtil.COLOR, Color.BLUE)
-                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(0)))
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling"),
             AbilityBuilder.of("focus", TBAbilityTypes.FOCUS_ON_GOAL)
-                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(0)))
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.TOGGLE), "enabling"),
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16).backgroundColor(() -> {
+                        if (a instanceof FocusOnGoalAbility a1 && !a1.hasSpeedAbility()) {
+                            if (CommonUtil.pick(a.entity, 40) instanceof EntityHitResult hr && hr.getEntity() instanceof LivingEntity target) {
+                                if (target.getEyePosition().distanceTo(a.entity.getEyePosition()) < 4) {
+                                    return 8553091;
+                                }
+                            }
+                        }
+                        return -1;
+                    })
+                    ))
+                    .condition(a -> new KeyCondition(a) {
+                        @Override
+                        public boolean get() {
+                            if (a instanceof FocusOnGoalAbility a1) {
+                                if (a1.condition(this, super.get())) {
+                                    return true;
+                                }
+                            }
+                            this.enabled = false;
+                            return false;
+                        }
+                    }.keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.TOGGLE), "enabling"),
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
             AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(1.0D).operation(AttributeModifier.Operation.ADDITION))
     ).uOffset(32));

@@ -67,8 +67,10 @@ public class IHasOverlay implements AbilityClientProperties {
                     return keyCondition.keyType;
                 }
             }
+            return null;
+        } else {
+            return this.keyType.get();
         }
-        return this.keyType.get();
     }
 
     public void renderIcon(int x, int y, float alpha, Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {

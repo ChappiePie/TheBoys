@@ -149,6 +149,7 @@ public class TBOverlays {
                 int texX = x + (type == 1 ? j : 0);
                 int texY = y + (type == 1 ? 0 : j);
 
+
                 float a = enabled ? ability.isEnabled() ? 1 : 0.25F : 1;
                 a *= f2;
                 {

@@ -1,10 +1,7 @@
 package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
-import chappie.theboys.common.ability.DamageImmunityAbility;
-import chappie.theboys.common.ability.SpeedAbility;
-import chappie.theboys.common.ability.SuperHearingAbility;
-import chappie.theboys.common.ability.TranslucentAbility;
+import chappie.theboys.common.ability.*;
 import chappie.theboys.util.interfaces.EntitySavingFields;
 import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
@@ -33,10 +30,10 @@ public class EntityMixin implements EntitySavingFields {
     @Shadow
     public float yRotO;
 
-    @Inject(method = "updateDynamicGameEventListener(Ljava/util/function/BiConsumer;)V", at = @At("TAIL"), cancellable = true)
+    @Inject(method = "updateDynamicGameEventListener(Ljava/util/function/BiConsumer;)V", at = @At("TAIL"))
     public void mixin$updateDynamicGameEventListener(BiConsumer<DynamicGameEventListener<?>, ServerLevel> listenerConsumer, CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
-        if (entity.level() instanceof ServerLevel serverLevel) {
+        if (entity.getCommandSenderWorld() instanceof ServerLevel serverLevel) {
             for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(entity))) {
                 listenerConsumer.accept(a.dynamicGameEventListener, serverLevel);
             }
@@ -63,6 +60,14 @@ public class EntityMixin implements EntitySavingFields {
         if (map.containsKey("xRot")) {
             this.xRotO = (float) map.get("xRot");
             cir.setReturnValue((float) map.get("xRot"));
+            return;
+        }
+        for (FocusOnGoalAbility a : CommonUtil.listOfType(FocusOnGoalAbility.class, CommonUtil.getAbilities((Entity) (Object) this))) {
+            float f = a.getXRot(cir.getReturnValue(), 1);
+            if (cir.getReturnValue() != f) {
+                cir.setReturnValue(f);
+            }
+            break;
         }
     }
 
@@ -72,6 +77,14 @@ public class EntityMixin implements EntitySavingFields {
         if (map.containsKey("yRot")) {
             this.yRotO = (float) map.get("yRot");
             cir.setReturnValue((float) map.get("yRot"));
+            return;
+        }
+        for (FocusOnGoalAbility a : CommonUtil.listOfType(FocusOnGoalAbility.class, CommonUtil.getAbilities((Entity) (Object) this))) {
+            float f = a.getYRot(cir.getReturnValue(), 1);
+            if (cir.getReturnValue() != f) {
+                cir.setReturnValue(f);
+            }
+            break;
         }
     }
 

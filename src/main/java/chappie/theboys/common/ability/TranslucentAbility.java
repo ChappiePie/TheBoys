@@ -6,7 +6,6 @@ import chappie.modulus.common.ability.base.AbilityClientProperties;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.events.RendererChangeCallback;
 import chappie.theboys.util.TBClientUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.LivingEntity;
@@ -44,12 +43,7 @@ public class TranslucentAbility extends Ability implements IHasTimer {
 
             public <T extends LivingEntity> boolean alphaChange(RendererChangeCallback.RendererChangeEvent<T, ? extends EntityModel<T>> event) {
                 AbilityClientProperties.super.rendererChange(event);
-
-                float m = 1.0F;
-                if (Minecraft.getInstance().player != null && !event.getEntity().isInvisibleTo(Minecraft.getInstance().player)) {
-                    m = 0.85F;
-                }
-                float alpha = getAlpha(event.modelProperties().partialTicks()) * m;
+                float alpha = getAlpha(event.modelProperties().partialTicks());
 
                 if (alpha < 1) {
                     RenderType renderType = TBClientUtil.RenderTypes.entityInvisibility(event.renderer().getTextureLocation(event.getEntity()));

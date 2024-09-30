@@ -74,9 +74,9 @@ dependencies {
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}")
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}")
 
-	modImplementation include("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") {
+	/*modImplementation include("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") {
 		exclude group: "maven.modrinth"
-	}
+	}*/
 
 	modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
 	modImplementation include("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
