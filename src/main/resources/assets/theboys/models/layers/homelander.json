@@ -1,9 +1,0 @@
-{
-    "resources": {
-        "layer_0": "theboys:textures/suits/homelander/layer_0.png",
-        "layer_1": "theboys:textures/suits/homelander/layer_1.png",
-        "smallArms": "theboys:textures/suits/homelander/slim.png",
-        "cape": "theboys:textures/suits/homelander/cape.png",
-        "overlay": "theboys:textures/models/red_eyes.png"
-    }
-}

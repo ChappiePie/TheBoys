@@ -3,16 +3,12 @@
   "id": "theboys",
   "version": "${version}",
   "name": "The Boys",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "\"The Boys\" mod, is based on the series of the same name, allows players to get into the role of superheroes. \\nIt includes suits, weapons and abilities inspired by the world of The Boys.\\nThis will enrich the gaming experience of fans of the series, allowing them to play as characters from this series.",
   "accessWidener": "theboys.accesswidener",
   "authors": [
-    "Me!"
+    "ChappiePie"
   ],
-  "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
-  },
-  "license": "CC0-1.0",
+  "license": "ARR",
   "icon": "assets/theboys/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -40,11 +36,12 @@
   ],
   "depends": {
     "fabricloader": ">=0.16.5",
-    "minecraft": "~1.20.4",
+    "minecraft": ">=1.20.4",
     "java": ">=17",
-    "fabric-api": "*"
+    "fabric-api": "*",
+    "modulus": "*"
   },
   "suggests": {
-    "another-mod": "*"
+    "modulus": "*"
   }
 }

@@ -38,11 +38,10 @@ public class SyringeVialAnim implements IHasTimer {
 
         if (this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem) || timeline == 1) {
             this.triggerAnim = false;
+            TheBoysCap.getCap(entity).syncToAll();
         }
 
-        for (IHasTimer.Timer timer : this.timers()) {
-            timer.update();
-        }
+        this.timers().forEach(Timer::update);
     }
 
     public boolean hideOffHand(Player player, TheBoysCap cap, float partialTicks, InteractionHand hand) {

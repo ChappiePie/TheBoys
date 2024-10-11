@@ -1,6 +1,7 @@
 package chappie.theboys.common.capability;
 
 import chappie.theboys.TheBoys;
+import chappie.theboys.util.timers.SyringeAnim;
 import chappie.theboys.util.timers.SyringeVialAnim;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
@@ -15,6 +16,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
 
     public static final ComponentKey<TheBoysCap> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(TheBoys.id("cap"), TheBoysCap.class);
     public final SyringeVialAnim vialAnim = new SyringeVialAnim();
+    public final SyringeAnim syringeAnim = new SyringeAnim();
     private final LivingEntity livingEntity;
     private boolean compoundV;
     private int eyesHeight = 5, eyesLength = 1;
@@ -30,6 +32,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
     public void tick() {
         if (this.livingEntity.isAlive()) {
             this.vialAnim.tick(this.livingEntity);
+            this.syringeAnim.tick(this.livingEntity);
 //            if (this.livingEntity.level().isClientSide()) {
 //                PlayerAnimCap cap = PlayerAnimCap.getCap(player);
 //                if (cap != null) {
@@ -66,19 +69,14 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         }
     }
 
-    public void sync() {
-        if (this.livingEntity instanceof ServerPlayer player) {
-            KEY.sync(player);
-        }
+    public void syncToAll() {
+        KEY.sync(this.livingEntity);
     }
 
-    public void syncToAll() {
-        this.sync();
-        for (LivingEntity livingEntity : this.livingEntity.getCommandSenderWorld().players()) {
-            if (livingEntity instanceof ServerPlayer player) {
-                KEY.sync(player);
-            }
-        }
+    @Override
+    public boolean shouldSyncWith(ServerPlayer player) {
+        //return player != this.livingEntity;
+        return true;
     }
 
     @Override
@@ -87,6 +85,9 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         CompoundTag nbt = tag.getCompound("eyeOptions");
         this.eyesHeight = nbt.getInt("eyesHeight");
         this.eyesLength = nbt.getInt("eyesLength");
+
+        this.syringeAnim.triggerAnim = tag.getBoolean("syringeAnim_triggerAnim");
+        this.vialAnim.triggerAnim = tag.getBoolean("vialAnim_triggerAnim");
     }
 
     @Override
@@ -97,5 +98,8 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         eyeOptions.putInt("eyesHeight", this.eyesHeight);
         eyeOptions.putInt("eyesLength", this.eyesLength);
         tag.put("eyeOptions", eyeOptions);
+
+        tag.putBoolean("syringeAnim_triggerAnim", this.syringeAnim.triggerAnim);
+        tag.putBoolean("vialAnim_triggerAnim", this.vialAnim.triggerAnim);
     }
 }

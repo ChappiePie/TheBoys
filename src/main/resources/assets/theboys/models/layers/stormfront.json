@@ -1,8 +1,0 @@
-{
-    "resources": {
-        "layer_0": "theboys:textures/suits/stormfront/layer_0.png",
-        "layer_1": "theboys:textures/suits/stormfront/layer_1.png",
-        "smallArms": "theboys:textures/suits/stormfront/slim.png",
-        "cape": "theboys:textures/suits/stormfront/cape.png"
-    }
-}

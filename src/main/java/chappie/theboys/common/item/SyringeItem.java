@@ -3,14 +3,15 @@ package chappie.theboys.common.item;
 import chappie.modulus.common.capability.anim.PlayerAnimCap;
 import chappie.theboys.client.renderer.SyringeRenderer;
 import chappie.theboys.common.capability.TheBoysCap;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -84,13 +85,22 @@ public class SyringeItem extends Item implements GeoItem {
         PlayerAnimCap cap = PlayerAnimCap.getCap(pPlayer);
         TheBoysCap boysCap = TheBoysCap.getCap(pPlayer);
         if (boysCap != null && cap != null && pHand == InteractionHand.MAIN_HAND) {
-            if (mainHandItem.getTag() != null && mainHandItem.getTag().contains("vial") && boysCap.vialAnim.timeline.value(1) == 0) {
-                cap.triggerAnim("theboys_syringe_controller", true, "inject");
-                cap.triggerAnim("theboys_syringe_controller", false, "inject" + (pPlayer.getMainArm() == HumanoidArm.LEFT ? "_left" : ""));
-                return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
+            if (mainHandItem.getTag() != null && mainHandItem.getTag().contains("vial")) {
+                if (offHandItem.isEmpty()) {
+                    if (boysCap.vialAnim.timeline.value(1) == 0) {
+                        boysCap.syringeAnim.triggerAnim = true;
+                        boysCap.syncToAll();
+                        return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
+                    }
+                } else {
+                    pPlayer.displayClientMessage(Component.literal("Remove the item from off hand slot").withStyle(ChatFormatting.RED), true);
+                }
             } else {
                 if (offHandItem.getItem() instanceof VialItem) {
                     boysCap.vialAnim.triggerAnim = true;
+                    boysCap.syncToAll();
+                } else {
+                    pPlayer.displayClientMessage(Component.literal("Place vial in off hand slot").withStyle(ChatFormatting.RED), true);
                 }
             }
         }

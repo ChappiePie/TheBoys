@@ -1,10 +1,9 @@
 {
   "injection.theboys.tooltip": "Injection: %s",
   "injection.theboys.compound_v": "Compound V",
-
-  "item.theboys.vial": "Vial Item",
-  "item.theboys.syringe": "Syringe Item",
-  "item.theboys.scrap": "Scrap Item",
+  "item.theboys.vial": "Vial",
+  "item.theboys.syringe": "Syringe",
+  "item.theboys.scrap": "Scrap",
 
   "item.theboys.atrain_helmet": "A-Train Helmet",
   "item.theboys.atrain_chestplate": "A-Train Chest",
@@ -18,9 +17,11 @@
   "item.theboys.stormfront_chestplate": "Stormfront Chest",
   "item.theboys.stormfront_leggings": "Stormfront Leggings",
   "item.theboys.stormfront_boots": "Stormfront Boots",
-
-  "item.theboys.starlight_chest": "Starlight Chest",
+  "item.theboys.starlight_chestplate": "Starlight Chest",
   "item.theboys.starlight_boots": "Starlight Boots",
+  "item.theboys.translucent_chestplate": "Translucent Chest",
+  "item.theboys.translucent_leggings": "Translucent Leggings",
+  "item.theboys.translucent_boots": "Translucent Boots",
 
   "theseven.motto": "The Seven: Let justice be done though the heavens fall.",
 
@@ -50,6 +51,7 @@
   "theboys.overlay.superpower": "Superpower",
 
   "narrator.button.theBoys": "The Boys",
+  "itemGroup.theboys.theboys": "The Boys",
   "item.theboys.suit.equip": "To equip part of the suit, pick up the item and press RMB on the armor item",
   "title.theboys.config": "The Boys"
 }

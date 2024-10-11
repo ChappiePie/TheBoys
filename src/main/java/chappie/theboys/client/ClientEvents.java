@@ -54,6 +54,42 @@ public class ClientEvents {
     public static boolean firstPersonAdditionalHand(FirstPersonAdditionalHandCallback.FirstPersonAdditionalHandEvent event) {
         var player = event.pPlayer();
         TheBoysCap theBoysCap = TheBoysCap.getCap(player);
+
+        boolean flag1 = player.getMainArm() == HumanoidArm.RIGHT;
+        int i = flag1 ? 1 : -1;
+        if (player.getMainHandItem().getItem() == TBItems.SYRINGE) {
+            float timeline = theBoysCap.syringeAnim.timeline.value(event.pPartialTicks());
+            float t = Math.min(timeline, 0.25F) * 4F;
+            float t1 = 1.0F - Math.min(timeline, 0.2F) * 5F;
+            if (t1 < 1.0F) {
+                event.swingProgress().set(0.0F);
+                event.equippedProgress().set(0.0F);
+                event.renderArm().set(true);
+            }
+            event.pMatrixStack().translate(0, -2, -1);
+            if (event.pHand() == InteractionHand.MAIN_HAND) {
+                event.pMatrixStack().translate(i / 16f * t, 2 / 16f * t, -3 / 16f * t);
+                event.pMatrixStack().translate(i * 8.75F / 16f, 19.75F / 16f, 6.0F / 16f);
+                //event.pMatrixStack().translate(-1 * timeline, 2 * timeline, -3 * timeline);
+                event.pMatrixStack().mulPose(Axis.ZP.rotationDegrees(i * -36F * t));
+                event.pMatrixStack().mulPose(Axis.YP.rotationDegrees(i * 72F * t));
+                event.pMatrixStack().mulPose(Axis.XP.rotationDegrees(-55F * t));
+                event.pMatrixStack().translate(i * -8.75F / 16f, -19.75F / 16f, -6.0F / 16f);
+            } else {
+                if (player.getOffhandItem().isEmpty()) {
+                    event.pMatrixStack().translate(0, -1 * t1, 0);
+                }
+                event.pMatrixStack().translate(i * 2 / 16f * t, 3 / 16f * t, -1 / 16f * t);
+                event.pMatrixStack().translate(i * -8.75F / 16f, 19.75F / 16f, 6.0F / 16f);
+
+                event.pMatrixStack().mulPose(Axis.ZP.rotationDegrees(i * 138F * t));
+                event.pMatrixStack().mulPose(Axis.YP.rotationDegrees(i * -49F * t));
+                event.pMatrixStack().mulPose(Axis.XP.rotationDegrees(-74F * t));
+                event.pMatrixStack().translate(i * 8.75F / 16f, -19.75F / 16f, -6.0F / 16f);
+            }
+            event.pMatrixStack().translate(0, 2, 1);
+        }
+
         float t = theBoysCap.vialAnim.timeline.value(event.pPartialTicks());
         if (theBoysCap.vialAnim.hideOffHand(player, theBoysCap, event.pPartialTicks(), event.pHand()) && t < 0.2F) {
             event.equippedProgress().set(1.0F - t * 5F);
@@ -83,35 +119,41 @@ public class ClientEvents {
         TheBoysCap theBoysCap = TheBoysCap.getCap(event.entity());
         float partialTicks = event.modelProperties().partialTicks();
         if (event.entity() instanceof Player pPlayer) {
-            SyringeVialAnim vialAnim = theBoysCap.vialAnim;
-            float timeline = vialAnim.timeline.value(partialTicks);
-
             boolean flag1 = pPlayer.getMainArm() == HumanoidArm.RIGHT;
             int i = flag1 ? 1 : -1;
+            ModelPart mainHand = flag1 ? event.model().rightArm : event.model().leftArm;
+            ModelPart offHand = flag1 ? event.model().leftArm : event.model().rightArm;
+            if (pPlayer.getMainHandItem().getItem() == TBItems.SYRINGE) {
+                float timeline = theBoysCap.syringeAnim.timeline.value(partialTicks);
+                float t = Math.min(timeline, 0.25F) * 4F;
+
+                float t3 = 1.0F - t;
+                if (t3 < 1) {
+                    mainHand.xRot = mainHand.xRot * t3 - (float) (Math.toRadians(90 * t));
+                    mainHand.yRot = mainHand.yRot * t3 - (float) (Math.toRadians(60 * i * t));
+                    mainHand.zRot = mainHand.zRot * t3 + (float) (Math.toRadians(32 * i * t));
+
+                    offHand.xRot = offHand.xRot * t3 - (float) (Math.toRadians(90 * t));
+                    offHand.yRot = offHand.yRot * t3 - (float) (Math.toRadians(40 * i * t));
+                    offHand.zRot = offHand.zRot * t3 + (float) (Math.toRadians(45 * i * t));
+                }
+            }
+
+            SyringeVialAnim vialAnim = theBoysCap.vialAnim;
+            float timeline = vialAnim.timeline.value(partialTicks);
             if (pPlayer.getMainHandItem().getItem() == TBItems.SYRINGE && pPlayer.getOffhandItem().getItem() == TBItems.VIAL || timeline > 0) {
                 float t = Math.min(timeline, 0.5F) * 2F;
                 float t1 = Mth.sin(pPlayer.tickCount + partialTicks) * vialAnim.rollVial.value(partialTicks);
                 float t2 = vialAnim.insertVial.value(partialTicks);
 
-                ModelPart mainHand = flag1 ? event.model().rightArm : event.model().leftArm;
-                ModelPart offHand = flag1 ? event.model().leftArm : event.model().rightArm;
-
                 float t3 = 1.0F - t;
-                mainHand.xRot *= t3;
-                mainHand.yRot *= t3;
-                mainHand.zRot *= t3;
+                offHand.xRot = offHand.xRot * t3 - (float) Math.toRadians(102.5F + t2 * 2F) * t;
+                offHand.yRot = offHand.yRot * t3 + (float) Math.toRadians(45F + t1) * t * i;
+                offHand.zRot = offHand.zRot * t3 - (float) Math.toRadians(85F * t * i);
 
-                offHand.xRot *= t3;
-                offHand.yRot *= t3;
-                offHand.zRot *= t3;
-
-                offHand.xRot -= (float) (Math.toRadians(102.5F + t2 * 2F) * t);
-                offHand.yRot += (float) (Math.toRadians(45F + t1) * t) * i;
-                offHand.zRot -= (float) (Math.toRadians(85F) * t) * i;
-
-                mainHand.xRot -= (float) (Math.toRadians(72.5F) * t);
-                mainHand.yRot -= (float) (Math.toRadians(45F) * t) * i;
-                mainHand.zRot += (float) (Math.toRadians(90F) * t) * i;
+                mainHand.xRot = mainHand.xRot * t3 - (float) Math.toRadians(72.5F * t);
+                mainHand.yRot = mainHand.yRot * t3 - (float) Math.toRadians(45F * t * i);
+                mainHand.zRot = mainHand.zRot * t3 + (float) Math.toRadians(90F * t * i);
             }
         }
 
@@ -291,7 +333,6 @@ public class ClientEvents {
     private static PlayState handleSyringe(AnimationState<PlayerAnimCap> event) {
         Player player = event.getAnimatable().player;
         boolean thirdPerson = !event.getController().getName().contains("first_person");
-        String name = thirdPerson ? (player.getMainArm() == HumanoidArm.LEFT ? "_left" : "") : "";
 
         if (event.getController().getCurrentAnimation() != null) {
             if (event.getController().getCurrentAnimation().animation().name().equals("injecting")) {

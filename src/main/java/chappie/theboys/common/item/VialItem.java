@@ -24,7 +24,7 @@ public class VialItem extends Item implements GeoItem {
     private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
 
     public VialItem() {
-        super(new Properties().stacksTo(1));
+        super(new Properties().stacksTo(64));
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
