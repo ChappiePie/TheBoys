@@ -2,12 +2,15 @@ package chappie.theboys;
 
 import chappie.modulus.Modulus;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
-import chappie.modulus.util.events.RegisterPlayerControllerCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
 import chappie.theboys.client.ClientEvents;
 import chappie.theboys.client.TBOverlays;
 import chappie.theboys.client.gui.EyeOptionsScreen;
+import chappie.theboys.client.gui.SynthesizerScreen;
 import chappie.theboys.client.renderer.TrailRenderer;
+import chappie.theboys.client.renderer.block.SynthesizerRenderer;
+import chappie.theboys.common.block.entity.TBBlockEntities;
+import chappie.theboys.common.block.menu.TBMenus;
 import chappie.theboys.common.entity.TBEntities;
 import chappie.theboys.common.item.SyringeItem;
 import chappie.theboys.common.item.TBItems;
@@ -26,6 +29,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -44,7 +49,6 @@ public class TheBoysClient implements ClientModInitializer {
                 EyeOptionsScreen.updateData();
             }
         });
-        RegisterPlayerControllerCallback.EVENT.register(ClientEvents::addAnimationControllers);
         SetupAnimCallback.EVENT.register(ClientEvents::setupAnim);
         FirstPersonAdditionalHandCallback.EVENT.register(ClientEvents::firstPersonAdditionalHand);
         ClientTickEvents.END_CLIENT_TICK.register(TBOverlays::clientTick);
@@ -67,5 +71,9 @@ public class TheBoysClient implements ClientModInitializer {
             }
             return 0;
         });
+
+        MenuScreens.register(TBMenus.SYNTHESIZER, SynthesizerScreen::new);
+        BlockEntityRenderers.register(TBBlockEntities.SYNTHESIZER,
+                context -> new SynthesizerRenderer());
     }
 }

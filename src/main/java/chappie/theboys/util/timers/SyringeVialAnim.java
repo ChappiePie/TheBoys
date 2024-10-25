@@ -19,14 +19,14 @@ public class SyringeVialAnim implements IHasTimer {
 
     public boolean triggerAnim;
 
-    public void tick(LivingEntity entity) {
+    public void tick(LivingEntity entity, TheBoysCap theBoysCap) {
         ItemStack mainHandItem = entity.getMainHandItem();
         ItemStack offHandItem = entity.getOffhandItem();
         this.timeline.predicate = () -> this.triggerAnim
                 && mainHandItem.getItem() instanceof SyringeItem
                 && offHandItem.getItem() instanceof VialItem;
         float timeline = this.timeline.value(1);
-
+        // TODO reverse animation
         if (timeline == 1 && !entity.getCommandSenderWorld().isClientSide()) {
             mainHandItem.getOrCreateTag().put("vial", offHandItem.save(new CompoundTag()));
             offHandItem.shrink(1);
@@ -38,7 +38,7 @@ public class SyringeVialAnim implements IHasTimer {
 
         if (this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem) || timeline == 1) {
             this.triggerAnim = false;
-            TheBoysCap.getCap(entity).syncToAll();
+            theBoysCap.syncToAll();
         }
 
         this.timers().forEach(Timer::update);

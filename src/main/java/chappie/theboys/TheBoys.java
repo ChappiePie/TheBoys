@@ -4,6 +4,9 @@ import chappie.modulus.client.gui.ChappModListWidget;
 import chappie.theboys.client.gui.EyeOptionsScreen;
 import chappie.theboys.common.ability.base.TBAbilityTypes;
 import chappie.theboys.common.ability.base.TBSuperpowers;
+import chappie.theboys.common.block.TBBlocks;
+import chappie.theboys.common.block.entity.TBBlockEntities;
+import chappie.theboys.common.block.menu.TBMenus;
 import chappie.theboys.common.entity.TBEntities;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.particle.TBParticleTypes;
@@ -42,6 +45,10 @@ public class TheBoys implements ModInitializer {
         TBSuperpowers.init();
         TBEntities.init();
         TBParticleTypes.init();
+
+        TBBlocks.init();
+        TBBlockEntities.init();
+        TBMenus.init();
 
         ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.CLIENT, TBConfig.CLIENT_SPEC);
         ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, TBConfig.COMMON_SPEC);

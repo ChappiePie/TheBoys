@@ -11,6 +11,7 @@ import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
 
@@ -24,6 +25,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         this.livingEntity = livingEntity;
     }
 
+    @Nullable
     public static TheBoysCap getCap(Object provider) {
         return KEY.maybeGet(provider).orElse(null);
     }
@@ -31,8 +33,8 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
     @Override
     public void tick() {
         if (this.livingEntity.isAlive()) {
-            this.vialAnim.tick(this.livingEntity);
-            this.syringeAnim.tick(this.livingEntity);
+            this.vialAnim.tick(this.livingEntity, this);
+            this.syringeAnim.tick(this.livingEntity, this);
 //            if (this.livingEntity.level().isClientSide()) {
 //                PlayerAnimCap cap = PlayerAnimCap.getCap(player);
 //                if (cap != null) {

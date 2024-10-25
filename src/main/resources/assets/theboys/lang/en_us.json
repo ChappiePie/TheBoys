@@ -1,6 +1,7 @@
 {
   "injection.theboys.tooltip": "Injection: %s",
   "injection.theboys.compound_v": "Compound V",
+  "block.theboys.synthesizer": "Synthesizer",
   "item.theboys.vial": "Vial",
   "item.theboys.syringe": "Syringe",
   "item.theboys.scrap": "Scrap",
@@ -33,6 +34,7 @@
   "superpower.theboys.homelander": "Homelander",
   "superpower.theboys.a_train": "A-Train",
   "superpower.theboys.starlight": "Starlight",
+  "superpower.theboys.transclucent": "Transclucent",
   "superpower.theboys.stormfront": "Stormfront",
 
   "gui.theboys.eyeOptions": "Eye Options",
@@ -53,5 +55,6 @@
   "narrator.button.theBoys": "The Boys",
   "itemGroup.theboys.theboys": "The Boys",
   "item.theboys.suit.equip": "To equip part of the suit, pick up the item and press RMB on the armor item",
-  "title.theboys.config": "The Boys"
+  "title.theboys.config": "The Boys",
+  "container.theboys.synthesizer": "Synthesizer"
 }

@@ -13,7 +13,7 @@ public class SyringeAnim implements IHasTimer {
 
     public boolean triggerAnim;
 
-    public void tick(LivingEntity entity) {
+    public void tick(LivingEntity entity, TheBoysCap theBoysCap) {
         ItemStack mainHandItem = entity.getMainHandItem();
         ItemStack offHandItem = entity.getOffhandItem();
         this.timeline.predicate = () -> this.triggerAnim
@@ -23,7 +23,7 @@ public class SyringeAnim implements IHasTimer {
 
         if (this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem && offHandItem.isEmpty()) || timeline == 1 || entity.getUseItemRemainingTicks() > 0 && entity.getUseItemRemainingTicks() <= 10) {
             this.triggerAnim = false;
-            TheBoysCap.getCap(entity).syncToAll();
+            theBoysCap.syncToAll();
         }
 
         this.timers().forEach(Timer::update);

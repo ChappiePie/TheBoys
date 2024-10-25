@@ -37,26 +37,9 @@ public class SyringeItem extends Item implements GeoItem {
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
-    public boolean hasCustomColor(ItemStack pStack) {
-        CompoundTag compoundtag = pStack.getTag();
-        return compoundtag != null && compoundtag.getCompound("vial").contains("color", 99);
-    }
-
     public int getColor(ItemStack pStack) {
         CompoundTag compoundtag = pStack.getTag();
-        return compoundtag != null && compoundtag.getCompound("vial").getCompound("tag").contains("color", 99) ? compoundtag.getCompound("vial").getCompound("tag").getInt("color") : -1;
-    }
-
-    public void clearColor(ItemStack pStack) {
-        CompoundTag compoundtag = pStack.getTag();
-        if (compoundtag != null && compoundtag.contains("color")) {
-            compoundtag.getCompound("vial").remove("color");
-        }
-
-    }
-
-    public void setColor(ItemStack pStack, int pColor) {
-        pStack.getOrCreateTag().getCompound("vial").putInt("color", pColor);
+        return compoundtag != null ? VialItem.getColor(compoundtag.getCompound("vial").getCompound("tag")) : -1;
     }
 
     @Override

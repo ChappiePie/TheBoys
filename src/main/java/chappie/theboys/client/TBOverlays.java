@@ -11,6 +11,7 @@ import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.KeyMap;
 import chappie.theboys.TheBoys;
 import chappie.theboys.TheBoysClient;
+import chappie.theboys.client.gui.SynthesizerScreen;
 import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.base.TBSuperpower;
@@ -277,6 +278,8 @@ public class TBOverlays {
     public static void clientTick(Minecraft minecraft) {
         if (!Minecraft.getInstance().isPaused()) {
             Player player = Minecraft.getInstance().player;
+            SynthesizerScreen.rollTimer.update();
+            SynthesizerScreen.timer.update();
             if (player != null && player.isAlive()) {
                 List<SpeedAbility> abilities = CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(player));
                 boolean b = false;

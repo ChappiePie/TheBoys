@@ -1,12 +1,9 @@
 package chappie.theboys.client;
 
-import chappie.modulus.common.capability.anim.PlayerAnimCap;
 import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
-import chappie.modulus.util.events.RegisterPlayerControllerCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
-import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.SuperHearingAbility;
@@ -29,7 +26,6 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -42,10 +38,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.AnimationState;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
 
 import java.awt.*;
 
@@ -97,19 +89,6 @@ public class ClientEvents {
             if (t > 0) {
                 event.swingProgress().set(0.0F);
                 event.equippedProgress().set(0.0F);
-            }
-        }
-
-        PlayerAnimCap cap = PlayerAnimCap.getCap(player);
-        if (cap != null) {
-            var controller = cap.getController("theboys_syringe_controller", true);
-            if (controller != null && controller.getCurrentAnimation() != null && controller.getAnimationState() != AnimationController.State.STOPPED) {
-                if (event.pHand() == InteractionHand.MAIN_HAND) {
-                    event.equippedProgress().set(0.0F);
-                } else if (controller.getCurrentAnimation().animation().name().equals("injecting")
-                        || controller.getCurrentAnimation().animation().name().equals("inject_tick")) {
-                    event.renderArm().set(true);
-                }
             }
         }
         return false;
@@ -311,45 +290,5 @@ public class ClientEvents {
         }
         poseStack.popPose();
         return canceled;
-    }
-
-    public static void addAnimationControllers(RegisterPlayerControllerCallback.RegisterPlayerControllerEvent e) {
-        e.registerController(b -> b.name("theboys_syringe_controller_first_person").transitionTickTime(2).animationHandler(ClientEvents::handleSyringe)
-                .animationFile(new ResourceLocation(TheBoys.MODID, "animations/player_first_person.animation.json")), c -> {
-            //c.triggerableAnim("inject", RawAnimation.begin().then("inject", Animation.LoopType.PLAY_ONCE));
-            c.setAnimationSpeed(1.5F);
-            c.triggerableAnim("inject", RawAnimation.begin().thenPlay("inject"));
-            c.triggerableAnim("injecting", RawAnimation.begin().thenPlay("injecting"));
-        });
-        e.registerController(b -> b.name("theboys_syringe_controller").transitionTickTime(15).animationHandler(ClientEvents::handleSyringe)
-                .animationFile(new ResourceLocation(TheBoys.MODID, "animations/player.animation.json")), c -> {
-            c.setAnimationSpeed(1.5F);
-            c.triggerableAnim("inject", RawAnimation.begin().thenPlay("inject_tick"));
-            c.triggerableAnim("inject_left", RawAnimation.begin().thenPlay("inject_tick_left"));
-            c.triggerableAnim("injecting", RawAnimation.begin().thenPlay("injecting"));
-        });
-    }
-
-    private static PlayState handleSyringe(AnimationState<PlayerAnimCap> event) {
-        Player player = event.getAnimatable().player;
-        boolean thirdPerson = !event.getController().getName().contains("first_person");
-
-        if (event.getController().getCurrentAnimation() != null) {
-            if (event.getController().getCurrentAnimation().animation().name().equals("injecting")) {
-                event.getController().transitionLength(15);
-            } else {
-                if (!thirdPerson) {
-                    event.getController().transitionLength(2);
-                }
-            }
-
-            if (player.getUseItem().getItem() != TBItems.SYRINGE || player.getUseItemRemainingTicks() <= 10
-            ) {
-                if (event.getController().getAnimationState() != AnimationController.State.STOPPED) {
-                    event.getController().tryTriggerAnimation("injecting");
-                }
-            }
-        }
-        return PlayState.CONTINUE;
     }
 }

@@ -91,7 +91,7 @@ public class FlightAbility extends Ability implements IHasTimer {
             } else {
                 vec3 = entity.getDeltaMovement().multiply(1.05, 0.1F, 1.05); // slight sliding effect
                 vec3 = vec3.add(0, Math.sin(entity.tickCount / 10F) / 50F, 0); // hover
-                vec3 = vec3.add(inputVector(entity, speed)); // unite two vectors, default and with movements.
+                vec3 = vec3.add(inputVector(entity, speed * 2)); // unite two vectors, default and with movements.
             }
             entity.setDeltaMovement(vec3);
             entity.fallDistance = 0.0F;

@@ -3,12 +3,8 @@ package chappie.theboys.common.item;
 import chappie.theboys.client.renderer.VialRenderer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.client.RenderProvider;
@@ -33,9 +29,22 @@ public class VialItem extends Item implements GeoItem {
         return compoundtag != null && compoundtag.contains("color", 99);
     }
 
-    public int getColor(ItemStack pStack) {
-        CompoundTag compoundtag = pStack.getTag();
-        return compoundtag != null && compoundtag.contains("color", 99) ? compoundtag.getInt("color") : -1;
+    public static int getColor(CompoundTag tag) {
+        if (tag != null) {
+            if (tag.contains("color", 99)) {
+                return tag.getInt("color");
+            }
+            if (tag.getBoolean("compoundV")) {
+                return 104166;
+            }
+        }
+        return -1;
+    }
+
+    public static ItemStack compoundV() {
+        ItemStack pStack = TBItems.VIAL.getDefaultInstance();
+        pStack.getOrCreateTag().putBoolean("compoundV", true);
+        return pStack;
     }
 
     public void clearColor(ItemStack pStack) {
@@ -50,10 +59,13 @@ public class VialItem extends Item implements GeoItem {
         pStack.getOrCreateTag().putInt("color", pColor);
     }
 
+    public int getColor(ItemStack pStack) {
+        return VialItem.getColor(pStack.getTag());
+    }
+
     @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        setColor(pPlayer.getItemInHand(pUsedHand), 104166);
-        return super.use(pLevel, pPlayer, pUsedHand);
+    public String getDescriptionId(ItemStack stack) {
+        return stack.getTag() != null && stack.getTag().contains("compoundV") ? "injection.theboys.compound_v" : super.getDescriptionId(stack);
     }
 
     @Override

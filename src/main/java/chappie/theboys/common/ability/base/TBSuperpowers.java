@@ -28,6 +28,7 @@ public class TBSuperpowers {
                     .change(TBCommonUtil.COLOR, Color.RED)
                     .additionalData(a ->
                             new IHasOverlay(a, (b) -> b.uOffset(48)
+                                    .backgroundColor(() -> a.conditionManager.test("eyes") ? 16711680 : -1)
                                     .keyType(() -> !a.conditionManager.test("eyes") ?
                                             KeyMap.KeyType.FIRST : KeyMap.KeyType.MOUSE_RIGHT))
                     ),
@@ -85,6 +86,7 @@ public class TBSuperpowers {
 
     public static final Superpower TRANSLUCENT = register("transclucent", new TBSuperpower(
             AbilityBuilder.of("translucent", TBAbilityTypes.TRANSLUCENT)
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
             AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
