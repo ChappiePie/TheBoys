@@ -89,7 +89,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         this.eyesLength = nbt.getInt("eyesLength");
 
         this.syringeAnim.triggerAnim = tag.getBoolean("syringeAnim_triggerAnim");
-        this.vialAnim.triggerAnim = tag.getBoolean("vialAnim_triggerAnim");
+        this.vialAnim.readFromNbt(tag.getCompound("vialAnim"));
     }
 
     @Override
@@ -102,6 +102,6 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         tag.put("eyeOptions", eyeOptions);
 
         tag.putBoolean("syringeAnim_triggerAnim", this.syringeAnim.triggerAnim);
-        tag.putBoolean("vialAnim_triggerAnim", this.vialAnim.triggerAnim);
+        tag.put("vialAnim", this.vialAnim.writeToNbt());
     }
 }

@@ -1,6 +1,9 @@
 package chappie.theboys.common.item;
 
+import chappie.modulus.common.ability.base.Superpower;
+import chappie.modulus.common.capability.PowerCap;
 import chappie.modulus.common.capability.anim.PlayerAnimCap;
+import chappie.theboys.TheBoys;
 import chappie.theboys.client.renderer.SyringeRenderer;
 import chappie.theboys.common.capability.TheBoysCap;
 import net.minecraft.ChatFormatting;
@@ -47,16 +50,27 @@ public class SyringeItem extends Item implements GeoItem {
         return 30;
     }
 
+    private boolean hasCompoundV(ItemStack pStack) {
+        return pStack.getTag() != null && pStack.getTag().contains("vial") && pStack.getTag().getCompound("vial").getCompound("tag").getBoolean("compoundV");
+    }
+
     @Override
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
-        if (pLivingEntity instanceof Player player && !pLevel.isClientSide()) {
+        if (pLivingEntity instanceof Player player && !pLevel.isClientSide() && this.hasCompoundV(pStack)) {
             player.getCooldowns().addCooldown(this, 20);
+            var superpowers = Superpower.REGISTRY.stream().filter(p -> Superpower.REGISTRY.getKey(p).getNamespace().equals(TheBoys.MODID)).toList();
+            var power = superpowers.get(player.getRandom().nextInt(superpowers.size()));
+
             var effects = BuiltInRegistries.MOB_EFFECT.stream().filter(p -> BuiltInRegistries.MOB_EFFECT.getKey(p).getNamespace().equals("minecraft") && p.getCategory().equals(MobEffectCategory.HARMFUL)).toList();
             var mobEffect = effects.get(player.getRandom().nextInt(effects.size()));
+            PowerCap cap = PowerCap.getCap(player);
+            if (cap != null) {
+                cap.setSuperpower(power);
+            }
             if (player.getRandom().nextBoolean()) {
                 player.addEffect(new MobEffectInstance(mobEffect, 200, 3, false, true, true));
             }
-            //mainHandItem.getOrCreateTag().put("vial",);
+            pStack.getOrCreateTag().getCompound("vial").remove("tag");
         }
         return super.finishUsingItem(pStack, pLevel, pLivingEntity);
     }
@@ -70,16 +84,28 @@ public class SyringeItem extends Item implements GeoItem {
         if (boysCap != null && cap != null && pHand == InteractionHand.MAIN_HAND) {
             if (mainHandItem.getTag() != null && mainHandItem.getTag().contains("vial")) {
                 if (offHandItem.isEmpty()) {
-                    if (boysCap.vialAnim.timeline.value(1) == 0) {
-                        boysCap.syringeAnim.triggerAnim = true;
+                    if (pPlayer.isCrouching()) {
+                        boysCap.vialAnim.reverse = true;
+                        boysCap.vialAnim.triggerAnim = true;
                         boysCap.syncToAll();
-                        return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
+                        return InteractionResultHolder.pass(pPlayer.getItemInHand(pHand));
+                    }
+
+                    if (boysCap.vialAnim.timeline.value(1) == 0) {
+                        if (this.hasCompoundV(mainHandItem)) {
+                            boysCap.syringeAnim.triggerAnim = true;
+                            boysCap.syncToAll();
+                            return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
+                        } else {
+                            pPlayer.displayClientMessage(Component.literal("There is no compound V").withStyle(ChatFormatting.RED), true);
+                        }
                     }
                 } else {
                     pPlayer.displayClientMessage(Component.literal("Remove the item from off hand slot").withStyle(ChatFormatting.RED), true);
                 }
             } else {
                 if (offHandItem.getItem() instanceof VialItem) {
+                    boysCap.vialAnim.reverse = false;
                     boysCap.vialAnim.triggerAnim = true;
                     boysCap.syncToAll();
                 } else {

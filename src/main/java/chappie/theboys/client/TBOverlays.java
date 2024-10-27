@@ -26,7 +26,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -98,7 +97,6 @@ public class TBOverlays {
             poseStack.scale(0.5F, 0.5F, 1F);
             int newX = x * 4;
             int newY = y * 3;
-            var l = Language.getInstance();
             text = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
             guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 10, newY + 16, FastColor.ARGB32.color(127, 0, 0, 0));
             guiGraphics.drawString(mc.font, text, newX + 5, newY + 5, textColor, true);
@@ -109,7 +107,8 @@ public class TBOverlays {
         // Abilities icons and text
         if (f1 != 1) {
             poseStack.pushPose();
-            int type = 1;
+
+            int type = 0;
             int maxX = 94;
             boolean enabled = false;
             if (type == 1) {

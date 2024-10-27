@@ -46,11 +46,15 @@ public class ClientEvents {
     public static boolean firstPersonAdditionalHand(FirstPersonAdditionalHandCallback.FirstPersonAdditionalHandEvent event) {
         var player = event.pPlayer();
         TheBoysCap theBoysCap = TheBoysCap.getCap(player);
-
+        if (theBoysCap == null) return false;
+        ItemStack pStack = player.getItemInHand(event.pHand());
+        if (!pStack.isEmpty() && (pStack.getItem() == TBItems.SYRINGE || pStack.getItem() == TBItems.VIAL)) {
+            event.renderArm().set(true);
+        }
         boolean flag1 = player.getMainArm() == HumanoidArm.RIGHT;
         int i = flag1 ? 1 : -1;
-        if (player.getMainHandItem().getItem() == TBItems.SYRINGE) {
-            float timeline = theBoysCap.syringeAnim.timeline.value(event.pPartialTicks());
+        float timeline = theBoysCap.syringeAnim.timeline.value(event.pPartialTicks());
+        if (player.getMainHandItem().getItem() == TBItems.SYRINGE && timeline != 0) {
             float t = Math.min(timeline, 0.25F) * 4F;
             float t1 = 1.0F - Math.min(timeline, 0.2F) * 5F;
             if (t1 < 1.0F) {
@@ -83,7 +87,10 @@ public class ClientEvents {
         }
 
         float t = theBoysCap.vialAnim.timeline.value(event.pPartialTicks());
-        if (theBoysCap.vialAnim.hideOffHand(player, theBoysCap, event.pPartialTicks(), event.pHand()) && t < 0.2F) {
+        if (t != 0F) {
+            event.renderArm().set(true);
+        }
+        if (t > 0 && t <= 0.2F && event.pHand() == InteractionHand.OFF_HAND && pStack.isEmpty()) {
             event.equippedProgress().set(1.0F - t * 5F);
         } else {
             if (t > 0) {
@@ -126,7 +133,7 @@ public class ClientEvents {
                 float t2 = vialAnim.insertVial.value(partialTicks);
 
                 float t3 = 1.0F - t;
-                offHand.xRot = offHand.xRot * t3 - (float) Math.toRadians(102.5F + t2 * 2F) * t;
+                offHand.xRot = offHand.xRot * t3 - (float) Math.toRadians(105F + t2 * 4F) * t;
                 offHand.yRot = offHand.yRot * t3 + (float) Math.toRadians(45F + t1) * t * i;
                 offHand.zRot = offHand.zRot * t3 - (float) Math.toRadians(85F * t * i);
 
