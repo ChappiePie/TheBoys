@@ -1,6 +1,7 @@
 package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
+import chappie.theboys.common.ability.DamageResistanceAbility;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.util.interfaces.EntitySavingFields;
@@ -127,8 +128,6 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
         var map = ((EntitySavingFields) this).map();
         if (map.containsKey("isFallFlying")) {
             cir.setReturnValue((boolean) map.get("isFallFlying"));
-        } else {
-            boolean b = false;
         }
     }
 
@@ -153,6 +152,16 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
         var map = ((EntitySavingFields) this).map();
         if (map.containsKey("fallFlyingTicks")) {
             cir.setReturnValue((int) map.get("fallFlyingTicks"));
+        }
+    }
+
+    @Inject(method = "getDamageAfterMagicAbsorb", at = @At("RETURN"), cancellable = true)
+    public void mixin$getDamageAfterMagicAbsorb(DamageSource damageSource, float damageAmount, CallbackInfoReturnable<Float> cir) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        for (DamageResistanceAbility a : CommonUtil.listOfType(DamageResistanceAbility.class, CommonUtil.getAbilities(entity))) {
+            if (a.isEnabled()) {
+                cir.setReturnValue(damageAmount * (1.0F / a.dataManager.get(DamageResistanceAbility.AMPLIFIER)));
+            }
         }
     }
 }

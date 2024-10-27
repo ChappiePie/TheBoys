@@ -7,10 +7,7 @@ import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.KeyMap;
 import chappie.modulus.util.ModRegistries;
 import chappie.theboys.TheBoys;
-import chappie.theboys.common.ability.AttributeModifierAbility;
-import chappie.theboys.common.ability.DamageImmunityAbility;
-import chappie.theboys.common.ability.FocusOnGoalAbility;
-import chappie.theboys.common.ability.HeatVisionAbility;
+import chappie.theboys.common.ability.*;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
 import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.core.Registry;
@@ -44,6 +41,8 @@ public class TBSuperpowers {
             AbilityBuilder.of("super_hearing", TBAbilityTypes.SUPER_HEARING)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD).action(KeyCondition.Action.HELD), "enabling"),
+
+            AbilityBuilder.of("damage_resistance", TBAbilityTypes.DAMAGE_RESISTANCE).additionalData((a) -> a.dataManager.set(DamageResistanceAbility.AMPLIFIER, 8F)),
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(2.0D).operation(AttributeModifier.Operation.ADDITION)),
             AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(10.0D).operation(AttributeModifier.Operation.ADDITION)),
             AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
@@ -87,9 +86,11 @@ public class TBSuperpowers {
     public static final Superpower TRANSLUCENT = register("transclucent", new TBSuperpower(
             AbilityBuilder.of("translucent", TBAbilityTypes.TRANSLUCENT)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16)))
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling"),
+            AbilityBuilder.of("damage_resistance", TBAbilityTypes.DAMAGE_RESISTANCE).additionalData((a) -> a.dataManager.set(DamageResistanceAbility.AMPLIFIER, 4F)),
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
             AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
+            AttributeModifierAbility.of("armor", b -> b.attribute(Attributes.ARMOR).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
             AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
     ));
 

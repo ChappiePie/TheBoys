@@ -70,7 +70,9 @@ public class SyringeItem extends Item implements GeoItem {
             if (player.getRandom().nextBoolean()) {
                 player.addEffect(new MobEffectInstance(mobEffect, 200, 3, false, true, true));
             }
-            pStack.getOrCreateTag().getCompound("vial").remove("tag");
+            if (!player.getAbilities().instabuild) {
+                pStack.getOrCreateTag().getCompound("vial").remove("tag");
+            }
         }
         return super.finishUsingItem(pStack, pLevel, pLivingEntity);
     }

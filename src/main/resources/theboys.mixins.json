@@ -5,6 +5,7 @@
   "client": [
     "client.AbstractSoundInstanceMixin",
     "client.GameRendererMixin",
+    "client.GuiMixin",
     "client.HumanoidArmorLayerMixin",
     "client.HumanoidModelMixin",
     "client.ItemInHandLayerMixin",

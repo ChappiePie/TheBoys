@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -56,6 +57,9 @@ public class SpeedAbility extends Ability {
 
             boolean isMoving = x != x1 || z != z1;
 
+            if (entity instanceof Player player && player.tickCount % 100 == 0) {
+                player.getFoodData().eat(1, 1.0F);
+            }
             this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED, speedLevel, AttributeModifier.Operation.MULTIPLY_TOTAL);
             this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED, speedLevel, AttributeModifier.Operation.MULTIPLY_TOTAL);
 

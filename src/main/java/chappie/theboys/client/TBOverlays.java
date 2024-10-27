@@ -46,7 +46,13 @@ public class TBOverlays {
 
     private static final IHasTimer.Timer ANIM_TICK = new IHasTimer.Timer(() -> 10, TheBoysClient.OVERLAY::isDown);
 
-    public static void render(Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
+    public static void render(Minecraft mc, float partialTick, GuiGraphics guiGraphics) {
+        TBOverlays.renderHud(mc, mc.gui, guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+        TBOverlays.renderATrain(guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
+        TBOverlays.renderEyes(mc, partialTick);
+    }
+
+    public static void renderHud(Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
         Entity entity = mc.getCameraEntity();
         if (!(entity instanceof LivingEntity e) || PowerCap.getCap(e) == null || !(PowerCap.getCap(e).getSuperpower() instanceof TBSuperpower power))
             return;
@@ -110,7 +116,6 @@ public class TBOverlays {
 
             int type = 0;
             int maxX = 94;
-            boolean enabled = false;
             if (type == 1) {
                 maxX = size * 20;
             } else if (type == 2) {
@@ -122,9 +127,6 @@ public class TBOverlays {
                     if (maxX < maxWidth) {
                         maxX = maxWidth;
                     }
-                }
-                if (ability.isEnabled()) {
-                    enabled = true;
                 }
             }
 
@@ -150,8 +152,7 @@ public class TBOverlays {
                 int texY = y + (type == 1 ? 0 : j);
 
 
-                float a = enabled ? ability.isEnabled() ? 1 : 0.25F : 1;
-                a *= f2;
+                float a = f2;
                 {
                     int cBack = iHasOverlay.getBackgroundColor();
                     float r = FastColor.ABGR32.red(cBack) / 255F;

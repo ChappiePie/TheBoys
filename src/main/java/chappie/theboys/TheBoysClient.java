@@ -26,8 +26,6 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -52,13 +50,6 @@ public class TheBoysClient implements ClientModInitializer {
         SetupAnimCallback.EVENT.register(ClientEvents::setupAnim);
         FirstPersonAdditionalHandCallback.EVENT.register(ClientEvents::firstPersonAdditionalHand);
         ClientTickEvents.END_CLIENT_TICK.register(TBOverlays::clientTick);
-        HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-            Minecraft mc = Minecraft.getInstance();
-            TBOverlays.render(mc, mc.gui, matrices, tickDelta, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
-            TBOverlays.renderEyes(mc, tickDelta);
-            TBOverlays.renderATrain(matrices, tickDelta, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
-        });
-
         ParticleFactoryRegistry.getInstance().register(TBParticleTypes.LASER, LaserParticle.LaserParticleFactory::new);
         EntityRendererRegistry.register(TBEntities.TRAIL, TrailRenderer::new);
 
