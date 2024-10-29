@@ -11,11 +11,15 @@ public class TBBlockEntities {
 
     private static <T extends BlockEntity> BlockEntityType<T> register(String name, BlockEntityType.BlockEntitySupplier<T> block) {
         return Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, TheBoys.id(name), BlockEntityType.Builder.of(block, TBBlocks.SYNTHESIZER).build(null));
-    }    public static final BlockEntityType<SynthesizerBlockEntity> SYNTHESIZER = register("synthesizer", SynthesizerBlockEntity::new);
+    }
 
     public static void init() {
 
     }
+
+    public static final BlockEntityType<SynthesizerBlockEntity> SYNTHESIZER = register("synthesizer", SynthesizerBlockEntity::new);
+
+
 
 
 }

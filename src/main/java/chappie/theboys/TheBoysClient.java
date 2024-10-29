@@ -36,7 +36,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class TheBoysClient implements ClientModInitializer {
 
-    public static final ToggleKeyMapping OVERLAY = new ToggleKeyMapping("%s.key.overlay".formatted(TheBoys.MODID), GLFW.GLFW_KEY_LEFT_ALT, "key.categories.%s".formatted(Modulus.MODID), () -> TBConfig.CLIENT.abilitiesOverlayToggle.get());
+    public static final ToggleKeyMapping OVERLAY = new ToggleKeyMapping("key.%s.overlay".formatted(TheBoys.MODID), GLFW.GLFW_KEY_LEFT_ALT, "key.categories.%s".formatted(Modulus.MODID), () -> TBConfig.CLIENT.abilitiesOverlayToggle.get());
 
     @Override
     public void onInitializeClient() {

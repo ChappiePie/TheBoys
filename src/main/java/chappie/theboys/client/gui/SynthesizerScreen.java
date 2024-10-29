@@ -155,16 +155,16 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
         Component component = null;
         if (this.getMenu().getItems().get(1).isEmpty()) {
             if (!this.getMenu().isLit()) {
-                component = Component.literal("Add fuel");
+                component = Component.translatable("tooltip.theboys.synthesizer.fuel");
             }
         } else if (this.getMenu().getWaterMb() < 250) {
-            component = Component.literal("Add %s mb of water".formatted(250 - this.getMenu().getWaterMb()));
+            component = Component.translatable("tooltip.theboys.synthesizer.water", 250 - this.getMenu().getWaterMb());
         } else if (this.getMenu().isCentrifugeEmpty()) {
-            component = Component.literal("Centrifuge is empty");
+            component = Component.translatable("tooltip.theboys.synthesizer.centrifugeEmpty");
         } else if (this.getMenu().getItems().get(2).isEmpty()) {
-            component = Component.literal("Place any item in center");
+            component = Component.translatable("tooltip.theboys.synthesizer.centerItem");
         } else if (this.getMenu().getItems().get(2).getCount() > 1) {
-            component = Component.literal("Item in center should be one!");
+            component = Component.translatable("tooltip.theboys.synthesizer.oneCenterItem");
         }
         return component;
     }

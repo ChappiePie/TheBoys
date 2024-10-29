@@ -11,11 +11,15 @@ public class TBMenus {
 
     private static <T extends AbstractContainerMenu> MenuType<T> register(String name, MenuType.MenuSupplier<T> block) {
         return Registry.register(BuiltInRegistries.MENU, TheBoys.id(name), new MenuType<>(block, FeatureFlags.DEFAULT_FLAGS));
-    }    public static final MenuType<SynthesizerMenu> SYNTHESIZER = register("synthesizer", SynthesizerMenu::new);
+    }
 
     public static void init() {
 
     }
+
+    public static final MenuType<SynthesizerMenu> SYNTHESIZER = register("synthesizer", SynthesizerMenu::new);
+
+
 
 
 }

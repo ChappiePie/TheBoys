@@ -208,6 +208,13 @@ public class ClientEvents {
             for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
                 float yBodyRot = Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot);
                 float f = Mth.wrapDegrees(player.getViewYRot(partialTick) - yBodyRot);
+                if (!ability.cooldown.end() && player.isSprinting() && !Minecraft.getInstance().isPaused()) {
+                    float f1 = ability.cooldown.value(partialTick);
+                    pPoseStack.mulPose(Axis.ZP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
+                    pPoseStack.mulPose(Axis.YP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
+
+                }
+
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees((f * ability.sprintingTimer.value(partialTick)) / 2.0F));
                 break;
             }

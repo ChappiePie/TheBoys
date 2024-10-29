@@ -13,6 +13,7 @@ import net.minecraft.world.item.*;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -21,16 +22,9 @@ import static net.minecraft.world.item.ArmorItem.Type.*;
 public class TBItems {
 
     public static final ArrayList<Item> ITEMS = new ArrayList<>();
+
     public static final ImmutableMap<ArmorItem.Type, SuitItem> HOMELANDER_SUIT = registerSuitParts(SuitItem::new, "homelander", (p) -> {
     }, CHESTPLATE, LEGGINGS, BOOTS);
-    public static final CreativeModeTab THE_BOYS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TheBoys.id("theboys"), FabricItemGroup.builder().icon(() -> new ItemStack(TBItems.HOMELANDER_SUIT.get(ArmorItem.Type.CHESTPLATE)))
-            .title(Component.translatable("itemGroup.%s.theboys".formatted(TheBoys.MODID)))
-            .displayItems((itemDisplayParameters, output) -> {
-                for (Item entry : TBItems.ITEMS) {
-                    output.accept(entry);
-                }
-            }).build()
-    );
     public static final ImmutableMap<ArmorItem.Type, SuitItem> ATRAIN_SUIT = registerSuitParts(SuitItem::new, "atrain", (p) -> p.armorScale((e, stack) ->
             p.getSlot() != EquipmentSlot.HEAD ? SuitProperties.BASIC_ARMOR_SCALE.apply(p.getSlot()) : new Vector3f(-Integer.MAX_VALUE)), HELMET, CHESTPLATE, LEGGINGS, BOOTS);
     public static final ImmutableMap<ArmorItem.Type, SuitItem> STARLIGHT_SUIT = registerSuitParts(SuitItem::new, "starlight", (p) -> p.armorScale((e, stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, BOOTS);
@@ -38,6 +32,14 @@ public class TBItems {
 
     public static final SyringeItem SYRINGE = register("syringe", new SyringeItem());
     public static final VialItem VIAL = register("vial", new VialItem());
+
+    public static final CreativeModeTab THE_BOYS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TheBoys.id("theboys"), FabricItemGroup.builder()
+            .icon(() -> new ItemStack(Objects.requireNonNull(TBItems.HOMELANDER_SUIT.get(CHESTPLATE))))
+            .title(Component.translatable("title.theboys")).displayItems((itemDisplayParameters, output) -> {
+                for (Item entry : TBItems.ITEMS) {
+                    output.accept(entry);
+                }
+            }).build());
 
     private static ImmutableMap<ArmorItem.Type, SuitItem> registerSuitParts(SuitSupplier supplier, String type, Consumer<SuitProperties> consumer, ArmorItem.Type... slots) {
         return TBItems.registerSuitParts(supplier, type, consumer, ArmorMaterials.LEATHER::getDefenseForType, 0.0F, slots);

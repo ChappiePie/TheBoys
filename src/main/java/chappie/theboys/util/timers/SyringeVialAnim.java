@@ -15,19 +15,28 @@ public class SyringeVialAnim implements IHasTimer {
     public final IHasTimer.Timer timeline = new IHasTimer.Timer(() -> 20, () -> false);
     public final IHasTimer.Timer rollVial = new IHasTimer.Timer(() -> 6, () -> false);
     public final IHasTimer.Timer insertVial = new IHasTimer.Timer(() -> 3, () -> false);
+    private final TheBoysCap boysCap;
+    private boolean triggerAnim, reverse;
 
-    public boolean triggerAnim, reverse;
+    public SyringeVialAnim(TheBoysCap boysCap) {
+        this.boysCap = boysCap;
+    }
 
-    public void tick(LivingEntity entity, TheBoysCap theBoysCap) {
+    public void triggerAnim(boolean trigger, boolean reverse) {
+        this.triggerAnim = trigger;
+        this.reverse = reverse;
+        this.boysCap.syncToAll();
+    }
+
+    public void tick(LivingEntity entity) {
         ItemStack mainHandItem = entity.getMainHandItem();
         ItemStack offHandItem = entity.getOffhandItem();
         this.timeline.predicate = () -> this.triggerAnim
                 && mainHandItem.getItem() instanceof SyringeItem
                 && (offHandItem.getItem() instanceof VialItem || (this.reverse && mainHandItem.getTag() != null && mainHandItem.getTag().contains("vial") && offHandItem.isEmpty()));
         float timeline = this.timeline.value(1);
-        // TODO reverse animation
         if (timeline == 1 && !entity.getCommandSenderWorld().isClientSide()) {
-            if (reverse) {
+            if (this.reverse) {
                 ItemStack itemStack = ItemStack.of(mainHandItem.getOrCreateTag().getCompound("vial"));
                 entity.setItemInHand(InteractionHand.OFF_HAND, itemStack);
                 mainHandItem.getOrCreateTag().remove("vial");
@@ -43,7 +52,7 @@ public class SyringeVialAnim implements IHasTimer {
 
         if (this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem) || timeline == 1) {
             this.triggerAnim = false;
-            theBoysCap.syncToAll();
+            this.boysCap.syncToAll();
         }
 
         this.timers().forEach(Timer::update);

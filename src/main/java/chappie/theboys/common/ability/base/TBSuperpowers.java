@@ -23,19 +23,18 @@ public class TBSuperpowers {
             HeatVisionAbility.of("lasers", k -> k.keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD),
                             k -> k.keyType(KeyMap.KeyType.MOUSE_RIGHT).action(KeyCondition.Action.HELD))
                     .change(TBCommonUtil.COLOR, Color.RED)
-                    .additionalData(a ->
-                            new IHasOverlay(a, (b) -> b.uOffset(48)
-                                    .backgroundColor(() -> a.conditionManager.test("eyes") ? 16711680 : -1)
+                    .additionalData(a -> new IHasOverlay(a,
+                            (b) -> b.uOffset(48).backgroundColor(() -> a.conditionManager.test("eyes") ? 16711680 : -1)
                                     .keyType(() -> !a.conditionManager.test("eyes") ?
                                             KeyMap.KeyType.FIRST : KeyMap.KeyType.MOUSE_RIGHT))
                     ),
             AbilityBuilder.of("flight", TBAbilityTypes.FLIGHT)
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.TOGGLE), "enabling", "slow_falling")
-                    //.condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.JUMP).action(KeyCondition.Action.ACTION), "boost")
-                    .condition(a -> new DoubleJumpCondition(a).shouldStop(() -> a.entity.onGround() || a.entity.isShiftKeyDown()), "enabling")
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.TOGGLE), "enabling", "pressed")
+                    .condition(a -> new DoubleKeyCondition(a).shouldStop(() -> a.entity.onGround() || a.entity.isShiftKeyDown()), "enabling")
+                    .condition(a -> new DoubleKeyCondition(a).keyType(KeyMap.KeyType.SPRINT).shouldStop(() -> !(a instanceof FlightAbility f && f.cooldown.end() && a.isEnabled() && a.dataManager.get(FlightAbility.SPRINTING))), "boost")
                     .additionalData(a ->
                             new IHasOverlay(a, (b) -> b.uOffset(32)
-                                    .keyType(() -> !a.conditionManager.test("slow_falling") ?
+                                    .keyType(() -> !a.conditionManager.test("pressed") ?
                                             KeyMap.KeyType.SECOND : KeyMap.KeyType.JUMP))
                     ),
             AbilityBuilder.of("super_hearing", TBAbilityTypes.SUPER_HEARING)

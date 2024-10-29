@@ -24,11 +24,6 @@ public class VialItem extends Item implements GeoItem {
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
-    public boolean hasCustomColor(ItemStack pStack) {
-        CompoundTag compoundtag = pStack.getTag();
-        return compoundtag != null && compoundtag.contains("color", 99);
-    }
-
     public static int getColor(CompoundTag tag) {
         if (tag != null) {
             if (tag.contains("color", 99)) {
@@ -45,6 +40,11 @@ public class VialItem extends Item implements GeoItem {
         ItemStack pStack = TBItems.VIAL.getDefaultInstance();
         pStack.getOrCreateTag().putBoolean("compoundV", true);
         return pStack;
+    }
+
+    public boolean hasCustomColor(ItemStack pStack) {
+        CompoundTag compoundtag = pStack.getTag();
+        return compoundtag != null && compoundtag.contains("color", 99);
     }
 
     public void clearColor(ItemStack pStack) {

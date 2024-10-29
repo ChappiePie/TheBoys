@@ -73,7 +73,7 @@ public class TBOverlays {
         // Text above
         MutableComponent text;
         if (tab) {
-            text = Component.translatable("theboys.overlay.abilities").withStyle(ClientUtil.BOLD_MINECRAFT);
+            text = Component.translatable("overlay.theboys.abilities").withStyle(ClientUtil.BOLD_MINECRAFT);
         } else {
             text = power.getDisplayName().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
             //text = Component.translatable("theboys.overlay.superpower");

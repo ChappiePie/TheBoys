@@ -16,11 +16,12 @@ import org.jetbrains.annotations.Nullable;
 public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
 
     public static final ComponentKey<TheBoysCap> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(TheBoys.id("cap"), TheBoysCap.class);
-    public final SyringeVialAnim vialAnim = new SyringeVialAnim();
-    public final SyringeAnim syringeAnim = new SyringeAnim();
+    public final SyringeVialAnim vialAnim = new SyringeVialAnim(this);
+    public final SyringeAnim syringeAnim = new SyringeAnim(this);
     private final LivingEntity livingEntity;
     private boolean compoundV;
     private int eyesHeight = 5, eyesLength = 1;
+
     public TheBoysCap(LivingEntity livingEntity) {
         this.livingEntity = livingEntity;
     }
@@ -33,8 +34,8 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
     @Override
     public void tick() {
         if (this.livingEntity.isAlive()) {
-            this.vialAnim.tick(this.livingEntity, this);
-            this.syringeAnim.tick(this.livingEntity, this);
+            this.vialAnim.tick(this.livingEntity);
+            this.syringeAnim.tick(this.livingEntity);
 //            if (this.livingEntity.level().isClientSide()) {
 //                PlayerAnimCap cap = PlayerAnimCap.getCap(player);
 //                if (cap != null) {
@@ -88,7 +89,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         this.eyesHeight = nbt.getInt("eyesHeight");
         this.eyesLength = nbt.getInt("eyesLength");
 
-        this.syringeAnim.triggerAnim = tag.getBoolean("syringeAnim_triggerAnim");
+        this.syringeAnim.readFromNbt(tag.getCompound("syringeAnim"));
         this.vialAnim.readFromNbt(tag.getCompound("vialAnim"));
     }
 
@@ -101,7 +102,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         eyeOptions.putInt("eyesLength", this.eyesLength);
         tag.put("eyeOptions", eyeOptions);
 
-        tag.putBoolean("syringeAnim_triggerAnim", this.syringeAnim.triggerAnim);
+        tag.put("syringeAnim", this.syringeAnim.writeToNbt());
         tag.put("vialAnim", this.vialAnim.writeToNbt());
     }
 }

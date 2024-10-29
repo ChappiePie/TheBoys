@@ -7,7 +7,9 @@ import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.data.DataAccessor;
 import chappie.modulus.util.events.SetupAnimCallback;
+import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -31,6 +33,8 @@ public class FlightAbility extends Ability implements IHasTimer {
     public final Timer forwardTimer = new Timer(() -> 5, () -> this.isEnabled() && this.dataManager.get(FORWARD_IMPULSE) > 0);
     public final Timer backwardTimer = new Timer(() -> 5, () -> this.isEnabled() && this.dataManager.get(FORWARD_IMPULSE) < 0);
 
+    public final Cooldown cooldown = new Cooldown();
+
     public FlightAbility(LivingEntity entity, AbilityBuilder builder) {
         super(entity, builder);
     }
@@ -39,7 +43,7 @@ public class FlightAbility extends Ability implements IHasTimer {
     public void defineData() {
         super.defineData();
         this.dataManager.define(SPEED, 1.0F);
-        this.dataManager.define(SPRINT_SPEED, 2.5F);
+        this.dataManager.define(SPRINT_SPEED, 2.0F);
         this.dataManager.define(BREAK_BLOCKS, true);
 
         this.dataManager.define(SPRINTING, false, false);
@@ -72,15 +76,30 @@ public class FlightAbility extends Ability implements IHasTimer {
                 this.dataManager.setFromClient(FORWARD_IMPULSE, Math.round(f));
             }
         }
+        boolean sprinting = this.dataManager.get(SPRINTING);
 
         if (enabled) {
             if (!(entity instanceof Player) && this.enabledTicks == 0) {
                 entity.setDeltaMovement(entity.getDeltaMovement().add(0, 0.4, 0));
             }
 
-            float speed = entity.isSprinting() ? this.dataManager.get(SPRINT_SPEED) : this.dataManager.get(SPEED);
+            float speed = sprinting ? this.dataManager.get(SPRINT_SPEED) : this.dataManager.get(SPEED);
+            if (this.cooldown.end()) {
+                if (this.conditionManager.test("boost")) {
+                    this.cooldown.start(60);
+                    TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.EXPLOSION,
+                            true, this.entity.position(), Vec3.ZERO, 1, 10);
+
+                }
+            } else {
+                speed += this.cooldown.value(1) * 4F;
+                if (sprinting) {
+                    TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.CLOUD,
+                            true, this.entity.position(), Vec3.ZERO, 0.05F, 10);
+                }
+            }
             Vec3 vec3;
-            if (entity.isSprinting()) {
+            if (sprinting) {
                 vec3 = entity.getDeltaMovement().scale(0.25F).add(entity.getLookAngle().scale(speed));
                 /*if (this.conditionManager.test("boost")) {
                     vec3 = vec3.add(entity.getLookAngle().scale(20F));
@@ -126,7 +145,7 @@ public class FlightAbility extends Ability implements IHasTimer {
 
     @Override
     public List<Timer> timers() {
-        return List.of(this.timer, this.sprintingTimer, this.forwardTimer, this.backwardTimer);
+        return List.of(this.timer, this.sprintingTimer, this.forwardTimer, this.backwardTimer, this.cooldown);
     }
 
     public record FlightClientProperties(FlightAbility ability) implements AbilityClientProperties {

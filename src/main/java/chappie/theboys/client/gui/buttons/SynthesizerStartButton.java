@@ -35,7 +35,7 @@ public class SynthesizerStartButton extends ImageButton {
     @Override
     public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-        MutableComponent text = this.screen.getMenu().data.get(0) == 0 ? Component.literal("Start") : Component.literal("Stop");
+        MutableComponent text = this.screen.getMenu().data.get(0) == 0 ? Component.translatable("button.theboys.synthesizer.start") : Component.translatable("button.theboys.synthesizer.stop");
         text = text.withStyle(ChatFormatting.UNDERLINE);
         int i = this.active ? 16777215 : 10526880;
 

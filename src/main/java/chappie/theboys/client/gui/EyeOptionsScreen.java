@@ -174,7 +174,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             float f = 2.5F;
             pPoseStack.scale(f, f, f);
             pPoseStack.translate((this.width / 2F - 200) / f, (h - 95) / f, 0);
-            guiGraphics.drawString(this.font, Component.literal("The Boys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
+            guiGraphics.drawString(this.font, Component.translatable("title.theboys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
                     FastColor.ARGB32.color(255, 170, 20, 20), true);
             pPoseStack.popPose();
         }

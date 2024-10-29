@@ -7,22 +7,23 @@ import net.minecraft.nbt.CompoundTag;
 
 import java.util.function.Supplier;
 
-public class DoubleJumpCondition extends Condition {
+public class DoubleKeyCondition extends Condition {
+    public KeyMap.KeyType keyType = KeyMap.KeyType.JUMP;
     private Supplier<Boolean> shouldStop = () -> false;
-    private boolean isJumped, enabled;
-    private int jumpTriggerTime;
+    private boolean isPressed, enabled;
+    private int keyTriggerTime;
 
-    public DoubleJumpCondition(Ability ability) {
-        super(ability, (c) -> c instanceof DoubleJumpCondition k && k.enabled);
+    public DoubleKeyCondition(Ability ability) {
+        super(ability, (c) -> c instanceof DoubleKeyCondition k && k.enabled);
     }
 
     @Override
     public void update() {
         super.update();
-        if (this.jumpTriggerTime > 0) {
-            --this.jumpTriggerTime;
+        if (this.keyTriggerTime > 0) {
+            --this.keyTriggerTime;
         }
-        this.isJumped = this.ability.keys.isDown(KeyMap.KeyType.JUMP);
+        this.isPressed = this.ability.keys.isDown(this.keyType);
         if (this.shouldStop.get()) {
             this.enabled = false;
         }
@@ -31,18 +32,23 @@ public class DoubleJumpCondition extends Condition {
     @Override
     public void keyEvent() {
         super.keyEvent();
-        if (!isJumped && this.ability.keys.isDown(KeyMap.KeyType.JUMP)) {
-            if (this.jumpTriggerTime == 0) {
-                this.jumpTriggerTime = 8;
+        if (!this.isPressed && this.ability.keys.isDown(this.keyType) && !this.shouldStop.get()) {
+            if (this.keyTriggerTime == 0) {
+                this.keyTriggerTime = 8;
             } else {
                 this.enabled = !this.enabled;
-                this.jumpTriggerTime = 0;
+                this.keyTriggerTime = 0;
             }
         }
     }
 
-    public DoubleJumpCondition shouldStop(Supplier<Boolean> shouldStop) {
+    public DoubleKeyCondition shouldStop(Supplier<Boolean> shouldStop) {
         this.shouldStop = shouldStop;
+        return this;
+    }
+
+    public DoubleKeyCondition keyType(KeyMap.KeyType keyType) {
+        this.keyType = keyType;
         return this;
     }
 

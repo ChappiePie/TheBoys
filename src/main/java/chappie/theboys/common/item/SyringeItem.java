@@ -87,31 +87,27 @@ public class SyringeItem extends Item implements GeoItem {
             if (mainHandItem.getTag() != null && mainHandItem.getTag().contains("vial")) {
                 if (offHandItem.isEmpty()) {
                     if (pPlayer.isCrouching()) {
-                        boysCap.vialAnim.reverse = true;
-                        boysCap.vialAnim.triggerAnim = true;
-                        boysCap.syncToAll();
+                        boysCap.vialAnim.triggerAnim(true, true);
                         return InteractionResultHolder.pass(pPlayer.getItemInHand(pHand));
                     }
 
                     if (boysCap.vialAnim.timeline.value(1) == 0) {
                         if (this.hasCompoundV(mainHandItem)) {
-                            boysCap.syringeAnim.triggerAnim = true;
-                            boysCap.syncToAll();
+                            boysCap.syringeAnim.triggerAnim(true);
+                            ;
                             return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
                         } else {
-                            pPlayer.displayClientMessage(Component.literal("There is no compound V").withStyle(ChatFormatting.RED), true);
+                            pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED), true);
                         }
                     }
                 } else {
-                    pPlayer.displayClientMessage(Component.literal("Remove the item from off hand slot").withStyle(ChatFormatting.RED), true);
+                    pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.offHandSlot").withStyle(ChatFormatting.RED), true);
                 }
             } else {
                 if (offHandItem.getItem() instanceof VialItem) {
-                    boysCap.vialAnim.reverse = false;
-                    boysCap.vialAnim.triggerAnim = true;
-                    boysCap.syncToAll();
+                    boysCap.vialAnim.triggerAnim(true, false);
                 } else {
-                    pPlayer.displayClientMessage(Component.literal("Place vial in off hand slot").withStyle(ChatFormatting.RED), true);
+                    pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.noVial").withStyle(ChatFormatting.RED), true);
                 }
             }
         }
