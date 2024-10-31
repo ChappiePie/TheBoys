@@ -66,19 +66,19 @@ public class FlightAbility extends Ability implements IHasTimer {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (entity.getCommandSenderWorld().isClientSide) {
-            float f = entity.zza;
-            boolean sprinting = entity.isSprinting();
-            if (this.dataManager.get(SPRINTING) != sprinting) {
-                this.dataManager.setFromClient(SPRINTING, sprinting);
-            }
-            if (this.dataManager.get(FORWARD_IMPULSE) != f) {
-                this.dataManager.setFromClient(FORWARD_IMPULSE, Math.round(f));
-            }
-        }
-        boolean sprinting = this.dataManager.get(SPRINTING);
 
         if (enabled) {
+            if (entity.getCommandSenderWorld().isClientSide) {
+                float f = entity.zza;
+                boolean sprinting = entity.isSprinting();
+                if (this.dataManager.get(SPRINTING) != sprinting) {
+                    this.dataManager.setFromClient(SPRINTING, sprinting);
+                }
+                if (this.dataManager.get(FORWARD_IMPULSE) != f) {
+                    this.dataManager.setFromClient(FORWARD_IMPULSE, Math.round(f));
+                }
+            }
+            boolean sprinting = this.dataManager.get(SPRINTING);
             if (!(entity instanceof Player) && this.enabledTicks == 0) {
                 entity.setDeltaMovement(entity.getDeltaMovement().add(0, 0.4, 0));
             }

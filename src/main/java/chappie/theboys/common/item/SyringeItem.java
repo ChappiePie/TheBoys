@@ -5,6 +5,7 @@ import chappie.modulus.common.capability.PowerCap;
 import chappie.theboys.TheBoys;
 import chappie.theboys.client.renderer.SyringeRenderer;
 import chappie.theboys.common.capability.TheBoysCap;
+import chappie.theboys.util.TBConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,6 +16,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -65,38 +67,46 @@ public class SyringeItem extends Item implements GeoItem {
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
         if (pLivingEntity instanceof Player player && !pLevel.isClientSide()) {
             PowerCap cap = PowerCap.getCap(player);
-
+            boolean b = false;
             if (cap != null && pStack.hasTag()) {
                 player.getCooldowns().addCooldown(this, 20);
                 CompoundTag vialTag = pStack.getOrCreateTag().getCompound("vial");
-                if (this.hasSuperpower(pStack)) {
+                if (this.hasSuperpower(pStack) && cap.getSuperpower() == null) {
                     if (this.vialSuperpower(pStack).equals("compoundV")) {
                         var superpowers = Superpower.REGISTRY.stream().filter(p -> Superpower.REGISTRY.getKey(p).getNamespace().equals(TheBoys.MODID)).toList();
                         cap.setSuperpower(superpowers.get(player.getRandom().nextInt(superpowers.size())));
-                    } else if (cap.getSuperpower() == null) {
-                        cap.setSuperpower(Superpower.REGISTRY.get(new ResourceLocation(vialTag.getCompound("tag").getString("superpower"))));
-                        vialTag.getCompound("tag").remove("superpower");
                     } else {
-                        if (!vialTag.contains("tag")) {
-                            vialTag.put("tag", new CompoundTag());
-                        }
-                        vialTag.getCompound("tag").putString("superpower", Superpower.REGISTRY.getKey(cap.getSuperpower()).toString());
-                        cap.setSuperpower(null);
+                        cap.setSuperpower(Superpower.REGISTRY.get(new ResourceLocation(vialTag.getCompound("tag").getString("superpower"))));
+                    }
+                    if (!player.getAbilities().instabuild) {
+                        vialTag.getCompound("tag").remove("superpower");
+                        b = true;
                     }
                 } else {
                     if (!vialTag.contains("tag")) {
                         vialTag.put("tag", new CompoundTag());
                     }
-                    vialTag.getCompound("tag").putString("superpower", Superpower.REGISTRY.getKey(cap.getSuperpower()).toString());
-                    cap.setSuperpower(null);
+                    if (!vialTag.getCompound("tag").contains("superpower")) {
+                        if (TBConfig.COMMON.storeAbilities.get() || player.getAbilities().instabuild) {
+                            vialTag.getCompound("tag").putString("superpower", Superpower.REGISTRY.getKey(cap.getSuperpower()).toString());
+                        } else {
+                            vialTag.getCompound("tag").putString("superpower", "compoundV");
+                        }
+                        cap.setSuperpower(null);
+                        b = true;
+                    } else {
+                        if (this.vialSuperpower(pStack).equals("compoundV")) {
+                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 3, false, true, true));
+                            if (!player.getAbilities().instabuild) {
+                                vialTag.getCompound("tag").remove("superpower");
+                            }
+                        }
+                    }
                 }
-                if (player.getRandom().nextBoolean()) {
+                if (player.getRandom().nextBoolean() && b) {
                     var effects = BuiltInRegistries.MOB_EFFECT.stream().filter(p -> BuiltInRegistries.MOB_EFFECT.getKey(p).getNamespace().equals("minecraft") && p.getCategory().equals(MobEffectCategory.HARMFUL)).toList();
                     var mobEffect = effects.get(player.getRandom().nextInt(effects.size()));
                     player.addEffect(new MobEffectInstance(mobEffect, 200, 3, false, true, true));
-                }
-                if (!player.getAbilities().instabuild) {
-                    vialTag.remove("tag");
                 }
             }
         }
@@ -118,11 +128,29 @@ public class SyringeItem extends Item implements GeoItem {
                     }
 
                     if (boysCap.vialAnim.timeline.value(1) == 0) {
-                        if (this.hasSuperpower(mainHandItem) || cap.getSuperpower() != null) {
+                        boolean use = false;
+                        if (this.hasSuperpower(mainHandItem)) {
+                            if (cap.getSuperpower() == null) {
+                                use = true;
+                            } else {
+                                if (vialSuperpower(mainHandItem).equals("compoundV")) {
+                                    use = true;
+                                } else {
+                                    if (pPlayer.getAbilities().instabuild) {
+                                        use = true;
+                                    } else {
+                                        pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED), true);
+                                    }
+                                }
+                            }
+                        } else {
+                            if (cap.getSuperpower() != null) {
+                                use = true;
+                            }
+                        }
+                        if (use) {
                             boysCap.syringeAnim.triggerAnim(true);
                             return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
-                        } else {
-                            pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED), true);
                         }
                     }
                 } else {

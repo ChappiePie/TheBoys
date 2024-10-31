@@ -28,7 +28,7 @@ public class SyringeAnim implements IHasTimer {
         ItemStack offHandItem = entity.getOffhandItem();
         this.timeline.predicate = () -> this.triggerAnim
                 && mainHandItem.getItem() instanceof SyringeItem
-                && offHandItem.isEmpty();
+                && offHandItem.isEmpty() && entity.isUsingItem();
         float timeline = this.timeline.value(1);
 
         if (this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem && offHandItem.isEmpty()) || timeline == 1 || entity.getUseItemRemainingTicks() > 0 && entity.getUseItemRemainingTicks() <= 10) {

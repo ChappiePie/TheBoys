@@ -9,6 +9,9 @@
   "block.theboys.synthesizer": "Synthesizer",
   "button.theboys.synthesizer.start": "Start",
   "button.theboys.synthesizer.stop": "Stop",
+  "config.theboys.suitOpacity": "Suit Opacity",
+  "config.theboys.storeAbilities": "Store Abilities",
+
   "container.theboys.synthesizer": "Synthesizer",
   "gui.theboys.eyeOptions": "Eye Options",
   "gui.theboys.eyeOptions.basicPresets": "Basic presets for lasers",

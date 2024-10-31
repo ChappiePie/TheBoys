@@ -7,6 +7,7 @@ import chappie.theboys.common.item.VialItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -43,6 +44,10 @@ public class SyringeVialAnim implements IHasTimer {
             } else {
                 mainHandItem.getOrCreateTag().put("vial", offHandItem.copyWithCount(1).save(new CompoundTag()));
                 offHandItem.shrink(1);
+            }
+            this.triggerAnim = false;
+            if (entity instanceof Player player) {
+                player.getCooldowns().addCooldown(mainHandItem.getItem(), 20);
             }
         }
 

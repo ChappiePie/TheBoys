@@ -3,9 +3,9 @@ package chappie.theboys.util.interfaces;
 import java.util.Map;
 
 public interface EntitySavingFields {
-    void setup(Map<String, Object> map);
+    void theBoys$setup(Map<String, Object> map);
 
-    void reset();
+    void theBoys$reset();
 
-    Map<String, Object> map();
+    Map<String, Object> theBoys$map();
 }

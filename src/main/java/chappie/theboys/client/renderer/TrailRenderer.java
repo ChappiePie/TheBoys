@@ -28,7 +28,7 @@ public class TrailRenderer extends EntityRenderer<TrailEntity> {
         float f = 1F - (entityIn.tickCount / (float) entityIn.lifeTime);
         float alpha = f / 2.0F;
         f = Math.max(0, 0.5F + f - 0.5F);
-        ((EntitySavingFields) attached).setup(entityIn.fieldSavingMap);
+        ((EntitySavingFields) attached).theBoys$setup(entityIn.fieldSavingMap);
         poseStack.pushPose();
         if (Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(attached) instanceof LivingEntityRendererAccessor accessor) {
             accessor.mixin$setupRotations(attached, poseStack, entityIn.tickCount, entityIn.yBodyRot, 1);
@@ -41,7 +41,7 @@ public class TrailRenderer extends EntityRenderer<TrailEntity> {
         float blue = (entityIn.color.getBlue() + (int) ((255 - entityIn.color.getBlue()) * f)) / 255F;
         entityIn.model.renderToBuffer(poseStack, bufferIn.getBuffer(RenderType.entityTranslucent(entityIn.texture)), packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
         poseStack.popPose();
-        ((EntitySavingFields) attached).reset();
+        ((EntitySavingFields) attached).theBoys$reset();
         super.render(entityIn, entityYaw, partialTicks, poseStack, bufferIn, packedLightIn);
     }
 

@@ -1,12 +1,14 @@
 package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
-import chappie.theboys.common.ability.*;
+import chappie.theboys.common.ability.FocusOnGoalAbility;
+import chappie.theboys.common.ability.SpeedAbility;
+import chappie.theboys.common.ability.SuperHearingAbility;
+import chappie.theboys.common.ability.TranslucentAbility;
 import chappie.theboys.util.interfaces.EntitySavingFields;
 import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.phys.Vec3;
@@ -40,23 +42,9 @@ public class EntityMixin implements EntitySavingFields {
         }
     }
 
-    @Inject(method = "isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
-    public void mixin$isInvulnerableTo(DamageSource source, CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValue()) {
-            Entity entity = (Entity) (Object) this;
-            for (DamageImmunityAbility a : CommonUtil.listOfType(DamageImmunityAbility.class, CommonUtil.getAbilities(entity))) {
-                for (String s : a.damageSources) {
-                    if (s.equals(source.getMsgId()) && a.isEnabled()) {
-                        cir.setReturnValue(true);
-                    }
-                }
-            }
-        }
-    }
-
     @Inject(method = "getXRot", at = @At("TAIL"), cancellable = true)
     public void mixin$getXRot(CallbackInfoReturnable<Float> cir) {
-        var map = ((EntitySavingFields) this).map();
+        var map = ((EntitySavingFields) this).theBoys$map();
         if (map.containsKey("xRot")) {
             this.xRotO = (float) map.get("xRot");
             cir.setReturnValue((float) map.get("xRot"));
@@ -73,7 +61,7 @@ public class EntityMixin implements EntitySavingFields {
 
     @Inject(method = "getYRot", at = @At("TAIL"), cancellable = true)
     public void mixin$getYRot(CallbackInfoReturnable<Float> cir) {
-        var map = ((EntitySavingFields) this).map();
+        var map = ((EntitySavingFields) this).theBoys$map();
         if (map.containsKey("yRot")) {
             this.yRotO = (float) map.get("yRot");
             cir.setReturnValue((float) map.get("yRot"));
@@ -90,7 +78,7 @@ public class EntityMixin implements EntitySavingFields {
 
     @Inject(method = "getDeltaMovement", at = @At("TAIL"), cancellable = true)
     public void mixin$getDeltaMovement(CallbackInfoReturnable<Vec3> cir) {
-        var map = ((EntitySavingFields) this).map();
+        var map = ((EntitySavingFields) this).theBoys$map();
         if (map.containsKey("deltaMovement")) {
             cir.setReturnValue((Vec3) map.get("deltaMovement"));
         }
@@ -99,7 +87,7 @@ public class EntityMixin implements EntitySavingFields {
 
     @Inject(method = "isInWater", at = @At("TAIL"), cancellable = true)
     public void mixin$isInWater(CallbackInfoReturnable<Boolean> cir) {
-        var map = ((EntitySavingFields) this).map();
+        var map = ((EntitySavingFields) this).theBoys$map();
         if (map.containsKey("isInWater")) {
             cir.setReturnValue((boolean) map.get("isInWater"));
         }
@@ -115,17 +103,17 @@ public class EntityMixin implements EntitySavingFields {
     }
 
     @Override
-    public void setup(Map<String, Object> map) {
+    public void theBoys$setup(Map<String, Object> map) {
         this.theBoys$map.putAll(map);
     }
 
     @Override
-    public void reset() {
+    public void theBoys$reset() {
         this.theBoys$map.clear();
     }
 
     @Override
-    public Map<String, Object> map() {
+    public Map<String, Object> theBoys$map() {
         return this.theBoys$map;
     }
 

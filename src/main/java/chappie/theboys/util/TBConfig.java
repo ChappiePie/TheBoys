@@ -59,10 +59,12 @@ public class TBConfig {
     public static class Common {
 
         public final ForgeConfigSpec.DoubleValue suitOpacity;
+        public final ForgeConfigSpec.BooleanValue storeAbilities;
 
         Common(ForgeConfigSpec.Builder builder) {
             builder.comment("Common Settings").push("common");
             this.suitOpacity = builder.comment("Change suit opacity on armor").translation("config.theboys.suitOpacity").defineInRange("suitOpacity", 1.0D, 0.0D, 1.0D);
+            this.storeAbilities = builder.comment("Store abilities").translation("config.theboys.storeAbilities").define("storeAbilities", false);
             builder.pop();
         }
 

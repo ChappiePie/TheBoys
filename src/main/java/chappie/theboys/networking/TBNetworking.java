@@ -1,6 +1,5 @@
 package chappie.theboys.networking;
 
-import chappie.modulus.Modulus;
 import chappie.theboys.TheBoys;
 import chappie.theboys.networking.client.ClientSpawnTrail;
 import chappie.theboys.networking.server.ServerSetEyeOptions;
@@ -12,7 +11,7 @@ public class TBNetworking {
     public static void registerClientMessages() {
         ClientPlayNetworking.registerGlobalReceiver(ClientSpawnTrail.PACKET, ClientSpawnTrail::handle);
 
-        Modulus.LOGGER.debug("Registered client network");
+        TheBoys.LOGGER.debug("Registered client network");
     }
 
     public static void registerMessages() {

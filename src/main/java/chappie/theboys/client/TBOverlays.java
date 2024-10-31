@@ -241,7 +241,7 @@ public class TBOverlays {
                     RenderSystem.disableDepthTest();
                     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
-                    TBClientUtil.renderTextureOverlay(TBClientUtil.GLOW_EYES_OVERLAY, client.getWindow().getGuiScaledHeight(), client.getWindow().getGuiScaledWidth(), red, green, blue, alpha);
+                    ClientUtil.renderTextureOverlay(TBClientUtil.GLOW_EYES_OVERLAY, client.getWindow().getGuiScaledHeight(), client.getWindow().getGuiScaledWidth(), red, green, blue, alpha);
                 }
             }
         }
@@ -276,8 +276,8 @@ public class TBOverlays {
     }
 
     public static void clientTick(Minecraft minecraft) {
-        if (!Minecraft.getInstance().isPaused()) {
-            Player player = Minecraft.getInstance().player;
+        if (!minecraft.isPaused()) {
+            Player player = minecraft.player;
             SynthesizerScreen.rollTimer.update();
             SynthesizerScreen.timer.update();
             if (player != null && player.isAlive()) {

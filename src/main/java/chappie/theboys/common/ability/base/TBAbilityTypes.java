@@ -13,10 +13,7 @@ public class TBAbilityTypes {
     public static final AbilityType FOCUS_ON_GOAL = register("focus_on_goal", new AbilityType(FocusOnGoalAbility::new));
     public static final AbilityType FLIGHT = register("flight", new AbilityType(FlightAbility::new));
     public static final AbilityType SUPER_HEARING = register("super_hearing", new AbilityType(SuperHearingAbility::new));
-    public static final AbilityType ATTRIBUTE_MODIFIER = register("attribute_modifier", new AbilityType(AttributeModifierAbility::new));
-    public static final AbilityType DAMAGE_IMMUNITY = register("damage_immunity", new AbilityType(DamageImmunityAbility::new));
     public static final AbilityType TRANSLUCENT = register("translucent", new AbilityType(TranslucentAbility::new));
-    public static final AbilityType DAMAGE_RESISTANCE = register("damage_resistance", new AbilityType(DamageResistanceAbility::new));
 
     public static final AbilityType BRUH = register("bruh", new AbilityType(LightingAbility::new));
 

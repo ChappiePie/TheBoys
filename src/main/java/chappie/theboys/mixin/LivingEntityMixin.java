@@ -1,7 +1,6 @@
 package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
-import chappie.theboys.common.ability.DamageResistanceAbility;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.util.interfaces.EntitySavingFields;
@@ -125,7 +124,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
 
     @Inject(method = "isFallFlying", at = @At("TAIL"), cancellable = true)
     public void mixin$getFallFlying(CallbackInfoReturnable<Boolean> cir) {
-        var map = ((EntitySavingFields) this).map();
+        var map = ((EntitySavingFields) this).theBoys$map();
         if (map.containsKey("isFallFlying")) {
             cir.setReturnValue((boolean) map.get("isFallFlying"));
         }
@@ -133,7 +132,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
 
     @Inject(method = "getSwimAmount", at = @At("TAIL"), cancellable = true)
     public void mixin$getSwimAmount(CallbackInfoReturnable<Float> cir) {
-        var map = ((EntitySavingFields) this).map();
+        var map = ((EntitySavingFields) this).theBoys$map();
         if (map.containsKey("swimAmount")) {
             cir.setReturnValue((float) map.get("swimAmount"));
         }
@@ -141,7 +140,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
 
     @Inject(method = "isVisuallySwimming", at = @At("TAIL"), cancellable = true)
     public void mixin$isVisuallySwimming(CallbackInfoReturnable<Boolean> cir) {
-        var map = ((EntitySavingFields) this).map();
+        var map = ((EntitySavingFields) this).theBoys$map();
         if (map.containsKey("isVisuallySwimming")) {
             cir.setReturnValue((boolean) map.get("isVisuallySwimming"));
         }
@@ -149,19 +148,9 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
 
     @Inject(method = "getFallFlyingTicks", at = @At("TAIL"), cancellable = true)
     public void mixin$getFallFlyingTicks(CallbackInfoReturnable<Integer> cir) {
-        var map = ((EntitySavingFields) this).map();
+        var map = ((EntitySavingFields) this).theBoys$map();
         if (map.containsKey("fallFlyingTicks")) {
             cir.setReturnValue((int) map.get("fallFlyingTicks"));
-        }
-    }
-
-    @Inject(method = "getDamageAfterMagicAbsorb", at = @At("RETURN"), cancellable = true)
-    public void mixin$getDamageAfterMagicAbsorb(DamageSource damageSource, float damageAmount, CallbackInfoReturnable<Float> cir) {
-        LivingEntity entity = (LivingEntity) (Object) this;
-        for (DamageResistanceAbility a : CommonUtil.listOfType(DamageResistanceAbility.class, CommonUtil.getAbilities(entity))) {
-            if (a.isEnabled()) {
-                cir.setReturnValue(damageAmount * (1.0F / a.dataManager.get(DamageResistanceAbility.AMPLIFIER)));
-            }
         }
     }
 }
