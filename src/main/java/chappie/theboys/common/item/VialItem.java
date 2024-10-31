@@ -1,8 +1,13 @@
 package chappie.theboys.common.item;
 
+import chappie.modulus.common.ability.base.Superpower;
 import chappie.theboys.client.renderer.VialRenderer;
+import chappie.theboys.common.ability.base.TBSuperpower;
+import chappie.theboys.util.tooltip.SuperpowerTooltip;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -12,6 +17,7 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -26,11 +32,12 @@ public class VialItem extends Item implements GeoItem {
 
     public static int getColor(CompoundTag tag) {
         if (tag != null) {
-            if (tag.contains("color", 99)) {
-                return tag.getInt("color");
-            }
-            if (tag.getBoolean("compoundV")) {
-                return 104166;
+            if (tag.contains("superpower")) {
+                String superpower = tag.getString("superpower");
+                if (superpower.equals("compoundV")) {
+                    return 104166;
+                }
+                return superpower.hashCode();
             }
         }
         return -1;
@@ -38,25 +45,8 @@ public class VialItem extends Item implements GeoItem {
 
     public static ItemStack compoundV() {
         ItemStack pStack = TBItems.VIAL.getDefaultInstance();
-        pStack.getOrCreateTag().putBoolean("compoundV", true);
+        pStack.getOrCreateTag().putString("superpower", "compoundV");
         return pStack;
-    }
-
-    public boolean hasCustomColor(ItemStack pStack) {
-        CompoundTag compoundtag = pStack.getTag();
-        return compoundtag != null && compoundtag.contains("color", 99);
-    }
-
-    public void clearColor(ItemStack pStack) {
-        CompoundTag compoundtag = pStack.getTag();
-        if (compoundtag != null && compoundtag.contains("color")) {
-            compoundtag.remove("color");
-        }
-
-    }
-
-    public void setColor(ItemStack pStack, int pColor) {
-        pStack.getOrCreateTag().putInt("color", pColor);
     }
 
     public int getColor(ItemStack pStack) {
@@ -65,7 +55,21 @@ public class VialItem extends Item implements GeoItem {
 
     @Override
     public String getDescriptionId(ItemStack stack) {
-        return stack.getTag() != null && stack.getTag().contains("compoundV") ? "injection.theboys.compound_v" : super.getDescriptionId(stack);
+        return stack.getTag() != null && stack.getTag().contains("superpower") && stack.getTag().getString("superpower").equals("compoundV") ? "injection.theboys.compound_v" : super.getDescriptionId(stack);
+    }
+
+    @Override
+    public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+        if (stack.getTag() != null && stack.getTag().contains("superpower")) {
+            String sup = stack.getTag().getString("superpower");
+            if (!sup.equals("compoundV")) {
+                Superpower superpower = Superpower.REGISTRY.get(new ResourceLocation(sup));
+                if (superpower instanceof TBSuperpower tbs) {
+                    return Optional.of(new SuperpowerTooltip(tbs));
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

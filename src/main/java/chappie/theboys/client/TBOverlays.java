@@ -96,7 +96,7 @@ public class TBOverlays {
             guiGraphics.setColor(1, 1, 1, f1);
             guiGraphics.fill(x, y, x + 22, y + 22, color);
             RenderSystem.enableBlend();
-            power.renderIcon(x + 3, y + 3, f1, mc, gui, guiGraphics, partialTick, width, height);
+            power.renderIcon(x + 3, y + 3, f1, mc, guiGraphics, partialTick);
             //guiGraphics.blit(TEXTURE, x + 3, y + 3, 0, 128, 16, 16, 256, 256);
 
             poseStack.pushPose();

@@ -14,6 +14,8 @@ import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.tooltip.ArmorTooltip;
 import chappie.theboys.util.tooltip.ClientArmorTooltip;
+import chappie.theboys.util.tooltip.ClientSuperpowerTooltip;
+import chappie.theboys.util.tooltip.SuperpowerTooltip;
 import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
@@ -29,9 +31,8 @@ public class TheBoys implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
     static {
-        ChappModListWidget.MOD_CLICKED.put(MODID, (e) -> {
-            Minecraft.getInstance().setScreen(new EyeOptionsScreen(e.parent));
-        });
+        ChappModListWidget.MOD_CLICKED.put(MODID, (e) ->
+                Minecraft.getInstance().setScreen(new EyeOptionsScreen(e.parent)));
     }
 
     public static ResourceLocation id(String id) {
@@ -57,6 +58,9 @@ public class TheBoys implements ModInitializer {
         TooltipComponentCallback.EVENT.register(tooltip -> {
             if (tooltip instanceof ArmorTooltip) {
                 return new ClientArmorTooltip((ArmorTooltip) tooltip);
+            }
+            if (tooltip instanceof SuperpowerTooltip) {
+                return new ClientSuperpowerTooltip((SuperpowerTooltip) tooltip);
             }
             return null;
         });

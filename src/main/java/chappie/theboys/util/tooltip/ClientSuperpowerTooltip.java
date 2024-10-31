@@ -1,49 +1,51 @@
 package chappie.theboys.util.tooltip;
 
+import chappie.modulus.util.ClientUtil;
+import chappie.theboys.common.ability.base.TBSuperpower;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 
-public class ClientArmorTooltip implements ClientTooltipComponent {
+public class ClientSuperpowerTooltip implements ClientTooltipComponent {
     private static final ResourceLocation SLOT_SPRITE = new ResourceLocation("container/bundle/slot");
-    private final ItemStack itemStack;
+    private final TBSuperpower superpower;
 
-    public ClientArmorTooltip(ArmorTooltip tooltip) {
-        this.itemStack = tooltip.itemStack();
+    public ClientSuperpowerTooltip(SuperpowerTooltip tooltip) {
+        this.superpower = tooltip.superpower();
     }
 
     @Override
     public int getHeight() {
-        return this.gridSizeY() * 18;
+        return this.gridSizeY() * 22;
     }
 
     @Override
     public int getWidth(Font pFont) {
-        return this.gridSizeX() * 20 + pFont.width(this.itemStack.getHoverName().getString()) + 2;
+        return this.gridSizeX() * 20 + pFont.width(this.superpower.getDisplayName().getString()) + 2;
     }
 
     @Override
     public void renderImage(Font pFont, int pX, int pY, GuiGraphics pGuiGraphics) {
         int i = this.gridSizeX();
         int j = this.gridSizeY();
-        int k = 0;
 
         for (int l = 0; l < j; ++l) {
             for (int i1 = 0; i1 < i; ++i1) {
                 int j1 = pX + i1 * 18 + 1;
                 int k1 = pY + l * 20 + 1;
-                this.renderSlot(j1, k1, k++, pFont, pGuiGraphics);
+                this.renderSlot(j1, k1, pFont, pGuiGraphics);
             }
         }
     }
 
-    private void renderSlot(int pX, int pY, int pItemIndex, Font pFont, GuiGraphics guiGraphics) {
-        guiGraphics.renderItem(this.itemStack, pX + 1, pY + 1, pItemIndex);
+    private void renderSlot(int pX, int pY, Font pFont, GuiGraphics guiGraphics) {
         guiGraphics.blitSprite(SLOT_SPRITE, pX, pY, 0, 18, 20);
-        guiGraphics.drawString(pFont, this.itemStack.getHoverName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
-        guiGraphics.renderItemDecorations(pFont, this.itemStack, pX + 1, pY + 1);
+        guiGraphics.drawString(pFont, this.superpower.getDisplayName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
+        RenderSystem.enableBlend();
+        this.superpower.renderIcon(pX + 1, pY + 1, 1, Minecraft.getInstance(), guiGraphics, ClientUtil.getPartialTick());
     }
 
     private int gridSizeX() {

@@ -363,10 +363,9 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
                         resultItem = VialItem.compoundV();
                     }
                 } else {
-                    int i1 = level.random.nextInt(100);
-                    if (i1 <= 25) {
+                    if (level.random.nextInt(100) <= 25) {
                         resultItem = VialItem.compoundV();
-                    } else if (i1 <= 40) {
+                    } else if (level.random.nextInt(100) <= 40) {
                         resultItem = PotionUtils.setPotion(new ItemStack(Items.POTION), BuiltInRegistries.POTION.stream().filter(p -> BuiltInRegistries.POTION.getKey(p).getNamespace().equals("minecraft") && !p.getEffects().isEmpty()).findAny().get());
                     }
                 }

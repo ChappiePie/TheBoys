@@ -22,6 +22,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -33,7 +35,7 @@ public class SynthesizerBlock extends BaseEntityBlock {
     protected static final VoxelShape AABB = Block.box(0.0, 0.0, 0.0, 16.0, 9.0, 16.0);
 
     public SynthesizerBlock(Properties properties) {
-        super(properties.noOcclusion());
+        super(properties.noOcclusion().mapColor(MapColor.RAW_IRON).instrument(NoteBlockInstrument.BASEDRUM).strength(5.0F, 6.0F));
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
