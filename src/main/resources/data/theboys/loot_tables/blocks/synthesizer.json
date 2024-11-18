@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "the_boys:synthesizer"
+          "name": "theboys:synthesizer"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "the_boys:blocks/synthesizer"
+  "random_sequence": "theboys:blocks/synthesizer"
 }

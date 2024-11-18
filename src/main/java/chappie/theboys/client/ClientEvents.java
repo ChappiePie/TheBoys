@@ -4,6 +4,7 @@ import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
+import chappie.theboys.client.renderer.ClientHeroWithCapeProperties;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.SuperHearingAbility;
@@ -304,5 +305,18 @@ public class ClientEvents {
         }
         poseStack.popPose();
         return canceled;
+    }
+
+    public static boolean capeRender(AbstractClientPlayer player) {
+        ItemStack stack = player.getItemBySlot(EquipmentSlot.CHEST);
+        if (!stack.isEmpty() && stack.getItem() instanceof ArmorItem && stack.getTag() != null) {
+            if (stack.getTag().contains("Suit")) {
+                CompoundTag tag = stack.getOrCreateTag().getCompound("Suit");
+                if (ItemStack.of(tag.getCompound("Tags")).getItem() instanceof SuitItem item) {
+                    return !(item.getClientSuitProperties() instanceof ClientHeroWithCapeProperties);
+                }
+            }
+        }
+        return true;
     }
 }

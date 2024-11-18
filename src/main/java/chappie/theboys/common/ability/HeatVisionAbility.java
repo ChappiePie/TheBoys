@@ -18,7 +18,6 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -91,7 +90,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
         super.initializeClient(consumer);
         consumer.accept(new AbilityClientProperties() {
             @Override
-            public void render(EntityRendererProvider.Context context, LivingEntityRenderer<? extends LivingEntity, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
+            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!modelProperties.root().hasChild("head")) return;
                 Color color = dataManager.get(TBCommonUtil.COLOR);
                 float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
@@ -137,10 +136,10 @@ public class HeatVisionAbility extends GlowEyesAbility {
         hitResult.getEntity().setSecondsOnFire((int) (strength * 5));
         hitResult.getEntity().hurt(this.entity.damageSources().mobAttack(entity), strength * 2F);
 
-        TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
+        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
                 true, hitResult.getLocation(), Vec3.ZERO, 0.05F, 4);
 
-        TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
+        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
                 ParticleTypes.SMOKE, true, hitResult.getLocation(),
                 new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.15F, 10);
     }
@@ -172,10 +171,10 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 }
             }
         }
-        TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
+        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
                 true, hitResult.getLocation(), this.entity.getViewVector(0).multiply(0.25, 0, 0.25), 0.001F, 4);
 
-        TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
+        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
                 ParticleTypes.SMOKE, true, hitResult.getLocation(),
                 new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.05F, 10);
     }

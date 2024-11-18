@@ -7,7 +7,6 @@ import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.data.DataAccessor;
 import chappie.modulus.util.events.SetupAnimCallback;
-import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
@@ -23,6 +22,8 @@ public class FlightAbility extends Ability implements IHasTimer {
     public static final DataAccessor<Float> SPRINT_SPEED = new DataAccessor<>("sprint_speed", DataAccessor.DataSerializer.FLOAT);
     public static final DataAccessor<Float> SPEED = new DataAccessor<>("speed", DataAccessor.DataSerializer.FLOAT);
     public static final DataAccessor<Boolean> BREAK_BLOCKS = new DataAccessor<>("break_blocks", DataAccessor.DataSerializer.BOOLEAN);
+
+    public static final DataAccessor<Boolean> BOOSTING = new DataAccessor<>("boosting", DataAccessor.DataSerializer.BOOLEAN);
 
     public static final DataAccessor<Boolean> SPRINTING = new DataAccessor<>("sprinting", DataAccessor.DataSerializer.BOOLEAN);
     public static final DataAccessor<Boolean> ARM_AHEAD = new DataAccessor<>("arm_ahead", DataAccessor.DataSerializer.BOOLEAN);
@@ -45,6 +46,7 @@ public class FlightAbility extends Ability implements IHasTimer {
         this.dataManager.define(SPEED, 1.0F);
         this.dataManager.define(SPRINT_SPEED, 2.0F);
         this.dataManager.define(BREAK_BLOCKS, true);
+        this.dataManager.define(BOOSTING, false);
 
         this.dataManager.define(SPRINTING, false, false);
         this.dataManager.define(ARM_AHEAD, false, false);
@@ -66,7 +68,6 @@ public class FlightAbility extends Ability implements IHasTimer {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-
         if (enabled) {
             if (entity.getCommandSenderWorld().isClientSide) {
                 float f = entity.zza;
@@ -78,35 +79,31 @@ public class FlightAbility extends Ability implements IHasTimer {
                     this.dataManager.setFromClient(FORWARD_IMPULSE, Math.round(f));
                 }
             }
-            boolean sprinting = this.dataManager.get(SPRINTING);
+            boolean sprinting = this.dataManager.get(SPRINTING) || entity.isSprinting();
+            if (!sprinting || this.dataManager.get(FORWARD_IMPULSE) <= 0) {
+                this.dataManager.set(BOOSTING, false);
+            }
             if (!(entity instanceof Player) && this.enabledTicks == 0) {
                 entity.setDeltaMovement(entity.getDeltaMovement().add(0, 0.4, 0));
             }
 
             float speed = sprinting ? this.dataManager.get(SPRINT_SPEED) : this.dataManager.get(SPEED);
-            if (this.cooldown.end()) {
-                if (this.conditionManager.test("boost")) {
-                    this.cooldown.start(60);
-                    TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.EXPLOSION,
-                            true, this.entity.position(), Vec3.ZERO, 1, 10);
-
-                }
-            } else {
-                speed += this.cooldown.value(1) * 4F;
-                if (sprinting) {
-                    TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.CLOUD,
-                            true, this.entity.position(), Vec3.ZERO, 0.05F, 10);
-                }
-            }
             Vec3 vec3;
             if (sprinting) {
+                if (this.cooldown.end()) {
+                    if (this.conditionManager.test("boost")) {
+                        this.cooldown.start(60);
+                        this.dataManager.set(BOOSTING, true);
+                        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.EXPLOSION,
+                                true, this.entity.position(), Vec3.ZERO, 1, 10);
+                    }
+                }
+                if (this.dataManager.get(BOOSTING)) {
+                    speed += this.cooldown.value(1) * 4F;
+                    CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.CLOUD,
+                            true, this.entity.position(), Vec3.ZERO, 0.05F, 10);
+                }
                 vec3 = entity.getDeltaMovement().scale(0.25F).add(entity.getLookAngle().scale(speed));
-                /*if (this.conditionManager.test("boost")) {
-                    vec3 = vec3.add(entity.getLookAngle().scale(20F));
-                    TBCommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.CAMPFIRE_COSY_SMOKE,
-                            true, this.entity.position(), Vec3.ZERO, 0.05F, 20);
-                    this.entity.playSound(SoundEvents.ENDER_PEARL_THROW, 1, 1);
-                }*/
             } else {
                 vec3 = entity.getDeltaMovement().multiply(1.05, 0.1F, 1.05); // slight sliding effect
                 vec3 = vec3.add(0, Math.sin(entity.tickCount / 10F) / 50F, 0); // hover
@@ -114,6 +111,8 @@ public class FlightAbility extends Ability implements IHasTimer {
             }
             entity.setDeltaMovement(vec3);
             entity.fallDistance = 0.0F;
+        } else {
+            this.dataManager.set(BOOSTING, false);
         }
     }
 

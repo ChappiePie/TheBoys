@@ -14,6 +14,7 @@ public class TBAbilityTypes {
     public static final AbilityType FLIGHT = register("flight", new AbilityType(FlightAbility::new));
     public static final AbilityType SUPER_HEARING = register("super_hearing", new AbilityType(SuperHearingAbility::new));
     public static final AbilityType TRANSLUCENT = register("translucent", new AbilityType(TranslucentAbility::new));
+    public static final AbilityType ENERGY_CHARGING = register("energy_charging", new AbilityType(EnergyChargingAbility::new));
 
     public static final AbilityType BRUH = register("bruh", new AbilityType(LightingAbility::new));
 

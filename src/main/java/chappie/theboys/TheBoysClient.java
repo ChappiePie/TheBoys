@@ -26,6 +26,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -47,6 +48,7 @@ public class TheBoysClient implements ClientModInitializer {
                 EyeOptionsScreen.updateData();
             }
         });
+        LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(ClientEvents::capeRender);
         SetupAnimCallback.EVENT.register(ClientEvents::setupAnim);
         FirstPersonAdditionalHandCallback.EVENT.register(ClientEvents::firstPersonAdditionalHand);
         ClientTickEvents.END_CLIENT_TICK.register(TBOverlays::clientTick);

@@ -111,7 +111,7 @@ public class TBOverlays {
         }
 
         // Abilities icons and text
-        if (f1 != 1) {
+        if (f1 != 1 && size != 0) {
             poseStack.pushPose();
 
             int type = 0;
@@ -155,13 +155,18 @@ public class TBOverlays {
                 float a = f2;
                 {
                     int cBack = iHasOverlay.getBackgroundColor();
-                    float r = FastColor.ABGR32.red(cBack) / 255F;
-                    float g = FastColor.ABGR32.green(cBack) / 255F;
-                    float b = FastColor.ABGR32.blue(cBack) / 255F;
+                    float r = FastColor.ARGB32.red(cBack) / 255F;
+                    float g = FastColor.ARGB32.green(cBack) / 255F;
+                    float b = FastColor.ARGB32.blue(cBack) / 255F;
 
-                    guiGraphics.setColor(r, g, b, a);
+                    guiGraphics.setColor(r, g, b, !ability.isEnabled() ? 0.25F : 0.75F);
                     RenderSystem.enableBlend();
                     guiGraphics.blit(TEXTURE, texX + 3, texY + 3, 0, 0, 16, 16, 256, 256);
+
+                    guiGraphics.setColor(1, 1, 1, a);
+                    if (ability.isEnabled()) {
+                        guiGraphics.blit(TEXTURE, texX + 2, texY + 2, 0, 16, 18, 18, 256, 256);
+                    }
                     guiGraphics.setColor(1, 1, 1, a);
                 }
 

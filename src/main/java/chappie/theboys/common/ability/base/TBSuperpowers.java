@@ -31,7 +31,7 @@ public class TBSuperpowers {
                             k -> k.keyType(KeyMap.KeyType.MOUSE_RIGHT).action(KeyCondition.Action.HELD))
                     .change(TBCommonUtil.COLOR, Color.RED)
                     .additionalData(a -> new IHasOverlay(a,
-                            (b) -> b.uOffset(48).backgroundColor(() -> a.conditionManager.test("eyes") ? 16711680 : -1)
+                            (b) -> b.uOffset(48).backgroundColor(() -> a.conditionManager.test("eyes") ? 0xFF637F : -1)
                                     .keyType(() -> !a.conditionManager.test("eyes") ?
                                             KeyMap.KeyType.FIRST : KeyMap.KeyType.MOUSE_RIGHT))
                     ),
@@ -100,24 +100,28 @@ public class TBSuperpowers {
             AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
     ));
 
-    public static final Superpower STARLIGHT = register("starlight", new TBSuperpower(
-            AbilityBuilder.of("lasers", TBAbilityTypes.GLOW_EYES).condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD)).change(TBCommonUtil.COLOR, Color.YELLOW),
-            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
-    ));
-
-    public static final Superpower TEST = register("test", new TBSuperpower(
-            AbilityBuilder.of("speed", TBAbilityTypes.SPEED).change(TBCommonUtil.COLOR, Color.RED)
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling"),
-            AbilityBuilder.of("lasers", TBAbilityTypes.HEAT_VISION).change(TBCommonUtil.COLOR, Color.BLUE)
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.HELD), "enabling"),
-
-            AbilityBuilder.of("bruh", TBAbilityTypes.BRUH)
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD)
-                            .action(KeyCondition.Action.HELD), "enabling")
-    ));
+//    public static final Superpower STARLIGHT = register("starlight", new TBSuperpower(
+//            AbilityBuilder.of("lasers", TBAbilityTypes.GLOW_EYES)
+//                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling")
+//                    .change(TBCommonUtil.COLOR, Color.YELLOW),
+//            AbilityBuilder.of("energy_charging", TBAbilityTypes.ENERGY_CHARGING)
+//                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
+//            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
+//            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
+//            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
+//            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
+//    ));
+//
+//    public static final Superpower TEST = register("test", new TBSuperpower(
+//            AbilityBuilder.of("speed", TBAbilityTypes.SPEED).change(TBCommonUtil.COLOR, Color.RED)
+//                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling"),
+//            AbilityBuilder.of("lasers", TBAbilityTypes.HEAT_VISION).change(TBCommonUtil.COLOR, Color.BLUE)
+//                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.HELD), "enabling"),
+//
+//            AbilityBuilder.of("bruh", TBAbilityTypes.BRUH)
+//                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD)
+//                            .action(KeyCondition.Action.HELD), "enabling")
+//    ));
 
     public static <T extends TBSuperpower> T register(String id, T item) {
         return Registry.register(Superpower.REGISTRY, TheBoys.id(id), item);
