@@ -2,13 +2,5 @@
 	"parent": "minecraft:item/handheld",
 	"textures": {
 		"layer0": "theboys:item/syringe/2d"
-	},
-	"overrides": [
-		{
-			"predicate": {
-				"theboys:has_vial": 1
-			},
-			"model": "theboys:item/syringe_vial"
-		}
-	]
+	}
 }

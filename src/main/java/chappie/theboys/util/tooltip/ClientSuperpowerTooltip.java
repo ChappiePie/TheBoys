@@ -7,10 +7,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 public class ClientSuperpowerTooltip implements ClientTooltipComponent {
-    private static final ResourceLocation SLOT_SPRITE = new ResourceLocation("container/bundle/slot");
+    private static final ResourceLocation SLOT_SPRITE = ResourceLocation.withDefaultNamespace("container/bundle/slot");
     private final TBSuperpower superpower;
 
     public ClientSuperpowerTooltip(SuperpowerTooltip tooltip) {
@@ -18,7 +19,7 @@ public class ClientSuperpowerTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(Font font) {
         return this.gridSizeY() * 22;
     }
 
@@ -28,7 +29,7 @@ public class ClientSuperpowerTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public void renderImage(Font pFont, int pX, int pY, GuiGraphics pGuiGraphics) {
+    public void renderImage(Font pFont, int pX, int pY, int width, int height, GuiGraphics pGuiGraphics) {
         int i = this.gridSizeX();
         int j = this.gridSizeY();
 
@@ -42,7 +43,7 @@ public class ClientSuperpowerTooltip implements ClientTooltipComponent {
     }
 
     private void renderSlot(int pX, int pY, Font pFont, GuiGraphics guiGraphics) {
-        guiGraphics.blitSprite(SLOT_SPRITE, pX, pY, 0, 18, 20);
+        guiGraphics.blitSprite(RenderType::guiTextured, SLOT_SPRITE, pX, pY, 0, 18, 20);
         guiGraphics.drawString(pFont, this.superpower.getDisplayName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
         RenderSystem.enableBlend();
         this.superpower.renderIcon(pX + 1, pY + 1, 1, Minecraft.getInstance(), guiGraphics, ClientUtil.getPartialTick());

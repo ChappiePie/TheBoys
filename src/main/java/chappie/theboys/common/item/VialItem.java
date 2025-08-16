@@ -3,70 +3,63 @@ package chappie.theboys.common.item;
 import chappie.modulus.common.ability.base.Superpower;
 import chappie.theboys.client.renderer.VialRenderer;
 import chappie.theboys.common.ability.base.TBSuperpower;
+import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.tooltip.SuperpowerTooltip;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
-import software.bernie.geckolib.animatable.client.RenderProvider;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class VialItem extends Item implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
 
-    public VialItem() {
-        super(new Properties().stacksTo(64));
+    public VialItem(Properties properties) {
+        super(properties.stacksTo(64));
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
-    public static int getColor(CompoundTag tag) {
-        if (tag != null) {
-            if (tag.contains("superpower")) {
-                String superpower = tag.getString("superpower");
-                if (superpower.equals("compoundV")) {
-                    return 104166;
-                }
-                return superpower.hashCode();
+    public static int getColor(ItemStack stack) {
+        String superpower = stack.getOrDefault(TBDataComponents.SUPERPOWER, "");
+        if (!superpower.isEmpty()) {
+            if (superpower.equals("compoundV")) {
+                return 104166;
             }
+            return superpower.hashCode();
         }
         return -1;
     }
 
     public static ItemStack compoundV() {
         ItemStack pStack = TBItems.VIAL.getDefaultInstance();
-        pStack.getOrCreateTag().putString("superpower", "compoundV");
+        pStack.set(TBDataComponents.SUPERPOWER, "compoundV");
         return pStack;
     }
 
-    public int getColor(ItemStack pStack) {
-        return VialItem.getColor(pStack.getTag());
-    }
-
     @Override
-    public String getDescriptionId(ItemStack stack) {
-        return stack.getTag() != null && stack.getTag().contains("superpower") && stack.getTag().getString("superpower").equals("compoundV") ? "injection.theboys.compound_v" : super.getDescriptionId(stack);
+    public Component getName(ItemStack stack) {
+        return Objects.equals(stack.getOrDefault(TBDataComponents.SUPERPOWER, ""), "compoundV") ? Component.literal("injection.theboys.compound_v") : super.getName(stack);
     }
 
     @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        if (stack.getTag() != null && stack.getTag().contains("superpower")) {
-            String sup = stack.getTag().getString("superpower");
-            if (!sup.equals("compoundV")) {
-                Superpower superpower = Superpower.REGISTRY.get(new ResourceLocation(sup));
-                if (superpower instanceof TBSuperpower tbs) {
-                    return Optional.of(new SuperpowerTooltip(tbs));
-                }
+        String superpower = stack.getOrDefault(TBDataComponents.SUPERPOWER, "");
+        if (!superpower.isEmpty() && !superpower.equals("compoundV")) {
+            Superpower sup = Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower)).get().value();
+            if (sup instanceof TBSuperpower tbs) {
+                return Optional.of(new SuperpowerTooltip(tbs));
             }
         }
         return Optional.empty();
@@ -83,22 +76,18 @@ public class VialItem extends Item implements GeoItem {
     }
 
     @Override
-    public void createRenderer(Consumer<Object> consumer) {
-        consumer.accept(new RenderProvider() {
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        GeoItem.super.createGeoRenderer(consumer);
+        consumer.accept(new GeoRenderProvider() {
             private VialRenderer renderer;
 
             @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+            public @Nullable GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new VialRenderer();
 
                 return this.renderer;
             }
         });
-    }
-
-    @Override
-    public Supplier<Object> getRenderProvider() {
-        return renderProvider;
     }
 }

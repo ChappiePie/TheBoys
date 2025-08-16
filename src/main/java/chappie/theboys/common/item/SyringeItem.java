@@ -5,15 +5,15 @@ import chappie.modulus.common.capability.PowerCap;
 import chappie.theboys.TheBoys;
 import chappie.theboys.client.renderer.SyringeRenderer;
 import chappie.theboys.common.capability.TheBoysCap;
+import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.TBConfig;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -23,44 +23,46 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
-import software.bernie.geckolib.animatable.client.RenderProvider;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class SyringeItem extends Item implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
 
-    public SyringeItem() {
-        super(new Item.Properties().stacksTo(1));
+    public SyringeItem(Properties properties) {
+        super(properties.stacksTo(1));
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
-    public int getColor(ItemStack pStack) {
-        CompoundTag compoundtag = pStack.getTag();
-        return compoundtag != null ? VialItem.getColor(compoundtag.getCompound("vial").getCompound("tag")) : -1;
+    public static int getColor(ItemStack pStack) {
+        ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
+        return !vial.isEmpty() ? VialItem.getColor(vial) : -1;
     }
 
     @Override
-    public int getUseDuration(ItemStack pStack) {
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
         return 30;
     }
 
     private String vialSuperpower(ItemStack pStack) {
-        if (pStack.getTag() != null && pStack.getTag().contains("vial")) {
-            return pStack.getTag().getCompound("vial").getCompound("tag").getString("superpower");
+        ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
+        if (!vial.isEmpty()) {
+            return vial.getOrDefault(TBDataComponents.SUPERPOWER, "");
         }
         return "";
     }
 
     private boolean hasSuperpower(ItemStack pStack) {
-        return pStack.getTag() != null && pStack.getTag().contains("vial") && pStack.getTag().getCompound("vial").getCompound("tag").contains("superpower");
+        ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
+        return !vial.isEmpty() && !vial.getOrDefault(TBDataComponents.SUPERPOWER, "").isEmpty();
     }
 
     @Override
@@ -68,29 +70,26 @@ public class SyringeItem extends Item implements GeoItem {
         if (pLivingEntity instanceof Player player && !pLevel.isClientSide()) {
             PowerCap cap = PowerCap.getCap(player);
             boolean b = false;
-            if (cap != null && pStack.hasTag()) {
-                player.getCooldowns().addCooldown(this, 20);
-                CompoundTag vialTag = pStack.getOrCreateTag().getCompound("vial");
+            ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
+            if (cap != null && !vial.isEmpty()) {
+                player.getCooldowns().addCooldown(pStack, 20);
                 if (this.hasSuperpower(pStack) && cap.getSuperpower() == null) {
                     if (this.vialSuperpower(pStack).equals("compoundV")) {
                         var superpowers = Superpower.REGISTRY.stream().filter(p -> Superpower.REGISTRY.getKey(p).getNamespace().equals(TheBoys.MODID)).toList();
                         cap.setSuperpower(superpowers.get(player.getRandom().nextInt(superpowers.size())));
                     } else {
-                        cap.setSuperpower(Superpower.REGISTRY.get(new ResourceLocation(vialTag.getCompound("tag").getString("superpower"))));
+                        cap.setSuperpower(Superpower.REGISTRY.get(ResourceLocation.tryParse(vial.getOrDefault(TBDataComponents.SUPERPOWER, ""))).get().value());
                     }
                     if (!player.getAbilities().instabuild) {
-                        vialTag.getCompound("tag").remove("superpower");
+                        pStack.set(TBDataComponents.VIAL, ItemStack.EMPTY);
                         b = true;
                     }
                 } else {
-                    if (!vialTag.contains("tag")) {
-                        vialTag.put("tag", new CompoundTag());
-                    }
-                    if (!vialTag.getCompound("tag").contains("superpower")) {
+                    if (vial.getOrDefault(TBDataComponents.SUPERPOWER, "").isEmpty()) {
                         if (TBConfig.COMMON.storeAbilities.get() || player.getAbilities().instabuild) {
-                            vialTag.getCompound("tag").putString("superpower", Superpower.REGISTRY.getKey(cap.getSuperpower()).toString());
+                            vial.set(TBDataComponents.SUPERPOWER, Superpower.REGISTRY.getKey(cap.getSuperpower()).toString());
                         } else {
-                            vialTag.getCompound("tag").putString("superpower", "compoundV");
+                            vial.set(TBDataComponents.SUPERPOWER, "compoundV");
                         }
                         cap.setSuperpower(null);
                         b = true;
@@ -98,15 +97,16 @@ public class SyringeItem extends Item implements GeoItem {
                         if (this.vialSuperpower(pStack).equals("compoundV")) {
                             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 3, false, true, true));
                             if (!player.getAbilities().instabuild) {
-                                vialTag.getCompound("tag").remove("superpower");
+                                vial.set(TBDataComponents.SUPERPOWER, "");
                             }
                         }
                     }
+                    pStack.set(TBDataComponents.VIAL, vial);
                 }
                 if (player.getRandom().nextBoolean() && b) {
                     var effects = BuiltInRegistries.MOB_EFFECT.stream().filter(p -> BuiltInRegistries.MOB_EFFECT.getKey(p).getNamespace().equals("minecraft") && p.getCategory().equals(MobEffectCategory.HARMFUL)).toList();
                     var mobEffect = effects.get(player.getRandom().nextInt(effects.size()));
-                    player.addEffect(new MobEffectInstance(mobEffect, 200, 3, false, true, true));
+                    player.addEffect(new MobEffectInstance(Holder.direct(mobEffect), 200, 3, false, true, true));
                 }
             }
         }
@@ -114,17 +114,18 @@ public class SyringeItem extends Item implements GeoItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+    public InteractionResult use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack mainHandItem = pPlayer.getMainHandItem();
         ItemStack offHandItem = pPlayer.getOffhandItem();
         PowerCap cap = PowerCap.getCap(pPlayer);
         TheBoysCap boysCap = TheBoysCap.getCap(pPlayer);
         if (boysCap != null && cap != null && pHand == InteractionHand.MAIN_HAND) {
-            if (mainHandItem.getTag() != null && mainHandItem.getTag().contains("vial")) {
+            ItemStack vial = mainHandItem.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
+            if (!vial.isEmpty()) {
                 if (offHandItem.isEmpty()) {
                     if (pPlayer.isCrouching()) {
                         boysCap.vialAnim.triggerAnim(true, true);
-                        return InteractionResultHolder.pass(pPlayer.getItemInHand(pHand));
+                        return InteractionResult.PASS;
                     }
 
                     if (boysCap.vialAnim.timeline.value(1) == 0) {
@@ -165,11 +166,11 @@ public class SyringeItem extends Item implements GeoItem {
             }
         }
 
-        return InteractionResultHolder.pass(pPlayer.getItemInHand(pHand));
+        return InteractionResult.PASS;
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
 
     }
 
@@ -179,22 +180,18 @@ public class SyringeItem extends Item implements GeoItem {
     }
 
     @Override
-    public void createRenderer(Consumer<Object> consumer) {
-        consumer.accept(new RenderProvider() {
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        GeoItem.super.createGeoRenderer(consumer);
+        consumer.accept(new GeoRenderProvider() {
             private SyringeRenderer renderer;
 
             @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+            public @Nullable GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new SyringeRenderer();
 
                 return this.renderer;
             }
         });
-    }
-
-    @Override
-    public Supplier<Object> getRenderProvider() {
-        return renderProvider;
     }
 }

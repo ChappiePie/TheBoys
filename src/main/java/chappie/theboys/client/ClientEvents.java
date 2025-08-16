@@ -10,6 +10,7 @@ import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.TBItems;
+import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.item.suit.SuitItem;
 import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.interfaces.ISimpleSoundInstance;
@@ -24,9 +25,9 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -147,16 +148,15 @@ public class ClientEvents {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.isArmor()) {
                 ItemStack stack = event.entity().getItemBySlot(slot);
-                if (stack.getItem() instanceof ArmorItem && stack.getOrCreateTag().contains("Suit")) {
-                    CompoundTag tag = stack.getOrCreateTag().getCompound("Suit");
-                    ItemStack suitStack = ItemStack.of(tag.getCompound("Tags"));
+                if (stack.getItem() instanceof ArmorItem && !stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).isEmpty()) {
+                    ItemStack suitStack = stack.get(TBDataComponents.SUIT);
                     if (suitStack.getItem() instanceof SuitItem item) {
                         if (event.modelProperties().layers().stream().anyMatch(layer -> layer instanceof HumanoidArmorLayer)) {
-                            Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.entity(), stack);
+                            Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.state(), stack);
                             if (slot == EquipmentSlot.HEAD) {
                                 ClientUtil.modified(event.model().hat).setSize(vec3f);
                             }
-                            if (event.model() instanceof PlayerModel<?> model) {
+                            if (event.model() instanceof PlayerModel model) {
                                 switch (slot) {
                                     case CHEST -> {
                                         ClientUtil.modified(model.jacket).setSize(vec3f);
@@ -307,14 +307,11 @@ public class ClientEvents {
         return canceled;
     }
 
-    public static boolean capeRender(AbstractClientPlayer player) {
-        ItemStack stack = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (!stack.isEmpty() && stack.getItem() instanceof ArmorItem && stack.getTag() != null) {
-            if (stack.getTag().contains("Suit")) {
-                CompoundTag tag = stack.getOrCreateTag().getCompound("Suit");
-                if (ItemStack.of(tag.getCompound("Tags")).getItem() instanceof SuitItem item) {
-                    return !(item.getClientSuitProperties() instanceof ClientHeroWithCapeProperties);
-                }
+    public static boolean capeRender(PlayerRenderState playerRenderState) {
+        ItemStack stack = playerRenderState.chestEquipment;
+        if (!stack.isEmpty() && stack.getItem() instanceof ArmorItem) {
+            if (stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).getItem() instanceof SuitItem item) {
+                return !(item.getClientSuitProperties() instanceof ClientHeroWithCapeProperties);
             }
         }
         return true;

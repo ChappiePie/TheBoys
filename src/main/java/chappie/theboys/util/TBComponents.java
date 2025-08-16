@@ -2,11 +2,11 @@ package chappie.theboys.util;
 
 import chappie.theboys.common.capability.TBEntityCap;
 import chappie.theboys.common.capability.TheBoysCap;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
-import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
+import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 
 public class TBComponents implements EntityComponentInitializer {
     @Override

@@ -16,12 +16,12 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.awt.*;
@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class LightingAbility extends Ability implements IHasTimer {
-    public static final ResourceLocation WHITE = new ResourceLocation(TheBoys.MODID, "textures/models/white.png");
+    public static final ResourceLocation WHITE = ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/models/white.png");
 
     public Timer timer = new Timer(() -> 10, this::isEnabled);
 
@@ -92,7 +92,7 @@ public class LightingAbility extends Ability implements IHasTimer {
             }
 
             @Override
-            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
+            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!(renderer.getModel() instanceof HumanoidModel model)) return;
                 for (int k = 0; k < 2; k++) {
                     poseStack.pushPose();
@@ -141,15 +141,15 @@ public class LightingAbility extends Ability implements IHasTimer {
             }
 
             private void renderQuad(Vec3 from, Vec3 to, float width, float height, PoseStack poseStack, VertexConsumer consumer, float r, float g, float b, float a) {
+                PoseStack.Pose pose = poseStack.last();
                 Matrix4f poseMatrix = poseStack.last().pose();
-                Matrix3f normalMatrix = poseStack.last().normal();
 
                 float halfWidth = width * 0.5f;
                 float halfHeight = height * 0.5f;
-                consumer.vertex(poseMatrix, (float) from.x - halfWidth, (float) from.y - halfHeight, (float) from.z).color(r, g, b, a).uv(0f, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(240).normal(normalMatrix, 0f, 1f, 0f).endVertex();
-                consumer.vertex(poseMatrix, (float) from.x + halfWidth, (float) from.y + halfHeight, (float) from.z).color(r, g, b, a).uv(1f, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(240).normal(normalMatrix, 0f, 1f, 0f).endVertex();
-                consumer.vertex(poseMatrix, (float) to.x + halfWidth, (float) to.y + halfHeight, (float) to.z).color(r, g, b, a).uv(1f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(240).normal(normalMatrix, 0f, 1f, 0f).endVertex();
-                consumer.vertex(poseMatrix, (float) to.x - halfWidth, (float) to.y - halfHeight, (float) to.z).color(r, g, b, a).uv(0f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(240).normal(normalMatrix, 0f, 1f, 0f).endVertex();
+                consumer.addVertex(poseMatrix, (float) from.x - halfWidth, (float) from.y - halfHeight, (float) from.z).setColor(r, g, b, a).setUv(0f, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(240).setNormal(pose, 0f, 1f, 0f);
+                consumer.addVertex(poseMatrix, (float) from.x + halfWidth, (float) from.y + halfHeight, (float) from.z).setColor(r, g, b, a).setUv(1f, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(240).setNormal(pose, 0f, 1f, 0f);
+                consumer.addVertex(poseMatrix, (float) to.x + halfWidth, (float) to.y + halfHeight, (float) to.z).setColor(r, g, b, a).setUv(1f, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(240).setNormal(pose, 0f, 1f, 0f);
+                consumer.addVertex(poseMatrix, (float) to.x - halfWidth, (float) to.y - halfHeight, (float) to.z).setColor(r, g, b, a).setUv(0f, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(240).setNormal(pose, 0f, 1f, 0f);
             }
         });
     }

@@ -8,6 +8,8 @@ import chappie.modulus.util.events.RendererChangeCallback;
 import chappie.theboys.util.TBClientUtil;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.List;
@@ -37,18 +39,19 @@ public class TranslucentAbility extends Ability implements IHasTimer {
         consumer.accept(new AbilityClientProperties() {
 
             @Override
-            public boolean rendererChange(RendererChangeCallback.RendererChangeEvent<? extends LivingEntity, ? extends EntityModel<?>> event) {
+            public boolean rendererChange(RendererChangeCallback.RendererChangeEvent<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<? super LivingEntityRenderState>> event) {
                 return this.alphaChange(event);
             }
 
-            public <T extends LivingEntity> boolean alphaChange(RendererChangeCallback.RendererChangeEvent<T, ? extends EntityModel<T>> event) {
+            @SuppressWarnings("unchecked")
+            public <T extends LivingEntityRenderState> boolean alphaChange(RendererChangeCallback.RendererChangeEvent<? extends LivingEntity, T, ? extends EntityModel<? super LivingEntityRenderState>> event) {
                 AbilityClientProperties.super.rendererChange(event);
                 float alpha = getAlpha(event.modelProperties().partialTicks());
 
                 if (alpha < 1) {
-                    RenderType renderType = TBClientUtil.RenderTypes.entityInvisibility(event.renderer().getTextureLocation(event.getEntity()));
+                    RenderType renderType = TBClientUtil.RenderTypes.entityInvisibility(event.renderer().getTextureLocation((T) event.modelProperties().renderstate()));
                     event.renderer().getModel().renderToBuffer(event.poseStack(), event.multiBufferSource().getBuffer(renderType),
-                            event.packedLight(), event.packedOverlay(), event.red(), event.green(), event.blue(), event.alpha() * alpha);
+                            event.packedLight(), event.packedOverlay(), ARGB.colorFromFloat(event.alpha() * alpha, event.red(), event.green(), event.blue()));
                     return true;
                 }
                 return false;

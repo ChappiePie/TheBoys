@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -31,6 +32,9 @@ public class MinecraftMixin implements ISetupGameProfiles {
     @Shadow
     @Final
     private YggdrasilAuthenticationService authenticationService;
+
+    @Unique
+    private boolean theBoys$initialized = false;
 
     @Inject(method = "shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z", at = @At("RETURN"), cancellable = true)
     public void mixin$isCurrentlyGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir) {
@@ -48,11 +52,14 @@ public class MinecraftMixin implements ISetupGameProfiles {
 
     @Override
     public void theBoys$setup() {
-        Minecraft mc = (Minecraft) (Object) this;
-        Services services = Services.create(this.authenticationService, this.gameDirectory);
-        services.profileCache().setExecutor(mc);
-        SkullBlockEntity.setup(services, mc);
-        GameProfileCache.setUsesAuthentication(false);
+        if (!this.theBoys$initialized) {
+            Minecraft mc = (Minecraft) (Object) this;
+            Services services = Services.create(this.authenticationService, this.gameDirectory);
+            services.profileCache().setExecutor(mc);
+            SkullBlockEntity.setup(services, mc);
+            GameProfileCache.setUsesAuthentication(false);
+            this.theBoys$initialized = true;
+        }
     }
 
     @WrapOperation(method = "handleKeybinds()V", at = @At(value = "INVOKE",

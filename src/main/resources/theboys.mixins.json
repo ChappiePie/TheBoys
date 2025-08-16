@@ -14,9 +14,9 @@
     "client.LivingEntityRendererMixin",
     "client.LocalPlayerMixin",
     "client.MinecraftMixin",
-    "client.ModelBakeryMixin",
     "client.PlayerRendererMixin",
     "client.ScreenAccessor",
+    "client.SelectItemModelPropertiesMixin",
     "client.SoundEngineMixin"
   ],
   "mixins": [
@@ -24,7 +24,6 @@
     "EntityAccessor",
     "EntityMixin",
     "InventoryMixin",
-    "ItemStackMixin",
     "LiquidBlockMixin",
     "LivingEntityMixin",
     "LivingEntityRendererAccessor",

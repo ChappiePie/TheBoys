@@ -45,24 +45,24 @@ public class TBSuperpowers {
                                             KeyMap.KeyType.SECOND : KeyMap.KeyType.JUMP))
                     ),
             AbilityBuilder.of("super_hearing", TBAbilityTypes.SUPER_HEARING)
-                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16)))
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(64)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD).action(KeyCondition.Action.HELD), "enabling"),
 
             AbilityBuilder.of("damage_resistance", AbilityType.DAMAGE_RESISTANCE).additionalData((a) -> a.dataManager.set(DamageResistanceAbility.AMPLIFIER, 8F)),
-            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(2.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(10.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION)),
+            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE.value()).amount(2.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH.value()).amount(10.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST.value()).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE.value()).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADD_VALUE)),
             DamageImmunityAbility.of("fire_immunity", "lava", "onFire", "inFire", "hotFloor"))
             .uOffset(16));
 
     public static final Superpower A_TRAIN = register("a_train", new TBSuperpower(
             AbilityBuilder.of("speed", TBAbilityTypes.SPEED)
                     .change(TBCommonUtil.COLOR, Color.BLUE)
-                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16)))
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(80)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling"),
             AbilityBuilder.of("focus", TBAbilityTypes.FOCUS_ON_GOAL)
-                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16).backgroundColor(() -> {
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(96).backgroundColor(() -> {
                         if (a instanceof FocusOnGoalAbility a1 && !a1.hasSpeedAbility()) {
                             if (CommonUtil.pick(a.entity, 40) instanceof EntityHitResult hr && hr.getEntity() instanceof LivingEntity target) {
                                 if (target.getEyePosition().distanceTo(a.entity.getEyePosition()) < 4) {
@@ -85,8 +85,8 @@ public class TBSuperpowers {
                             return false;
                         }
                     }.keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.TOGGLE), "enabling"),
-            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(1.0D).operation(AttributeModifier.Operation.ADDITION))
+            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE.value()).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH.value()).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE))
     ).uOffset(32));
 
     public static final Superpower TRANSLUCENT = register("transclucent", new TBSuperpower(
@@ -94,10 +94,10 @@ public class TBSuperpowers {
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(16)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling"),
             AbilityBuilder.of("damage_resistance", AbilityType.DAMAGE_RESISTANCE).additionalData((a) -> a.dataManager.set(DamageResistanceAbility.AMPLIFIER, 4F)),
-            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("armor", b -> b.attribute(Attributes.ARMOR).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
-            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
+            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE.value()).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH.value()).amount(5.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("armor", b -> b.attribute(Attributes.ARMOR.value()).amount(5.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE.value()).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADD_VALUE))
     ));
 
 //    public static final Superpower STARLIGHT = register("starlight", new TBSuperpower(
@@ -106,10 +106,10 @@ public class TBSuperpowers {
 //                    .change(TBCommonUtil.COLOR, Color.YELLOW),
 //            AbilityBuilder.of("energy_charging", TBAbilityTypes.ENERGY_CHARGING)
 //                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
-//            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-//            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
-//            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-//            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
+//            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+//            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+//            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+//            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADD_VALUE))
 //    ));
 //
 //    public static final Superpower TEST = register("test", new TBSuperpower(

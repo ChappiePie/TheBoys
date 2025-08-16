@@ -12,7 +12,6 @@ import chappie.theboys.networking.server.ServerSetEyeOptions;
 import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.interfaces.ISetupGameProfiles;
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
@@ -32,13 +31,11 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.HashMap;
@@ -48,7 +45,7 @@ import java.util.function.Function;
 
 public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
 
-    public static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation(TheBoys.MODID, "textures/gui/eye_options.png");
+    public static final ResourceLocation TEXTURE_LOCATION = TheBoys.id("textures/gui/eye_options.png");
     private static final HumanoidModel<?> EYES_LAYER_MODEL = new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER));
     private static double LASERS_LENGTH = 5;
     public final Map<Renderable, Function<Integer, Integer>> changeYPos = new HashMap<>();
@@ -58,7 +55,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     @Nullable
     private PlayerInfo playerInfo;
     @Nullable
-    private SuitModel<Player> model;
+    private SuitModel model;
     private String skinModel;
     private ModSlider eyesLengthSlider, eyesHeightSlider, rotationSlider;
     private EditBox name;
@@ -165,7 +162,14 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
         this.setModelProperties(this.model, pPartialTick);
         PoseStack pPoseStack = guiGraphics.pose();
-        this.renderDirtBackground(guiGraphics);
+
+        if (this.minecraft.level == null) {
+            this.renderPanorama(guiGraphics, pPartialTick);
+        }
+
+        this.renderBlurredBackground();
+        this.renderMenuBackground(guiGraphics);
+
         pPoseStack.pushPose();
 
         int h = this.height / 2 + (laserOptions.isEmpty() ? 35 : laserOptions.size() < 4 ? 15 : 0);
@@ -175,7 +179,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             pPoseStack.scale(f, f, f);
             pPoseStack.translate((this.width / 2F - 200) / f, (h - 95) / f, 0);
             guiGraphics.drawString(this.font, Component.translatable("title.theboys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
-                    FastColor.ARGB32.color(255, 170, 20, 20), true);
+                    ARGB.color(255, 170, 20, 20), true);
             pPoseStack.popPose();
         }
 
@@ -202,14 +206,13 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+
     }
 
-    public void setModelProperties(SuitModel<Player> model, float pPartialTick) {
+    public void setModelProperties(SuitModel model, float pPartialTick) {
         if (this.minecraft == null) return;
-        model.young = false;
         model.setAllVisible(true);
-        model.hat.copyFrom(model.head);
         model.hat.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.HAT);
         model.jacket.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.JACKET);
         model.leftPants.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.LEFT_PANTS_LEG);
@@ -235,7 +238,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         poseStack.translate(x, y, 950.0D);
-        poseStack.mulPoseMatrix((new Matrix4f()).scaling((float) scale, (float) scale, (float) (-scale)));
+        poseStack.scale(scale, scale, -scale);
         poseStack.mulPose(rotation);
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
@@ -248,8 +251,11 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.translate(0.0F, -1.501F, 0.0F);
-        RenderSystem.runAsFancy(() -> {
-            this.model.renderToBuffer(poseStack, multibuffersource$buffersource.getBuffer(RenderType.entityTranslucent(this.playerInfo.getSkin().texture())), 15728880, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
+
+        guiGraphics.flush();
+        Lighting.setupForEntityInInventory();
+        guiGraphics.drawSpecial(multiBufferSource -> {
+            this.model.renderToBuffer(guiGraphics.pose(), multiBufferSource.getBuffer(RenderType.entityTranslucent(this.playerInfo.getSkin().texture())), 15728880, OverlayTexture.NO_OVERLAY);
             this.renderEyesAndLasers(poseStack, multibuffersource$buffersource, 15728880);
         });
         guiGraphics.flush();
@@ -279,11 +285,11 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             for (int i = 0; i < 3; i++) {
                 poseStack.pushPose();
                 poseStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
-                EYES_LAYER_MODEL.head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, i == 0 ? alpha : alpha * 0.25F);
+                EYES_LAYER_MODEL.head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
                 poseStack.popPose();
             }
             poseStack.translate(0, 0, -(Math.cos(this.tickCount * this.tickCount) / 100F));
-            EYES_LAYER_MODEL.hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
+            EYES_LAYER_MODEL.hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, red, green, blue));
             poseStack.popPose();
         }
 
@@ -540,8 +546,8 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             this.setFocused(TBConfig.CLIENT.eyesType.get() == this.type);
             //super.renderWidget(guiGraphics, pMouseX, pMouseY, pPartialTick);
             ResourceLocation resourcelocation = this.sprites.get(this.isActive(), this.isHoveredOrFocused());
-            guiGraphics.blit(resourcelocation, this.getX(), this.getY(), 0, 0, 24 + (this.isHoveredOrFocused() ? 32 : 0), 32, 32, 128, 128);
-            guiGraphics.blit(resourcelocation, this.getX() + 4, this.getY() + 4, type > 3 ? 72 : (type - 1) * 24, 0, 24, 24, 128, 128);
+            guiGraphics.blit(RenderType::guiTextured, resourcelocation, this.getX(), this.getY(), 0, 24 + (this.isHoveredOrFocused() ? 32 : 0), 32, 32, 128, 128);
+            guiGraphics.blit(RenderType::guiTextured, resourcelocation, this.getX() + 4, this.getY() + 4, type > 3 ? 72 : (type - 1) * 24, 0, 24, 24, 128, 128);
         }
     }
 

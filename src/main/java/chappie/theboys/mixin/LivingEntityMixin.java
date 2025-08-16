@@ -10,7 +10,9 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -45,18 +47,6 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
     @Inject(method = "tick()V", at = @At("HEAD"))
     public void mixin$tick(CallbackInfo ci) {
         this.oldPos = new Vec3(this.position().toVector3f());
-    }
-
-    @Inject(method = "getEyeHeight", at = @At("TAIL"), cancellable = true)
-    public void mixin$getEyeHeight(Pose pose, EntityDimensions dimensions, CallbackInfoReturnable<Float> cir) {
-        LivingEntity player = (LivingEntity) (Object) this;
-        if (player != null && player.isAlive() && !player.position().equals(Vec3.ZERO)) {
-            for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
-                if (player.isSprinting() && ability.isEnabled()) {
-                    cir.setReturnValue(0.51F);
-                }
-            }
-        }
     }
 
     @Inject(method = "maxUpStep()F", at = @At("RETURN"), cancellable = true)
@@ -112,7 +102,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
                                 }
 
                                 for (ServerPlayer serverPlayer : level.getEntitiesOfClass(ServerPlayer.class, CommonUtil.boxWithRange(entity.position(), 30))) {
-                                    level.sendParticles(serverPlayer, ParticleTypes.EXPLOSION, false, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.getCommandSenderWorld().getHeight()) * 10, 0.0D, 0.0D, 1F);
+                                    level.sendParticles(ParticleTypes.EXPLOSION, false, false, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.getCommandSenderWorld().getHeight()) * 10, 0.0D, 0.0D, 1F);
                                 }
                             }
                         }

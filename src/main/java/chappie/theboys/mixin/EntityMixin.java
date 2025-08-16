@@ -129,9 +129,8 @@ public class EntityMixin implements EntitySavingFields {
         Entity entity = (Entity) (Object) this;
         if (pSwimming) {
             for (SpeedAbility ability : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
-                float walkDifference = (entity.walkDist / 0.6F) - (entity.walkDistO / 0.6F);
-                boolean isMoving = entity.getDeltaMovement().horizontalDistanceSqr() >= 1.0E-7D;
-                if (ability.isEnabled() && (isMoving || walkDifference > 0.0F)) {
+                boolean isMoving = entity.getKnownMovement().horizontalDistanceSqr() >= 1.0E-7D;
+                if (ability.isEnabled() && isMoving) {
                     ci.cancel();
                     break;
                 }

@@ -3,17 +3,17 @@ package chappie.theboys.common.capability;
 import chappie.theboys.TheBoys;
 import chappie.theboys.util.timers.SyringeAnim;
 import chappie.theboys.util.timers.SyringeVialAnim;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
+import org.ladysnake.cca.api.v3.component.ComponentV3;
+import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
 
-public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
+public class TheBoysCap implements org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
 
     public static final ComponentKey<TheBoysCap> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(TheBoys.id("cap"), TheBoysCap.class);
     public final SyringeVialAnim vialAnim = new SyringeVialAnim(this);
@@ -83,7 +83,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag) {
+    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         this.compoundV = tag.getBoolean("CompoundV");
         CompoundTag nbt = tag.getCompound("eyeOptions");
         this.eyesHeight = nbt.getInt("eyesHeight");
@@ -94,7 +94,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag) {
+    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         tag.putBoolean("CompoundV", this.compoundV);
 
         CompoundTag eyeOptions = new CompoundTag();

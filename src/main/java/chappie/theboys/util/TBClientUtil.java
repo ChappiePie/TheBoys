@@ -10,28 +10,28 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.TriState;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class TBClientUtil {
 
-    public static final ModelResourceLocation SYRINGE_MODEL = new ModelResourceLocation(TheBoys.MODID, "syringe", "inventory");
-    public static final ModelResourceLocation SYRINGE_3D_MODEL = new ModelResourceLocation(TheBoys.MODID, "syringe_3d", "inventory");
+    public static final ModelResourceLocation SYRINGE_MODEL = new ModelResourceLocation(TheBoys.id("syringe"), "inventory");
+    public static final ModelResourceLocation SYRINGE_3D_MODEL = new ModelResourceLocation(TheBoys.id("syringe_3d"), "inventory");
 
-    public static final ModelResourceLocation VIAL_MODEL = new ModelResourceLocation(TheBoys.MODID, "vial", "inventory");
-    public static final ModelResourceLocation VIAL_3D_MODEL = new ModelResourceLocation(TheBoys.MODID, "vial_3d", "inventory");
-    public static final ResourceLocation GLOW_EYES_OVERLAY = new ResourceLocation(TheBoys.MODID, "textures/gui/glow_eyes_overlay.png");
+    public static final ModelResourceLocation VIAL_MODEL = new ModelResourceLocation(TheBoys.id("vial"), "inventory");
+    public static final ModelResourceLocation VIAL_3D_MODEL = new ModelResourceLocation(TheBoys.id("vial_3d"), "inventory");
+    public static final ResourceLocation GLOW_EYES_OVERLAY = TheBoys.id("textures/gui/glow_eyes_overlay.png");
 
-    public static void setupArms(PlayerModel<? extends LivingEntity> model, HumanoidArm side, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, AbstractClientPlayer pPlayer, ModelPart pRendererArm, ModelPart pRendererArmwear, float partialTicks) {
+    public static void setupArms(PlayerModel model, HumanoidArm side, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, Player pPlayer, ModelPart pRendererArm, ModelPart pRendererArmwear, float partialTicks) {
         TheBoysCap cap = TheBoysCap.getCap(pPlayer);
         if (cap == null) return;
         float timeline = cap.vialAnim.timeline.value(partialTicks);
@@ -82,7 +82,9 @@ public class TBClientUtil {
                 pPoseStack.popPose();
             }
         }
-        pRendererArmwear.copyFrom(pRendererArm);
+        if (pRendererArmwear != null) {
+            pRendererArmwear.copyFrom(pRendererArm);
+        }
     }
 
     public static class RenderTypes extends RenderType {
@@ -92,7 +94,7 @@ public class TBClientUtil {
         }
 
         public static RenderType entityInvisibility(ResourceLocation pLocation) {
-            RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder().setShaderState(RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL_SHADER).setTextureState(new RenderStateShard.TextureStateShard(pLocation, false, false)).setTransparencyState(TRANSLUCENT_TRANSPARENCY).setCullState(NO_CULL).setOutputState(ITEM_ENTITY_TARGET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE).createCompositeState(true);
+            RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder().setShaderState(RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL_SHADER).setTextureState(new RenderStateShard.TextureStateShard(pLocation, TriState.FALSE, false)).setTransparencyState(TRANSLUCENT_TRANSPARENCY).setCullState(NO_CULL).setOutputState(ITEM_ENTITY_TARGET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE).createCompositeState(true);
             return create("entity_invisibility", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, true, rendertype$compositestate);
         }
     }

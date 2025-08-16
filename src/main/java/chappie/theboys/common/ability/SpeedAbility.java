@@ -5,10 +5,13 @@ import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.data.DataAccessor;
+import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.entity.TrailEntity;
 import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.interfaces.ILivingEntityEx;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -20,7 +23,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.awt.*;
 import java.util.List;
-import java.util.UUID;
 
 public class SpeedAbility extends Ability implements IHasTimer {
     public static final VoxelShape STABLE_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.25D, 16.0D);
@@ -67,8 +69,8 @@ public class SpeedAbility extends Ability implements IHasTimer {
             if (entity instanceof Player player && player.tickCount % 100 == 0) {
                 player.getFoodData().eat(1, 1.0F);
             }
-            this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED, speedLevel, AttributeModifier.Operation.MULTIPLY_TOTAL);
-            this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED, speedLevel, AttributeModifier.Operation.MULTIPLY_TOTAL);
+            this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED.value(), speedLevel, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED.value(), speedLevel, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
             if (isMoving && !entity.isPassenger()) {
                 this.setupTrail(entity, speedLevel);
@@ -102,8 +104,8 @@ public class SpeedAbility extends Ability implements IHasTimer {
             }
         } else {
             this.dataManager.set(SPEED_LVL, 1);
-            this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED, 0.0F, AttributeModifier.Operation.MULTIPLY_TOTAL);
-            this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED, 0.0F, AttributeModifier.Operation.MULTIPLY_TOTAL);
+            this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED.value(), 0.0F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED.value(), 0.0F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             this.cooldown.timer = this.upgradeCooldown.timer = 0;
         }
     }
@@ -132,17 +134,17 @@ public class SpeedAbility extends Ability implements IHasTimer {
     }
 
     public void setAttribute(LivingEntity entity, String name, Attribute attribute, double amount, AttributeModifier.Operation operation) {
-        AttributeInstance instance = entity.getAttribute(attribute);
-        var uuid = UUID.fromString("fefb466b-f73a-4e1d-8bac-77f702d2b437");
+        AttributeInstance instance = entity.getAttribute(Holder.direct(attribute));
+        ResourceLocation location = TheBoys.id(name);
 
         if (instance != null) {
-            var modifier = instance.getModifier(uuid);
-            if (modifier != null && modifier.getAmount() != amount) {
-                instance.removeModifier(uuid);
+            var modifier = instance.getModifier(location);
+            if (modifier != null && modifier.amount() != amount) {
+                instance.removeModifier(location);
                 modifier = null;
             }
             if (modifier == null && amount != 0.0F) {
-                instance.addTransientModifier(new AttributeModifier(uuid, name, amount, operation));
+                instance.addTransientModifier(new AttributeModifier(location, amount, operation));
             }
         }
     }

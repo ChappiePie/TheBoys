@@ -15,10 +15,10 @@ import com.google.common.collect.Iterables;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.LivingEntity;
@@ -90,11 +90,11 @@ public class HeatVisionAbility extends GlowEyesAbility {
         super.initializeClient(consumer);
         consumer.accept(new AbilityClientProperties() {
             @Override
-            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
+            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!modelProperties.root().hasChild("head")) return;
                 Color color = dataManager.get(TBCommonUtil.COLOR);
                 float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
-                boolean humanoid = renderer.getModel() instanceof HumanoidModel || renderer.getModel() instanceof HierarchicalModel;
+                boolean humanoid = renderer.getModel() instanceof HumanoidModel || renderer.getModel() instanceof EntityModel;
                 poseStack.pushPose();
                 // Lasers rendered via 2 boxes
                 HitResult hitResult = CommonUtil.pick(entity, dataManager.get(HeatVisionAbility.DISTANCE));
@@ -133,7 +133,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
 
     protected void onHitEntity(EntityHitResult hitResult) {
         float strength = this.dataManager.get(STRENGTH);
-        hitResult.getEntity().setSecondsOnFire((int) (strength * 5));
+        hitResult.getEntity().setRemainingFireTicks((int) (strength * 5));
         hitResult.getEntity().hurt(this.entity.damageSources().mobAttack(entity), strength * 2F);
 
         CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),

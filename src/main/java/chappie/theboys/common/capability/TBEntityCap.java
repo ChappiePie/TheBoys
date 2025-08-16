@@ -1,13 +1,14 @@
 package chappie.theboys.common.capability;
 
 import chappie.theboys.TheBoys;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.tick.CommonTickingComponent;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
+import org.ladysnake.cca.api.v3.component.ComponentV3;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
+import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
 
 public class TBEntityCap implements AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
 
@@ -41,12 +42,12 @@ public class TBEntityCap implements AutoSyncedComponent, CommonTickingComponent,
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag) {
+    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         this.glowingTick = tag.getInt("glowingTick");
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag) {
+    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         tag.putInt("glowingTick", this.glowingTick);
     }
 }

@@ -1,6 +1,7 @@
 package chappie.theboys.common.block.menu;
 
 import chappie.theboys.common.item.VialItem;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -12,13 +13,14 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.world.level.Level;
 
 public class SynthesizerMenu extends AbstractContainerMenu {
     public final Container container;
     public final ContainerData data;
+    protected final Level level;
 
     public SynthesizerMenu(int containerId, Inventory playerInventory) {
         this(containerId, playerInventory, new SimpleContainer(9), new SimpleContainerData(7));
@@ -30,8 +32,9 @@ public class SynthesizerMenu extends AbstractContainerMenu {
         checkContainerSize(container, 9);
         checkContainerDataCount(data, 7);
         this.data = data;
+        this.level = playerInventory.player.level();
         this.addSlot(new WaterSlot(container, 0, 14, 54));
-        this.addSlot(new FuelSlot(container, 1, 145, 54));
+        this.addSlot(new FuelSlot(this, container, 1, 145, 54));
         this.addSlot(new Slot(container, 2, 79, 31) {
             @Override
             public boolean isActive() {
@@ -65,7 +68,7 @@ public class SynthesizerMenu extends AbstractContainerMenu {
     }
 
     public static boolean isWater(ItemStack stack) {
-        return stack.is(Items.WATER_BUCKET) || stack.is(Items.POTION) && PotionUtils.getPotion(stack) == Potions.WATER;
+        return stack.is(Items.WATER_BUCKET) || stack.is(Items.POTION) && stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().orElse(null) == Potions.WATER;
     }
 
     @Override
@@ -102,7 +105,7 @@ public class SynthesizerMenu extends AbstractContainerMenu {
                     if (!this.moveItemStackTo(itemStack2, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (AbstractFurnaceBlockEntity.isFuel(itemStack2) && !this.slots.get(1).hasItem()) {
+                } else if (player.level().fuelValues().isFuel(itemStack2) && !this.slots.get(1).hasItem()) {
                     if (!this.moveItemStackTo(itemStack2, 1, 2, false)) {
                         return ItemStack.EMPTY;
                     }
@@ -194,10 +197,17 @@ public class SynthesizerMenu extends AbstractContainerMenu {
         return this.data.get(1);
     }
 
+    private boolean isFuel(ItemStack stack) {
+        return this.level.fuelValues().isFuel(stack);
+    }
+
     static class FuelSlot extends Slot {
 
-        public FuelSlot(Container container, int slot, int xPosition, int yPosition) {
+        private final SynthesizerMenu menu;
+
+        public FuelSlot(SynthesizerMenu menu, Container container, int slot, int xPosition, int yPosition) {
             super(container, slot, xPosition, yPosition);
+            this.menu = menu;
         }
 
         public static boolean isBucket(ItemStack stack) {
@@ -206,7 +216,7 @@ public class SynthesizerMenu extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            return AbstractFurnaceBlockEntity.isFuel(stack) || isBucket(stack);
+            return this.menu.isFuel(stack) || isBucket(stack);
         }
 
         @Override
@@ -214,7 +224,6 @@ public class SynthesizerMenu extends AbstractContainerMenu {
             return isBucket(stack) ? 1 : super.getMaxStackSize(stack);
         }
     }
-
 
     static class WaterSlot extends Slot {
 
@@ -224,8 +233,9 @@ public class SynthesizerMenu extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
+            PotionContents potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
             return stack.is(Items.BUCKET) || stack.is(Items.WATER_BUCKET) || stack.is(Items.GLASS_BOTTLE)
-                    || stack.is(Items.POTION) && PotionUtils.getPotion(stack) == Potions.WATER;
+                    || stack.is(Items.POTION) && potionContents.is(Potions.WATER);
         }
 
         @Override

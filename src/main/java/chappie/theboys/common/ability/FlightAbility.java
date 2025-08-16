@@ -8,6 +8,7 @@ import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.data.DataAccessor;
 import chappie.modulus.util.events.SetupAnimCallback;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.entity.state.ArmedEntityRenderState;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -46,7 +47,7 @@ public class FlightAbility extends Ability implements IHasTimer {
         this.dataManager.define(SPEED, 1.0F);
         this.dataManager.define(SPRINT_SPEED, 2.0F);
         this.dataManager.define(BREAK_BLOCKS, true);
-        this.dataManager.define(BOOSTING, false);
+        this.dataManager.define(BOOSTING, false, false);
 
         this.dataManager.define(SPRINTING, false, false);
         this.dataManager.define(ARM_AHEAD, false, false);
@@ -161,10 +162,12 @@ public class FlightAbility extends Ability implements IHasTimer {
             float f3 = this.ability.sprintingTimer.value(properties.partialTicks()) * f;
             float f4 = 1.0F - (f1 + f2) / 2.0F;
             float toRad = (float) Math.toRadians(f);
-            float bob = Mth.sin(properties.ageInTicks() * 0.067F) * 0.05F;
+            if (!(event.state() instanceof ArmedEntityRenderState state)) return;
+            float bob = Mth.sin(state.ageInTicks * 0.067F) * 0.05F;
 
-            boolean right = !entity.isUsingItem() && model.rightArmPose == HumanoidModel.ArmPose.EMPTY && !model.leftArmPose.isTwoHanded();
-            boolean left = !entity.isUsingItem() && model.leftArmPose == HumanoidModel.ArmPose.EMPTY && !model.rightArmPose.isTwoHanded();
+
+            boolean right = !entity.isUsingItem() && state.rightArmPose == HumanoidModel.ArmPose.EMPTY && !state.leftArmPose.isTwoHanded();
+            boolean left = !entity.isUsingItem() && state.leftArmPose == HumanoidModel.ArmPose.EMPTY && !state.rightArmPose.isTwoHanded();
 
             model.head.xRot /= 1 + f;
             model.head.xRot += bob * f;

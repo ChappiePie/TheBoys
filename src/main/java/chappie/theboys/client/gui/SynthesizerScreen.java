@@ -11,6 +11,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -63,19 +64,19 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int i = this.leftPos;
         int j = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(SYNTHESIZER_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        guiGraphics.blit(RenderType::guiTextured, SYNTHESIZER_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 
         float f = this.getMenu().data.get(1) / 500F;
 
         int progress = (int) (37 * f);
-        guiGraphics.blit(SYNTHESIZER_LOCATION, i + 16, j + 10 + 37 - progress, 190, 37 - progress, 12, progress, 256, 256);
+        guiGraphics.blit(RenderType::guiTextured, SYNTHESIZER_LOCATION, i + 16, j + 10 + 37 - progress, 190, 37 - progress, 12, progress, 256, 256);
 
         int progress1 = Mth.ceil(this.menu.getBurnProgress() * 16.0F);
-        guiGraphics.blit(SYNTHESIZER_LOCATION, i + 145, j + 28, 202, 0, progress1, 5, 256, 256);
+        guiGraphics.blit(RenderType::guiTextured, SYNTHESIZER_LOCATION, i + 145, j + 28, 202, 0, progress1, 5, 256, 256);
 
 
         int progress2 = Mth.ceil(this.menu.getLitProgress() * 14.0F);
-        guiGraphics.blit(SYNTHESIZER_LOCATION, i + 146, j + 37 + 14 - progress2, 176, 14 - progress2, 14, progress2, 256, 256);
+        guiGraphics.blit(RenderType::guiTextured, SYNTHESIZER_LOCATION, i + 146, j + 37 + 14 - progress2, 176, 14 - progress2, 14, progress2, 256, 256);
 
 
         guiGraphics.pose().pushPose();
@@ -89,7 +90,7 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
 
         for (Slot slot : this.menu.slots) {
             if (slot instanceof SynthesizerMenu.CentrifugeSlot) {
-                guiGraphics.blit(SYNTHESIZER_LOCATION, slot.x - 4, slot.y - 4, 218, 54, 24, 24, 256, 256);
+                guiGraphics.blit(RenderType::guiTextured, SYNTHESIZER_LOCATION, slot.x - 4, slot.y - 4, 218, 54, 24, 24, 256, 256);
                 super.renderSlot(guiGraphics, slot);
             }
         }
@@ -112,7 +113,7 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
             guiGraphics.pose().translate(12.5F, 12.5F, 0);
             guiGraphics.pose().scale(f, f, 1);
             guiGraphics.pose().translate(-12.5F, -12.5F, 0);
-            guiGraphics.blit(SYNTHESIZER_LOCATION, 0, 0, slot.getItem().isEmpty() ? 231 : 206, 29, 25, 25, 256, 256);
+            guiGraphics.blit(RenderType::guiTextured, SYNTHESIZER_LOCATION, 0, 0, slot.getItem().isEmpty() ? 231 : 206, 29, 25, 25, 256, 256);
             guiGraphics.pose().translate(-(slot.x - 4), -(slot.y - 4), 0);
         }
         if (!(slot instanceof SynthesizerMenu.CentrifugeSlot)) {
@@ -124,7 +125,7 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
             f = timer.value(ClientUtil.getPartialTick());
             guiGraphics.pose().scale(f, f, 1);
             guiGraphics.pose().translate(-14.5F, -14.5F, 0);
-            guiGraphics.blit(SYNTHESIZER_LOCATION, 0, 0, 218, 0, 29, 29, 256, 256);
+            guiGraphics.blit(RenderType::guiTextured, SYNTHESIZER_LOCATION, 0, 0, 218, 0, 29, 29, 256, 256);
             guiGraphics.pose().translate(0, 0, -255);
             guiGraphics.pose().popPose();
         }

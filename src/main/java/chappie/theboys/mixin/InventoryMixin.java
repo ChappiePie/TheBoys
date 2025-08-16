@@ -11,8 +11,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Inventory.class)
 public class InventoryMixin {
 
-    @Inject(method = "swapPaint(D)V", at = @At("HEAD"), cancellable = true)
-    public void cancelSwapSlots(double pDirection, CallbackInfo ci) {
+    // TODO maybe is right but i didn't tested
+    @Inject(method = "pickSlot", at = @At("HEAD"), cancellable = true)
+    public void cancelSwapSlots(int index, CallbackInfo ci) {
         assert Minecraft.getInstance().player != null;
         TheBoysCap cap = TheBoysCap.getCap(Minecraft.getInstance().player);
         if (cap != null && cap.vialAnim.rollVial.value(1) > 0) {

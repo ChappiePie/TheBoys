@@ -5,6 +5,7 @@ import chappie.theboys.common.block.entity.SynthesizerBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
@@ -16,8 +17,8 @@ public class SynthesizerRenderer extends GeoBlockRenderer<SynthesizerBlockEntity
     }
 
     @Override
-    public void preRender(PoseStack poseStack, SynthesizerBlockEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+    public void preRender(PoseStack poseStack, SynthesizerBlockEntity animatable, BakedGeoModel model, @Nullable MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int renderColor) {
+        super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
 
         poseStack.pushPose();
         poseStack.translate(0.0625F * 1.25F, 0, 0.0625F * 1.5F);
@@ -40,8 +41,8 @@ public class SynthesizerRenderer extends GeoBlockRenderer<SynthesizerBlockEntity
     }
 
     @Override
-    public void postRender(PoseStack poseStack, SynthesizerBlockEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        super.postRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+    public void postRender(PoseStack poseStack, SynthesizerBlockEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int renderColor) {
+        super.postRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
         poseStack.popPose();
     }
 }

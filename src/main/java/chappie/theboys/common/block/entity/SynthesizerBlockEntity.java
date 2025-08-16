@@ -5,7 +5,9 @@ import chappie.theboys.common.block.menu.SynthesizerMenu;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.VialItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -20,16 +22,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
@@ -114,14 +116,15 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
         return this.getItems().size();
     }
 
+
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         this.waterMb = tag.getInt("waterMb");
         this.work = tag.getBoolean("work");
         this.opened = tag.getBoolean("opened");
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, this.getItems());
+        ContainerHelper.loadAllItems(tag, this.getItems(), registries);
 
         this.litTime = tag.getShort("burnTime");
         this.cookingProgress = tag.getShort("time");
@@ -133,18 +136,17 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
         if (fuel.isEmpty()) {
             return 0;
         } else {
-            Item item = fuel.getItem();
-            return AbstractFurnaceBlockEntity.getFuel().getOrDefault(item, 0);
+            return this.level.fuelValues().burnDuration(fuel);
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("waterMb", this.waterMb);
         tag.putBoolean("work", this.work);
         tag.putBoolean("opened", this.opened);
-        ContainerHelper.saveAllItems(tag, this.getItems());
+        ContainerHelper.saveAllItems(tag, this.getItems(), registries);
 
         tag.putShort("burnTime", (short) this.litTime);
         tag.putShort("time", (short) this.cookingProgress);
@@ -232,6 +234,11 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
     }
 
     @Override
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.items = items;
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
 
     }
@@ -242,8 +249,8 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return this.saveWithoutMetadata(registries);
     }
 
     @Nullable
@@ -307,7 +314,8 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
         // set up water
         ItemStack waterStack = this.items.get(0);
         if (!waterStack.isEmpty()) {
-            if (waterStack.is(Items.POTION) && PotionUtils.getPotion(waterStack) == Potions.WATER) {
+            PotionContents potionContents = waterStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+            if (waterStack.is(Items.POTION) && potionContents.is(Potions.WATER)) {
                 if (this.setWaterMb(this.waterMb + 25)) {
                     this.items.set(0, Items.GLASS_BOTTLE.getDefaultInstance());
                 }
@@ -333,8 +341,8 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
                 Item item = fuelStack.getItem();
                 fuelStack.shrink(1);
                 if (fuelStack.isEmpty()) {
-                    Item item2 = item.getCraftingRemainingItem();
-                    this.items.set(1, item2 == null ? ItemStack.EMPTY : new ItemStack(item2));
+                    ItemStack item2 = item.getCraftingRemainder();
+                    this.items.set(1, item2);
                 }
             }
         }
@@ -366,7 +374,10 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
                     if (level.random.nextInt(100) <= 25) {
                         resultItem = VialItem.compoundV();
                     } else if (level.random.nextInt(100) <= 40) {
-                        resultItem = PotionUtils.setPotion(new ItemStack(Items.POTION), BuiltInRegistries.POTION.stream().filter(p -> BuiltInRegistries.POTION.getKey(p).getNamespace().equals("minecraft") && !p.getEffects().isEmpty()).findAny().get());
+                        ItemStack potionStack = new ItemStack(Items.POTION);
+                        Potion potion = BuiltInRegistries.POTION.stream().filter(p -> BuiltInRegistries.POTION.getKey(p).getNamespace().equals("minecraft") && !p.getEffects().isEmpty()).findAny().get();
+                        potionStack.set(DataComponents.POTION_CONTENTS, new PotionContents(BuiltInRegistries.POTION.wrapAsHolder(potion)));
+                        resultItem = potionStack;
                     }
                 }
                 stack.shrink(1);

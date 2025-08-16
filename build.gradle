@@ -57,7 +57,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
 		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-1.20.4:2024.04.14@zip")
+		parchment("org.parchmentmc.data:parchment-1.21.4:2025.01.05@zip")
 	}
 	compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
 	modImplementation("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")
@@ -82,6 +82,8 @@ dependencies {
 	modImplementation include("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
 
 	modImplementation "chappie.modulus:modulus:${project.modulus_version}"
+
+	modRuntimeOnly "maven.modrinth:modmenu:${project.mod_menu_version}"
 }
 
 processResources {
@@ -93,14 +95,14 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 17
+    it.options.release = 21
 }
 
 java {
 	withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

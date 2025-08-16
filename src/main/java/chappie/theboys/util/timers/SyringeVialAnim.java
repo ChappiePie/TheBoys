@@ -4,6 +4,7 @@ import chappie.modulus.util.IHasTimer;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.SyringeItem;
 import chappie.theboys.common.item.VialItem;
+import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,20 +35,20 @@ public class SyringeVialAnim implements IHasTimer {
         ItemStack offHandItem = entity.getOffhandItem();
         this.timeline.predicate = () -> this.triggerAnim
                 && mainHandItem.getItem() instanceof SyringeItem
-                && (offHandItem.getItem() instanceof VialItem || (this.reverse && mainHandItem.getTag() != null && mainHandItem.getTag().contains("vial") && offHandItem.isEmpty()));
+                && (offHandItem.getItem() instanceof VialItem || (this.reverse && !mainHandItem.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY).isEmpty() && offHandItem.isEmpty()));
         float timeline = this.timeline.value(1);
         if (timeline == 1 && !entity.getCommandSenderWorld().isClientSide()) {
             if (this.reverse) {
-                ItemStack itemStack = ItemStack.of(mainHandItem.getOrCreateTag().getCompound("vial"));
+                ItemStack itemStack = mainHandItem.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
                 entity.setItemInHand(InteractionHand.OFF_HAND, itemStack);
-                mainHandItem.getOrCreateTag().remove("vial");
+                mainHandItem.remove(TBDataComponents.VIAL);
             } else {
-                mainHandItem.getOrCreateTag().put("vial", offHandItem.copyWithCount(1).save(new CompoundTag()));
+                mainHandItem.set(TBDataComponents.VIAL, offHandItem.copyWithCount(1));
                 offHandItem.shrink(1);
             }
             this.triggerAnim = false;
             if (entity instanceof Player player) {
-                player.getCooldowns().addCooldown(mainHandItem.getItem(), 20);
+                player.getCooldowns().addCooldown(mainHandItem, 20);
             }
         }
 

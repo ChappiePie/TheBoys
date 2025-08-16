@@ -1,16 +1,20 @@
 package chappie.theboys.networking.server;
 
-import chappie.theboys.TheBoys;
+import chappie.modulus.Modulus;
 import chappie.theboys.common.capability.TheBoysCap;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
-public class ServerSetEyeOptions implements FabricPacket {
+public class ServerSetEyeOptions implements CustomPacketPayload {
 
-    public static final PacketType<ServerSetEyeOptions> PACKET = PacketType.create(TheBoys.id("server_set_eye_options"), ServerSetEyeOptions::new);
+    public static final ResourceLocation PACKET_ID = Modulus.id("server_set_eye_options");
+    public static final Type<ServerSetEyeOptions> PACKET = new Type<>(PACKET_ID);
+    public static StreamCodec<FriendlyByteBuf, ServerSetEyeOptions> CODEC = CustomPacketPayload.codec(ServerSetEyeOptions::write, ServerSetEyeOptions::new);
+
     public int eyesHeight;
     public int eyesLength;
 
@@ -24,12 +28,6 @@ public class ServerSetEyeOptions implements FabricPacket {
         this.eyesLength = buf.readInt();
     }
 
-    @Override
-    public PacketType<?> getType() {
-        return PACKET;
-    }
-
-    @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(this.eyesHeight);
         buf.writeInt(this.eyesLength);
@@ -39,5 +37,10 @@ public class ServerSetEyeOptions implements FabricPacket {
         if (player != null) {
             TheBoysCap.getCap(player).setEyeOptions(this.eyesHeight, this.eyesLength);
         }
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return PACKET;
     }
 }

@@ -8,11 +8,11 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TBEntityCap;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.GameEventTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -124,11 +124,7 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
             Vec3 vec3 = vibrationInfo.pos();
             data.setTravelTimeInTicks(user.calculateTravelTimeInTicks(vibrationInfo.distance()));
             VibrationParticleOption option = new VibrationParticleOption(user.getPositionSource(), data.getTravelTimeInTicks());
-            if (this.entity instanceof ServerPlayer player) {
-                level.sendParticles(player, option, false, vec3.x, vec3.y, vec3.z, 1, 0.0, 0.0, 0.0, 0.0);
-            } else {
-                level.sendParticles(option, vec3.x, vec3.y, vec3.z, 1, 0.0, 0.0, 0.0, 0.0);
-            }
+            level.sendParticles(option, vec3.x, vec3.y, vec3.z, 1, 0.0, 0.0, 0.0, 0.0);
             user.onDataChanged();
             data.getSelectionStrategy().startOver();
         });
@@ -149,11 +145,7 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
                 double f = Mth.lerp(d, vec3.y, vec32.y);
                 double g = Mth.lerp(d, vec3.z, vec32.z);
                 VibrationParticleOption option = new VibrationParticleOption(positionSource, i);
-                if (this.entity instanceof ServerPlayer player) {
-                    level.sendParticles(player, option, false, e, f, g, 1, 0.0, 0.0, 0.0, 0.0);
-                } else {
-                    level.sendParticles(option, e, f, g, 1, 0.0, 0.0, 0.0, 0.0);
-                }
+                level.sendParticles(option, e, f, g, 1, 0.0, 0.0, 0.0, 0.0);
                 data.setReloadVibrationParticle(false);
             }
         }
@@ -218,7 +210,7 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
         }
 
         @Override
-        public boolean canReceiveVibration(ServerLevel level, BlockPos pos, GameEvent gameEvent, GameEvent.Context context) {
+        public boolean canReceiveVibration(ServerLevel level, BlockPos pos, Holder<GameEvent> gameEvent, GameEvent.Context context) {
             LivingEntity entity = this.ability.entity;
             if (!entity.isDeadOrDying() && this.ability.isEnabled()
                     && level.getWorldBorder().isWithinBounds(pos)) {
@@ -240,7 +232,7 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
         }
 
         @Override
-        public void onReceiveVibration(ServerLevel level, BlockPos pos, GameEvent gameEvent, @Nullable Entity entity, @Nullable Entity playerEntity, float distance) {
+        public void onReceiveVibration(ServerLevel level, BlockPos pos, Holder<GameEvent> gameEvent, @Nullable Entity entity, @Nullable Entity playerEntity, float distance) {
             if (entity != null) {
                 TBEntityCap cap = TBEntityCap.getCap(entity);
                 if (cap != null) {

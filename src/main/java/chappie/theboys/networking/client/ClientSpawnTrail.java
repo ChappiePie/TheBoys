@@ -2,17 +2,21 @@ package chappie.theboys.networking.client;
 
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.entity.TrailEntity;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -20,9 +24,11 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 import java.util.UUID;
 
-public class ClientSpawnTrail implements FabricPacket, Packet<ClientGamePacketListener> {
+public class ClientSpawnTrail implements CustomPacketPayload {
 
-    public static final PacketType<ClientSpawnTrail> PACKET = PacketType.create(TheBoys.id("spawn_trail"), ClientSpawnTrail::new);
+    public static final ResourceLocation PACKET_ID = TheBoys.id("spawn_trail");
+    public static final Type<ClientSpawnTrail> PACKET = new Type<>(PACKET_ID);
+    public static StreamCodec<FriendlyByteBuf, ClientSpawnTrail> CODEC = CustomPacketPayload.codec(ClientSpawnTrail::write, ClientSpawnTrail::new);
     public final TrailEntity entity;
     public final int typeId;
     public final int entityId;
@@ -32,7 +38,6 @@ public class ClientSpawnTrail implements FabricPacket, Packet<ClientGamePacketLi
     public final int velX, velY, velZ;
     public final int lifeTime, ownerId;
     public final Color color;
-
     public ClientSpawnTrail(TrailEntity e) {
         this.entity = e;
         this.typeId = BuiltInRegistries.ENTITY_TYPE.getId(e.getType());
@@ -52,8 +57,13 @@ public class ClientSpawnTrail implements FabricPacket, Packet<ClientGamePacketLi
         this.velY = (int) (d2 * 8000.0D);
         this.velZ = (int) (d3 * 8000.0D);
         this.lifeTime = e.lifeTime;
-        this.ownerId = e.entity.getId();
+        this.ownerId = e.attached.getId();
         this.color = e.color;
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return PACKET;
     }
 
     public ClientSpawnTrail(FriendlyByteBuf buf) {
@@ -80,12 +90,6 @@ public class ClientSpawnTrail implements FabricPacket, Packet<ClientGamePacketLi
         this.color = new Color(red, green, blue);
     }
 
-    @Override
-    public PacketType<?> getType() {
-        return PACKET;
-    }
-
-    @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeVarInt(this.typeId);
         buf.writeInt(this.entityId);
@@ -108,16 +112,10 @@ public class ClientSpawnTrail implements FabricPacket, Packet<ClientGamePacketLi
         buf.writeInt(this.color.getBlue());
     }
 
-    @Override
-    public void handle(ClientGamePacketListener handler) {
-        this.handle(Minecraft.getInstance().player, null);
-
-    }
-
     public void handle(LocalPlayer player, PacketSender packetSender) {
         Minecraft mc = Minecraft.getInstance();
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.byId(this.typeId);
-        Entity e = type.create(mc.level);
+        Entity e = type.create(mc.level, EntitySpawnReason.LOAD);
         if (e == null)
             return;
 
@@ -136,6 +134,24 @@ public class ClientSpawnTrail implements FabricPacket, Packet<ClientGamePacketLi
         e.lerpMotion(this.velX / 8000.0, this.velY / 8000.0, this.velZ / 8000.0);
         if (e instanceof TrailEntity entity) {
             entity.readSpawnData(this.lifeTime, (LivingEntity) entity.getCommandSenderWorld().getEntity(this.ownerId), this.color);
+        }
+    }
+
+    public static class Custom implements Packet<ClientGamePacketListener> {
+        public final ClientSpawnTrail trail;
+
+        public Custom(TrailEntity e) {
+            this.trail = new ClientSpawnTrail(e);
+        }
+
+        @Override
+        public PacketType<? extends Packet<ClientGamePacketListener>> type() {
+            return new PacketType<>(PacketFlow.CLIENTBOUND, ClientSpawnTrail.PACKET_ID);
+        }
+
+        @Override
+        public void handle(ClientGamePacketListener handler) {
+            this.trail.handle(Minecraft.getInstance().player, null);
         }
     }
 }

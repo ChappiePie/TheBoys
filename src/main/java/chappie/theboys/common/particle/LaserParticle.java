@@ -2,9 +2,8 @@ package chappie.theboys.common.particle;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -17,15 +16,14 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
-import java.util.Locale;
 
 public class LaserParticle extends RisingParticle {
 
@@ -111,7 +109,8 @@ public class LaserParticle extends RisingParticle {
     }
 
     private void makeCornerVertex(VertexConsumer pConsumer, Vector3f pVertex, float pU, float pV, int pPackedLight) {
-        pConsumer.vertex(pVertex.x(), pVertex.y(), pVertex.z(), this.rCol, this.gCol, this.bCol, this.alpha, pU, pV, OverlayTexture.NO_OVERLAY, pPackedLight, 0.0F, 1.0F, 0.0F);
+        pConsumer.addVertex(pVertex.x(), pVertex.y(), pVertex.z()).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setUv(pU, pV)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(pPackedLight).setNormal(0, 1, 0); /// @TODO
     }
 
     @Environment(EnvType.CLIENT)
@@ -138,34 +137,17 @@ public class LaserParticle extends RisingParticle {
     }
 
     public record LaserParticleOptions(int entityId) implements ParticleOptions {
-        public static final Codec<LaserParticleOptions> CODEC = RecordCodecBuilder.create((p_175793_) ->
-                p_175793_.group(Codec.INT.fieldOf("entityId")
-                                .forGetter((optionsBase) -> optionsBase.entityId))
-                        .apply(p_175793_, LaserParticleOptions::new));
-        public static final Deserializer<LaserParticleOptions> DESERIALIZER = new Deserializer<>() {
-            public LaserParticleOptions fromCommand(ParticleType<LaserParticleOptions> p_123689_, StringReader p_123690_) throws CommandSyntaxException {
-                p_123690_.expect(' ');
-                int i = p_123690_.readInt();
-                p_123690_.expect(' ');
-                return new LaserParticleOptions(i);
-            }
-
-            public LaserParticleOptions fromNetwork(ParticleType<LaserParticleOptions> p_123692_, FriendlyByteBuf p_123693_) {
-                return new LaserParticleOptions(p_123693_.readInt());
-            }
-        };
+        public static final MapCodec<LaserParticleOptions> CODEC = RecordCodecBuilder.mapCodec(
+                instance -> instance.group(Codec.INT.fieldOf("entityId").forGetter(optionsBase -> optionsBase.entityId))
+                        .apply(instance, LaserParticleOptions::new)
+        );
+        public static final StreamCodec<RegistryFriendlyByteBuf, LaserParticleOptions> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, opt -> opt.entityId, LaserParticleOptions::new
+        );
 
         @Override
         public ParticleType<?> getType() {
             return TBParticleTypes.LASER;
-        }
-
-        public void writeToNetwork(FriendlyByteBuf pBuffer) {
-            pBuffer.writeInt(this.entityId);
-        }
-
-        public String writeToString() {
-            return String.format(Locale.ROOT, "%s %s", BuiltInRegistries.PARTICLE_TYPE.getKey(this.getType()), entityId);
         }
     }
 }
