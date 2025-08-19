@@ -1,6 +1,5 @@
 package chappie.theboys.client.gui;
 
-import chappie.modulus.client.model.SuitModel;
 import chappie.modulus.networking.ModNetworking;
 import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.IOneScaleScreen;
@@ -22,6 +21,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.AnimationUtils;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -55,7 +55,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     @Nullable
     private PlayerInfo playerInfo;
     @Nullable
-    private SuitModel model;
+    private PlayerModel model;
     private String skinModel;
     private ModSlider eyesLengthSlider, eyesHeightSlider, rotationSlider;
     private EditBox name;
@@ -158,7 +158,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if (!this.playerInfo.getSkin().model().id().equals(this.skinModel)) {
             this.skinModel = this.playerInfo.getSkin().model().id();
-            this.model = new SuitModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(this.skinModel.equalsIgnoreCase("slim") ? SuitModel.SUIT_SLIM : SuitModel.SUIT));
+            this.model = new PlayerModel(Minecraft.getInstance().getEntityModels().bakeLayer(this.skinModel.equalsIgnoreCase("slim") ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), this.skinModel.equalsIgnoreCase("slim"));
         }
         this.setModelProperties(this.model, pPartialTick);
         PoseStack pPoseStack = guiGraphics.pose();
@@ -210,7 +210,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
 
     }
 
-    public void setModelProperties(SuitModel model, float pPartialTick) {
+    public void setModelProperties(PlayerModel model, float pPartialTick) {
         if (this.minecraft == null) return;
         model.setAllVisible(true);
         model.hat.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.HAT);

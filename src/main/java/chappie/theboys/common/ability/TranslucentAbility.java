@@ -49,7 +49,7 @@ public class TranslucentAbility extends Ability implements IHasTimer {
                 float alpha = getAlpha(event.modelProperties().partialTicks());
 
                 if (alpha < 1) {
-                    RenderType renderType = TBClientUtil.RenderTypes.entityInvisibility(event.renderer().getTextureLocation((T) event.modelProperties().renderstate()));
+                    RenderType renderType = TBClientUtil.RenderTypes.entityTranslucent(event.renderer().getTextureLocation((T) event.modelProperties().renderstate()));
                     event.renderer().getModel().renderToBuffer(event.poseStack(), event.multiBufferSource().getBuffer(renderType),
                             event.packedLight(), event.packedOverlay(), ARGB.colorFromFloat(event.alpha() * alpha, event.red(), event.green(), event.blue()));
                     return true;

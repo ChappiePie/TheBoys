@@ -9,6 +9,7 @@ import chappie.theboys.client.TBOverlays;
 import chappie.theboys.client.gui.EyeOptionsScreen;
 import chappie.theboys.client.gui.SynthesizerScreen;
 import chappie.theboys.client.item.VialTintSource;
+import chappie.theboys.client.model.CapeModel;
 import chappie.theboys.client.renderer.TrailRenderer;
 import chappie.theboys.client.renderer.block.SynthesizerRenderer;
 import chappie.theboys.common.block.entity.TBBlockEntities;
@@ -24,6 +25,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -47,6 +49,7 @@ public class TheBoysClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ItemTintSources.ID_MAPPER.put(TheBoys.id("vial"), VialTintSource.MAP_CODEC);
+        EntityModelLayerRegistry.registerModelLayer(CapeModel.LAYER_LOCATION, CapeModel::createBodyLayer);
         TBNetworking.registerClientMessages();
         KeyBindingHelper.registerKeyBinding(OVERLAY);
         ClientEntityEvents.ENTITY_LOAD.register((e, w) -> {

@@ -103,6 +103,9 @@ public class FlightAbility extends Ability implements IHasTimer {
                     speed += this.cooldown.value(1) * 4F;
                     CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.CLOUD,
                             true, this.entity.position(), Vec3.ZERO, 0.05F, 10);
+                    if (this.cooldown.timer == 0) {
+                        this.dataManager.set(BOOSTING, false);
+                    }
                 }
                 vec3 = entity.getDeltaMovement().scale(0.25F).add(entity.getLookAngle().scale(speed));
             } else {

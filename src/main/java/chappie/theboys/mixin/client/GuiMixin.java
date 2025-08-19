@@ -14,6 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class GuiMixin {
     @Inject(method = "renderHotbarAndDecorations", at = @At(value = "HEAD"))
     public void mixin$renderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        TBOverlays.render(Minecraft.getInstance(), deltaTracker.getGameTimeDeltaTicks(), guiGraphics);
+        TBOverlays.render(Minecraft.getInstance(), deltaTracker.getGameTimeDeltaPartialTick(false), guiGraphics);
     }
 }

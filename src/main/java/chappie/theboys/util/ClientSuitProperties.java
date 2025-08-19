@@ -1,10 +1,10 @@
 package chappie.theboys.util;
 
-import chappie.modulus.client.model.SuitModel;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.item.suit.SuitItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
@@ -47,7 +47,7 @@ public class ClientSuitProperties {
     public void render(PoseStack pPoseStack, MultiBufferSource pBuffer, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {
     }
 
-    public void renderSuitModel(SuitModel<?> theBoys$model, RenderType renderType, PoseStack pPoseStack, MultiBufferSource pBuffer, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack stack, ItemStack suitStack, HumanoidModel<?> pModel, float alpha) {
-        theBoys$model.renderToBuffer(pPoseStack, pBuffer.getBuffer(renderType), pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
+    public void renderSuitModel(PlayerModel suitModel, RenderType renderType, PoseStack pPoseStack, MultiBufferSource pBuffer, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack stack, ItemStack suitStack, HumanoidModel<?> pModel, float alpha) {
+        suitModel.renderToBuffer(pPoseStack, pBuffer.getBuffer(renderType), pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
     }
 }

@@ -54,7 +54,7 @@ public class FocusOnGoalAbility extends Ability {
                     Vec3 vec1 = entity.getEyePosition();
                     if (this.hasSpeedAbility()) {
                         if (this.dataManager.get(FORWARD_IMPULSE) > 0 && (Math.abs(entity.getX() - xOld) != 0 || Math.abs(entity.getZ() - zOld) != 0)) {
-
+                            // сделай проверку смотрит ли на моба,если нет то пусть уезжает
                             if (vec.distanceTo(vec1) > 2) {
                                 entity.setDeltaMovement(entity.getDeltaMovement().add(vec.subtract(vec1).multiply(0.01F, 0, 0.01F)));
                             } else {

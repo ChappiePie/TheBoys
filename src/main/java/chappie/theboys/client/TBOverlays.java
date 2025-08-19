@@ -94,8 +94,8 @@ public class TBOverlays {
         x += 7;
         y += 19;
         if (f != 1) {
-            guiGraphics.fill(x, y, x + 22, y + 22, ARGB.color((int) (f1 * 255), 0x282828));
             RenderSystem.enableBlend();
+            guiGraphics.fill(x, y, x + 22, y + 22, color);
             power.renderIcon(x + 3, y + 3, f1, mc, guiGraphics, partialTick);
             //guiGraphics.blit(TEXTURE, x + 3, y + 3, 0, 128, 16, 16, 256, 256);
 

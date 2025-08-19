@@ -5,6 +5,7 @@ import chappie.theboys.util.TBClientUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -46,6 +47,6 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
     @Inject(method = "renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/model/geom/ModelPart;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderType;entityTranslucent(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;"))
     private void renderHandPost(PoseStack pMatrixStack, MultiBufferSource pBuffer, int pCombinedLight, ResourceLocation skinTexture, ModelPart arm, boolean isSleeveVisible, CallbackInfo ci) {
         HumanoidArm side = arm == this.getModel().rightArm ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
-        TBClientUtil.setupArms(this.getModel(), side, pMatrixStack, pBuffer, pCombinedLight, this.player, arm, null, ClientUtil.getPartialTick());
+        TBClientUtil.setupArms(this.getModel(), side, pMatrixStack, pBuffer, pCombinedLight, Minecraft.getInstance().player, arm, null, ClientUtil.getPartialTick());
     }
 }

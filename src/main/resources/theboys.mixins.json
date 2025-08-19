@@ -4,6 +4,7 @@
   "minVersion": "0.8",
   "client": [
     "client.AbstractSoundInstanceMixin",
+    "client.EntityRenderersAccessor",
     "client.GameRendererMixin",
     "client.GuiMixin",
     "client.HumanoidArmorLayerMixin",

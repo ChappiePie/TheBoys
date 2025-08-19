@@ -152,7 +152,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
             }
             this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
 
-            if (this.blocksInFire.getValue() > 20) {
+            if (this.blocksInFire.getValue() > 60) {
                 this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.GLASS.defaultBlockState(), 11);
                 this.blocksInFire = null;
             }

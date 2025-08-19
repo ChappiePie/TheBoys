@@ -11,9 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.component.ComponentV3;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
 
-public class TheBoysCap implements org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
+public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
 
     public static final ComponentKey<TheBoysCap> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(TheBoys.id("cap"), TheBoysCap.class);
     public final SyringeVialAnim vialAnim = new SyringeVialAnim(this);

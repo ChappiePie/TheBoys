@@ -1,10 +1,10 @@
  package chappie.theboys.client.renderer;
 
- import chappie.modulus.mixin.client.EntityRenderersAccessor;
  import chappie.modulus.util.CommonUtil;
  import chappie.modulus.util.render.IHasContext;
  import chappie.theboys.common.entity.TrailEntity;
  import chappie.theboys.mixin.LivingEntityRendererAccessor;
+ import chappie.theboys.mixin.client.EntityRenderersAccessor;
  import chappie.theboys.util.interfaces.EntitySavingFields;
  import com.mojang.blaze3d.vertex.PoseStack;
  import net.minecraft.client.Minecraft;
