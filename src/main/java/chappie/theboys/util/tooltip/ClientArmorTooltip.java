@@ -41,7 +41,7 @@ public class ClientArmorTooltip implements ClientTooltipComponent {
 
     private void renderSlot(int pX, int pY, int pItemIndex, Font pFont, GuiGraphics guiGraphics) {
         guiGraphics.renderItem(this.itemStack, pX + 1, pY + 1, pItemIndex);
-        guiGraphics.blitSprite(SLOT_SPRITE, pX, pY, 0, 18, 20);
+        //guiGraphics.blitSprite(SLOT_SPRITE, pX, pY, 0, 18, 20);
         guiGraphics.drawString(pFont, this.itemStack.getHoverName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
         guiGraphics.renderItemDecorations(pFont, this.itemStack, pX + 1, pY + 1);
     }

@@ -6,18 +6,18 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 public class SynthesizerStartButton extends ImageButton {
-    private static final WidgetSprites BUTTON_SPRITES = new WidgetSprites(TheBoys.id("button"), TheBoys.id("button_highlighted"));
+    private static final ResourceLocation LOCATION = TheBoys.id("textures/gui/button.png");
     private final SynthesizerScreen screen;
 
     public SynthesizerStartButton(SynthesizerScreen screen, int leftPos, int topPos) {
-        super(leftPos + 139, topPos + 3, 29, 18, BUTTON_SPRITES, (p) -> {
+        super(leftPos + 139, topPos + 3, 29, 18, 0, 0, 18, LOCATION, (p) -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
                 if (screen.getMenu().clickMenuButton(mc.player, 0) && mc.gameMode != null) {

@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class SynthesizerBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    public static final MapCodec<SynthesizerBlock> CODEC = simpleCodec(SynthesizerBlock::new);
     protected static final VoxelShape AABB = Block.box(0.0, 0.0, 0.0, 16.0, 9.0, 16.0);
 
     public SynthesizerBlock(Properties properties) {
@@ -118,11 +117,6 @@ public class SynthesizerBlock extends BaseEntityBlock {
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
-    }
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
     }
 
     @Nullable

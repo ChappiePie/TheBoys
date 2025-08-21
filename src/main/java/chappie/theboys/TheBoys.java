@@ -16,7 +16,7 @@ import chappie.theboys.util.tooltip.ArmorTooltip;
 import chappie.theboys.util.tooltip.ClientArmorTooltip;
 import chappie.theboys.util.tooltip.ClientSuperpowerTooltip;
 import chappie.theboys.util.tooltip.SuperpowerTooltip;
-import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.Minecraft;

@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.resources.ResourceLocation;
 
 public class ClientSuperpowerTooltip implements ClientTooltipComponent {
-    private static final ResourceLocation SLOT_SPRITE = new ResourceLocation("container/bundle/slot");
+    //private static final ResourceLocation SLOT_SPRITE = new ResourceLocation("container/bundle/slot");
     private final TBSuperpower superpower;
 
     public ClientSuperpowerTooltip(SuperpowerTooltip tooltip) {
@@ -42,7 +42,7 @@ public class ClientSuperpowerTooltip implements ClientTooltipComponent {
     }
 
     private void renderSlot(int pX, int pY, Font pFont, GuiGraphics guiGraphics) {
-        guiGraphics.blitSprite(SLOT_SPRITE, pX, pY, 0, 18, 20);
+        //guiGraphics.blitSprite(SLOT_SPRITE, pX, pY, 0, 18, 20);
         guiGraphics.drawString(pFont, this.superpower.getDisplayName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
         RenderSystem.enableBlend();
         this.superpower.renderIcon(pX + 1, pY + 1, 1, Minecraft.getInstance(), guiGraphics, ClientUtil.getPartialTick());

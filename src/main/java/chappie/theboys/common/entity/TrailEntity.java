@@ -93,7 +93,7 @@ public class TrailEntity extends Entity {
             model.rightPants.visible = false;
             model.jacket.visible = false;
             this.model = model;
-            this.texture = player.getSkin().texture();
+            this.texture = player.getSkinTextureLocation();
         } else {
             if (EntityRenderersAccessor.providers().get(this.entity.getType()).create(IHasContext.getContext()) instanceof LivingEntityRenderer renderer) {
                 this.model = (EntityModel<LivingEntity>) renderer.getModel();

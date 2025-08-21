@@ -1,3 +1,5 @@
 accessWidener v2 named
-accessible method net/minecraft/client/gui/components/AbstractSliderButton getSprite ()Lnet/minecraft/resources/ResourceLocation;
-accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleSprite ()Lnet/minecraft/resources/ResourceLocation;
+extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderSlot (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;)V
+accessible field net/minecraft/client/gui/components/AbstractSliderButton SLIDER_LOCATION Lnet/minecraft/resources/ResourceLocation;
+accessible method net/minecraft/client/gui/components/AbstractSliderButton getTextureY ()I
+accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleTextureY ()I

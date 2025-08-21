@@ -132,7 +132,7 @@ public class ClientSpawnTrail implements FabricPacket, Packet<ClientGamePacketLi
 
         e.setId(this.entityId);
         e.setUUID(this.uuid);
-        mc.level.addEntity(e);
+        mc.level.putNonPlayerEntity(this.entityId, e);
         e.lerpMotion(this.velX / 8000.0, this.velY / 8000.0, this.velZ / 8000.0);
         if (e instanceof TrailEntity entity) {
             entity.readSpawnData(this.lifeTime, (LivingEntity) entity.getCommandSenderWorld().getEntity(this.ownerId), this.color);
