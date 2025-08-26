@@ -39,6 +39,7 @@ import org.joml.Matrix4f;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class TBOverlays {
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/gui/ui.png");
@@ -52,6 +53,11 @@ public class TBOverlays {
         TBOverlays.renderATrain(guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         TBOverlays.renderEyes(guiGraphics, mc, partialTick);
     }
+
+    /*
+    TODO Update abilities overlay to look better
+     */
+
 
     public static void renderHud(Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
         Entity entity = mc.getCameraEntity();
@@ -151,7 +157,6 @@ public class TBOverlays {
                 int texY = y + (type == 1 ? 0 : j);
 
 
-                float a = f2;
                 {
                     int cBack = iHasOverlay.getBackgroundColor();
                     float r = ARGB.red(cBack) / 255F;
@@ -169,7 +174,7 @@ public class TBOverlays {
 
                 iHasOverlay.renderIcon(texX + 3, texY + 3, f1, mc, gui, guiGraphics, partialTick, width, height);
                 if (type == 0) {
-                    guiGraphics.drawString(mc.font, ability.builder.displayName(), x + 22, texY + 7, ARGB.color((int) (a * 255), textColor), true);
+                    guiGraphics.drawString(mc.font, ability.builder.displayName(), x + 22, texY + 7, ARGB.color((int) (f2 * 255), textColor), true);
                 }
 
                 KeyMap.KeyType keyType = iHasOverlay.getKeyType();
@@ -189,9 +194,9 @@ public class TBOverlays {
                     if (type == 1) {
                         newX = texX * 2 + 10 + 6 - mc.font.width(key) / 2;
                     }
-                    guiGraphics.fill(newX, newY, newX + mc.font.width(key) + 10, newY + 16, ARGB.colorFromFloat(127 * ((a == 0.25F ? 0.5F : 1F) * f2), 0, 0, 0));
+                    guiGraphics.fill(newX, newY, newX + mc.font.width(key) + 10, newY + 16, ARGB.colorFromFloat(127 * ((f2 == 0.25F ? 0.5F : 1F) * f2), 0, 0, 0));
                     poseStack.translate(0, 0, 0);
-                    guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, ARGB.color((int) (((a == 0.25F ? 0.5F : 1F) * f2) * 255), textColor), true);
+                    guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, ARGB.color((int) (((f2 == 0.25F ? 0.5F : 1F) * f2) * 255), textColor), true);
                     poseStack.popPose();
                 }
             }
@@ -240,19 +245,8 @@ public class TBOverlays {
                     RenderSystem.defaultBlendFunc();
                     RenderSystem.disableDepthTest();
                     int i = ARGB.color(alpha, red, green, blue);
-                    guiGraphics.blit(
-                            RenderType::guiTexturedOverlay,
-                            TBClientUtil.GLOW_EYES_OVERLAY,
-                            0,
-                            0,
-                            0.0F,
-                            0.0F,
-                            guiGraphics.guiWidth(),
-                            guiGraphics.guiHeight(),
-                            guiGraphics.guiWidth(),
-                            guiGraphics.guiHeight(),
-                            i
-                    );
+                    guiGraphics.blit(RenderType::guiTexturedOverlay, TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
+                            guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight(), i);
                 }
             }
         }
@@ -277,7 +271,7 @@ public class TBOverlays {
                             u += 11.5F;
                         }
                     }
-                    blit(poseStack, A_TRAIN, left, top, u * 0.75F);
+                    TBOverlays.blit(guiGraphics, RenderType::guiTextured, A_TRAIN, left, top, 0, 24, u * 0.75F, 24, 96, 48);
                 }
                 poseStack.popPose();
                 break;
@@ -309,12 +303,45 @@ public class TBOverlays {
         }
     }
 
-    private static void blit(PoseStack pPoseStack, ResourceLocation location, float pX, float pY, float pUWidth) {
-        Matrix4f pMatrix = pPoseStack.last().pose();
-        VertexConsumer vertexConsumer = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderType.guiTextured(location));
-        vertexConsumer.addVertex(pMatrix, pX, pY + 24F, 1.0F).setUv(0.0F, 1.0F).setColor(1, 1, 1, 1);
-        vertexConsumer.addVertex(pMatrix, pX + pUWidth, pY + 24F, 1.0F).setUv(pUWidth / 96F, 1.0F).setColor(1, 1, 1, 1);
-        vertexConsumer.addVertex(pMatrix, pX + pUWidth, pY, 1.0F).setUv(pUWidth / 96F, 0.5F).setColor(1, 1, 1, 1);
-        vertexConsumer.addVertex(pMatrix, pX, pY, 1.0F).setUv(0.0F, 0.5F).setColor(1, 1, 1, 1);
+    public static void blit(GuiGraphics guiGraphics,
+                            Function<ResourceLocation, RenderType> renderTypeGetter,
+                            ResourceLocation atlasLocation, float x, float y,
+                            float uOffset, float vOffset, float uWidth, float vHeight,
+                            float textureWidth, float textureHeight) {
+        TBOverlays.blit(guiGraphics, renderTypeGetter, atlasLocation, x, y, uOffset, vOffset, uWidth, vHeight, uWidth, vHeight, textureWidth, textureHeight, -1);
+    }
+
+    public static void blit(GuiGraphics guiGraphics,
+                            Function<ResourceLocation, RenderType> renderTypeGetter,
+                            ResourceLocation atlasLocation, float x, float y,
+                            float uOffset, float vOffset, float uWidth, float vHeight,
+                            float width, float height, float textureWidth, float textureHeight,
+                            int color) {
+        TBOverlays.innerBlit(guiGraphics,
+                renderTypeGetter,
+                atlasLocation,
+                x,
+                x + uWidth,
+                y,
+                y + vHeight,
+                (uOffset + 0.0F) / textureWidth,
+                (uOffset + width) / textureWidth,
+                (vOffset + 0.0F) / textureHeight,
+                (vOffset + height) / textureHeight,
+                color
+        );
+    }
+
+    private static void innerBlit(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderTypeGetter,
+                                  ResourceLocation atlasLocation, float x1, float x2, float y1, float y2,
+                                  float minU, float maxU, float minV, float maxV,
+                                  int color) {
+        RenderType renderType = renderTypeGetter.apply(atlasLocation);
+        Matrix4f matrix4f = guiGraphics.pose().last().pose();
+        VertexConsumer vertexConsumer = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(renderType);
+        vertexConsumer.addVertex(matrix4f, x1, y1, 0.0F).setUv(minU, minV).setColor(color);
+        vertexConsumer.addVertex(matrix4f, x1, y2, 0.0F).setUv(minU, maxV).setColor(color);
+        vertexConsumer.addVertex(matrix4f, x2, y2, 0.0F).setUv(maxU, maxV).setColor(color);
+        vertexConsumer.addVertex(matrix4f, x2, y1, 0.0F).setUv(maxU, minV).setColor(color);
     }
 }

@@ -252,7 +252,8 @@ public class SynthesizerMenu extends AbstractContainerMenu {
 
         @Override
         public boolean mayPlace(ItemStack stack) {
-            return stack.getItem() instanceof VialItem;
+            boolean b = stack.getItem() instanceof VialItem;
+            return b;
         }
 
         @Override

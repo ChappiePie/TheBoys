@@ -8,7 +8,6 @@ import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.TBConfig;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +18,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
@@ -67,7 +67,7 @@ public class SyringeItem extends Item implements GeoItem {
 
     @Override
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
-        if (pLivingEntity instanceof Player player && !pLevel.isClientSide()) {
+        if (pLivingEntity instanceof Player player) {
             PowerCap cap = PowerCap.getCap(player);
             boolean b = false;
             ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
@@ -81,7 +81,9 @@ public class SyringeItem extends Item implements GeoItem {
                         cap.setSuperpower(Superpower.REGISTRY.get(ResourceLocation.tryParse(vial.getOrDefault(TBDataComponents.SUPERPOWER, ""))).get().value());
                     }
                     if (!player.getAbilities().instabuild) {
-                        pStack.set(TBDataComponents.VIAL, ItemStack.EMPTY);
+                        vial.remove(TBDataComponents.SUPERPOWER);
+                        pStack.set(TBDataComponents.VIAL, vial);
+                        this.broadcastChangesOnContainerMenu(player);
                         b = true;
                     }
                 } else {
@@ -91,26 +93,35 @@ public class SyringeItem extends Item implements GeoItem {
                         } else {
                             vial.set(TBDataComponents.SUPERPOWER, "compoundV");
                         }
+                        this.broadcastChangesOnContainerMenu(player);
                         cap.setSuperpower(null);
                         b = true;
                     } else {
                         if (this.vialSuperpower(pStack).equals("compoundV")) {
                             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 3, false, true, true));
                             if (!player.getAbilities().instabuild) {
-                                vial.set(TBDataComponents.SUPERPOWER, "");
+                                vial.remove(TBDataComponents.SUPERPOWER);
                             }
                         }
                     }
                     pStack.set(TBDataComponents.VIAL, vial);
+                    this.broadcastChangesOnContainerMenu(player);
                 }
                 if (player.getRandom().nextBoolean() && b) {
                     var effects = BuiltInRegistries.MOB_EFFECT.stream().filter(p -> BuiltInRegistries.MOB_EFFECT.getKey(p).getNamespace().equals("minecraft") && p.getCategory().equals(MobEffectCategory.HARMFUL)).toList();
                     var mobEffect = effects.get(player.getRandom().nextInt(effects.size()));
-                    player.addEffect(new MobEffectInstance(Holder.direct(mobEffect), 200, 3, false, true, true));
+                    player.addEffect(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(mobEffect), 200, 3, false, true, true));
                 }
             }
         }
         return super.finishUsingItem(pStack, pLevel, pLivingEntity);
+    }
+
+    private void broadcastChangesOnContainerMenu(Player player) {
+        AbstractContainerMenu abstractContainerMenu = player.containerMenu;
+        if (abstractContainerMenu != null) {
+            abstractContainerMenu.slotsChanged(player.getInventory());
+        }
     }
 
     @Override

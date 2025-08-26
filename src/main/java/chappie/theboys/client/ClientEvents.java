@@ -47,6 +47,8 @@ public class ClientEvents {
 
     public static boolean firstPersonAdditionalHand(FirstPersonAdditionalHandCallback.FirstPersonAdditionalHandEvent event) {
         var player = event.pPlayer();
+        ClientEvents.renderHeatVisionFP(event.pHand(), event.pPartialTicks(), event.pMatrixStack(), event.pBuffer(), event.pCombinedLight());
+
         TheBoysCap theBoysCap = TheBoysCap.getCap(player);
         if (theBoysCap == null) return false;
         ItemStack pStack = player.getItemInHand(event.pHand());
@@ -209,7 +211,7 @@ public class ClientEvents {
             for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
                 float yBodyRot = Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot);
                 float f = Mth.wrapDegrees(player.getViewYRot(partialTick) - yBodyRot);
-                if (!ability.cooldown.end() && player.isSprinting() && !Minecraft.getInstance().isPaused()) {
+                if (!ability.cooldown.end() && ability.dataManager.get(FlightAbility.BOOSTING) && player.isSprinting() && !Minecraft.getInstance().isPaused()) {
                     float f1 = ability.cooldown.value(partialTick);
                     pPoseStack.mulPose(Axis.ZP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
                     pPoseStack.mulPose(Axis.YP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
@@ -265,7 +267,7 @@ public class ClientEvents {
         }
     }
 
-    public static boolean renderHand(InteractionHand hand, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public static boolean renderHeatVisionFP(InteractionHand hand, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || !mc.options.getCameraType().isFirstPerson() || hand == InteractionHand.OFF_HAND)
             return false;

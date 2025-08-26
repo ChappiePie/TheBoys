@@ -7,6 +7,7 @@
   "abilities.theboys.translucent": "Translucent",
 
   "block.theboys.synthesizer": "Synthesizer",
+  "item.theboys.synthesizer": "Synthesizer",
   "button.theboys.synthesizer.start": "Start",
   "button.theboys.synthesizer.stop": "Stop",
   "config.theboys.suitOpacity": "Suit Opacity",
@@ -24,7 +25,7 @@
   "gui.theboys.eyeOptions.profileName": "Profile name",
   "gui.theboys.eyeOptions.skinPreset": "Skin preset",
 
-  "item.theboys.atrain_helmet": "A-Train Helmet",
+  "item.theboys.atrain_helmet": "A-Train Glasses",
   "item.theboys.atrain_chestplate": "A-Train Chest",
   "item.theboys.atrain_leggings": "A-Train Leggings",
   "item.theboys.atrain_boots": "A-Train Boots",

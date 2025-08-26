@@ -82,7 +82,7 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(i, j, 0);
         guiGraphics.pose().pushPose();
-        guiGraphics.enableScissor(this.leftPos + 36, this.topPos, this.leftPos + 36 + 103, this.topPos + 81);
+        guiGraphics.enableScissor(36, 0, 36 + 103, 81);
 
         guiGraphics.pose().translate(87.5F, 40.5F, 0);
         guiGraphics.pose().mulPose(Axis.ZN.rotationDegrees(360F * rollTimer.value(ClientUtil.getPartialTick())));
@@ -154,10 +154,8 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
 
     private @Nullable Component getToolTip() {
         Component component = null;
-        if (this.getMenu().getItems().get(1).isEmpty()) {
-            if (!this.getMenu().isLit()) {
-                component = Component.translatable("tooltip.theboys.synthesizer.fuel");
-            }
+        if (this.getMenu().getItems().get(1).isEmpty() && !this.getMenu().isLit()) {
+            component = Component.translatable("tooltip.theboys.synthesizer.fuel");
         } else if (this.getMenu().getWaterMb() < 250) {
             component = Component.translatable("tooltip.theboys.synthesizer.water", 250 - this.getMenu().getWaterMb());
         } else if (this.getMenu().isCentrifugeEmpty()) {

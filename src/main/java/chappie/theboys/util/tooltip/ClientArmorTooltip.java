@@ -1,15 +1,12 @@
 package chappie.theboys.util.tooltip;
 
-import chappie.theboys.TheBoys;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 
 public class ClientArmorTooltip implements ClientTooltipComponent {
-    private static final ResourceLocation SLOT_SPRITE = TheBoys.id("textures/gui/armor_slot.png");
     private final ItemStack itemStack;
 
     public ClientArmorTooltip(ArmorTooltip tooltip) {
@@ -23,7 +20,7 @@ public class ClientArmorTooltip implements ClientTooltipComponent {
 
     @Override
     public int getWidth(Font pFont) {
-        return this.gridSizeX() * 20 + pFont.width(this.itemStack.getHoverName().getString()) + 2;
+        return this.gridSizeX() * 20 + pFont.width(this.itemStack.getHoverName().getString()) + 14;
     }
 
     @Override
@@ -35,7 +32,7 @@ public class ClientArmorTooltip implements ClientTooltipComponent {
 
         for (int l = 0; l < j; ++l) {
             for (int i1 = 0; i1 < i; ++i1) {
-                int j1 = x + i1 * 18 + 1;
+                int j1 = x + i1 * 20 + 1;
                 int k1 = y + l * 20 + 1;
                 this.renderSlot(j1, k1, k++, font, guiGraphics);
             }
@@ -44,8 +41,27 @@ public class ClientArmorTooltip implements ClientTooltipComponent {
 
     private void renderSlot(int pX, int pY, int pItemIndex, Font pFont, GuiGraphics guiGraphics) {
         guiGraphics.renderItem(this.itemStack, pX + 1, pY + 1, pItemIndex);
-        guiGraphics.blitSprite(RenderType::guiTextured, SLOT_SPRITE, pX, pY, 0, 18, 20);
-        guiGraphics.drawString(pFont, this.itemStack.getHoverName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
+
+        int color = ARGB.color(57, 46, 86);
+        int colorLight = ARGB.color(37, 26, 66);
+        int colorDark = ARGB.color(77, 66, 106);
+
+        int b = 2;
+        guiGraphics.fill(pX + b, pY + b, pX + 18 + b, pY + 18 + b, colorLight);
+        guiGraphics.fill(pX - b, pY - b, pX + 18 - b, pY + 18 - b, colorDark);
+        guiGraphics.fill(pX, pY, pX + 18, pY + 18, color);
+
+        String s = this.itemStack.getHoverName().getString();
+        int x = pX + this.gridSizeX() * 20 + 1 + 5;
+        int y = pY + b;
+        int xMax = x + 4 + pFont.width(s);
+        int yMax = pY + pFont.lineHeight + 8;
+
+        guiGraphics.fill(x + b, y + b, xMax + b, yMax + b, colorLight);
+        guiGraphics.fill(x - b, y - b, xMax - b, yMax - b, colorDark);
+        guiGraphics.fill(x, y, xMax, yMax, color);
+
+        guiGraphics.drawString(pFont, s, x + b, pY + 5, -1, true);
         guiGraphics.renderItemDecorations(pFont, this.itemStack, pX + 1, pY + 1);
     }
 

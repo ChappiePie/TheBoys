@@ -1,5 +1,6 @@
 package chappie.theboys.mixin.client;
 
+import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import chappie.theboys.common.capability.TBEntityCap;
@@ -66,7 +67,7 @@ public class MinecraftMixin implements ISetupGameProfiles {
             target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 2))
     private boolean cancelSwapSlots(KeyMapping instance, Operation<Boolean> original) {
         TheBoysCap cap = TheBoysCap.getCap(Minecraft.getInstance().player);
-        if (cap != null && cap.vialAnim.rollVial.value(1) > 0) {
+        if (cap != null && cap.vialAnim.timeline.value(ClientUtil.getPartialTick()) > 0) {
             return false;
         } else {
             return original.call(instance);

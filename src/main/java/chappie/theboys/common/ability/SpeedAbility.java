@@ -10,8 +10,9 @@ import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.entity.TrailEntity;
 import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.interfaces.ILivingEntityEx;
-import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -97,7 +98,9 @@ public class SpeedAbility extends Ability implements IHasTimer {
                     for (LivingEntity e : entity.getCommandSenderWorld().getEntitiesOfClass(LivingEntity.class,
                             CommonUtil.boxWithRange(entity.position(), 0.5D))) {
                         if (e != entity) {
-                            e.hurt(e.damageSources().inWall(), speedLevel);
+                            if (entity.getCommandSenderWorld() instanceof ServerLevel level) {
+                                e.hurtServer(level, e.damageSources().inWall(), speedLevel);
+                            }
                         }
                     }
                 }
@@ -134,7 +137,7 @@ public class SpeedAbility extends Ability implements IHasTimer {
     }
 
     public void setAttribute(LivingEntity entity, String name, Attribute attribute, double amount, AttributeModifier.Operation operation) {
-        AttributeInstance instance = entity.getAttribute(Holder.direct(attribute));
+        AttributeInstance instance = entity.getAttribute(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute));
         ResourceLocation location = TheBoys.id(name);
 
         if (instance != null) {

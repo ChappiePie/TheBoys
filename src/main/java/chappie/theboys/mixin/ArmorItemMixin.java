@@ -26,6 +26,9 @@ public abstract class ArmorItemMixin extends Item {
         super(pProperties);
     }
 
+    /*
+    TODO Find out the solution to add attributes when setting up a suit on armor
+     */
     @Override
     public boolean overrideOtherStackedOnMe(ItemStack pStack, ItemStack pOther, Slot pSlot, ClickAction pAction, Player pPlayer, SlotAccess pAccess) {
         if (pAction == ClickAction.SECONDARY && pSlot.allowModification(pPlayer)) {
@@ -37,11 +40,11 @@ public abstract class ArmorItemMixin extends Item {
                             DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY, itemAttributeModifiers -> {
                                 if (suitItem.getItem() instanceof SuitItem item) {
                                     ImmutableList.Builder<ItemAttributeModifiers.Entry> builder = ImmutableList.builderWithExpectedSize(itemAttributeModifiers.modifiers().size() + 1);
-                                    for (ItemAttributeModifiers.Entry entry : itemAttributeModifiers.modifiers()) {
-                                        if (!item.properties.defaultModifiers().contains(entry)) {
-                                            builder.add(entry);
-                                        }
-                                    }
+//                                    for (ItemAttributeModifiers.Entry entry : itemAttributeModifiers.modifiers()) {
+//                                        if (!item.properties.defaultModifiers().contains(entry)) {
+//                                            builder.add(entry);
+//                                        }
+//                                    }
                                     return new ItemAttributeModifiers(builder.build(), itemAttributeModifiers.showInTooltip);
                                 }
                                 return itemAttributeModifiers;
@@ -61,17 +64,17 @@ public abstract class ArmorItemMixin extends Item {
                             pAccess.set(suitItem);
                             pStack.set(TBDataComponents.SUIT, pOther.copyWithCount(1));
 
-                            pStack.update(
-                                    DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY, itemAttributeModifiers -> {
-                                        ItemAttributeModifiers modifiers = itemAttributeModifiers;
-                                        if (suitItem.getItem() instanceof SuitItem item) {
-                                            for (ItemAttributeModifiers.Entry defaultModifier : item.properties.defaultModifiers()) {
-                                                modifiers = modifiers.withModifierAdded(defaultModifier.attribute(), defaultModifier.modifier(), defaultModifier.slot());
-                                            }
-                                        }
-                                        return modifiers;
-                                    }
-                            );
+//                            pStack.update(
+//                                    DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY, itemAttributeModifiers -> {
+//                                        ItemAttributeModifiers modifiers = itemAttributeModifiers;
+//                                        if (suitItem.getItem() instanceof SuitItem item) {
+//                                            for (ItemAttributeModifiers.Entry defaultModifier : item.properties.defaultModifiers()) {
+//                                                modifiers = modifiers.withModifierAdded(defaultModifier.attribute(), defaultModifier.modifier(), defaultModifier.slot());
+//                                            }
+//                                        }
+//                                        return modifiers;
+//                                    }
+//                            );
 
 
                             pOther.shrink(1);
@@ -84,15 +87,15 @@ public abstract class ArmorItemMixin extends Item {
                     EquipmentSlot slot = item.equipmentSlot(pStack, pOther, pPlayer);
                     if (slot == null || pPlayer.getEquipmentSlotForItem(pStack).equals(slot)) {
                         pStack.set(TBDataComponents.SUIT, pOther.copyWithCount(1));
-                        pStack.update(
-                                DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY, itemAttributeModifiers -> {
-                                    ItemAttributeModifiers modifiers = itemAttributeModifiers;
-                                        for (ItemAttributeModifiers.Entry defaultModifier : item.properties.defaultModifiers()) {
-                                            modifiers = modifiers.withModifierAdded(defaultModifier.attribute(), defaultModifier.modifier(), defaultModifier.slot());
-                                        }
-                                    return modifiers;
-                                }
-                        );
+//                        pStack.update(
+//                                DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY, itemAttributeModifiers -> {
+//                                    ItemAttributeModifiers modifiers = itemAttributeModifiers;
+//                                        for (ItemAttributeModifiers.Entry defaultModifier : item.properties.defaultModifiers()) {
+//                                            modifiers = modifiers.withModifierAdded(defaultModifier.attribute(), defaultModifier.modifier(), defaultModifier.slot());
+//                                        }
+//                                    return modifiers;
+//                                }
+//                        );
                         pOther.shrink(1);
                         return true;
                     }

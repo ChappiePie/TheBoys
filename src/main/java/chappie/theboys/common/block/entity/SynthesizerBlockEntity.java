@@ -45,11 +45,11 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
     int litDuration;
     int cookingProgress;
     int cookingTotalTime = 200;
-    public final IHasTimer.Timer workTimer = new IHasTimer.Timer(() -> 5, this::isWork);
-    public final IHasTimer.Timer rollTimer = new RollTimer(this::isWork);
+    public final Timer workTimer = new Timer(() -> 5, this::isWork);
+    public final Timer rollTimer = new RollTimer(this::isWork);
     boolean work;
     private boolean opened = true;
-    public final IHasTimer.Timer openTimer = new IHasTimer.Timer(() -> 5, () -> this.opened);
+    public final Timer openTimer = new Timer(() -> 5, () -> this.opened);
     private NonNullList<ItemStack> items = NonNullList.withSize(9, ItemStack.EMPTY);
     private final ContainerData dataAccess = new ContainerData() {
         @Override
@@ -136,7 +136,7 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
         if (fuel.isEmpty()) {
             return 0;
         } else {
-            return this.level.fuelValues().burnDuration(fuel);
+            return this.level != null ? this.level.fuelValues().burnDuration(fuel) : 0;
         }
     }
 
@@ -417,7 +417,7 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
         return List.of(this.openTimer, this.workTimer, this.rollTimer);
     }
 
-    public static class RollTimer extends IHasTimer.Timer {
+    public static class RollTimer extends Timer {
         public RollTimer(Supplier<Boolean> predicate) {
             super(() -> 20, predicate);
         }

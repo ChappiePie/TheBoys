@@ -33,7 +33,7 @@ public class ClientSuitProperties {
     }
 
     public Vector3f armorScale(HumanoidRenderState renderState, ItemStack armorItem) {
-        return this.suitItem.properties.armorScale.apply(renderState, armorItem);
+        return this.suitItem.properties.armorScale.apply(armorItem);
     }
 
     public Vector3f suitScale(EquipmentSlot slot, HumanoidRenderState renderState, ItemStack armorStack) {

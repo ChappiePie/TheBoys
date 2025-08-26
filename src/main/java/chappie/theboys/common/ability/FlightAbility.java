@@ -59,7 +59,7 @@ public class FlightAbility extends Ability implements IHasTimer {
         super.onDataUpdated(accessor);
         if (accessor == SPRINTING) {
             if (this.dataManager.get(SPRINTING)) {
-                this.dataManager.set(ARM_AHEAD, this.entity.getRandom().nextInt(100) < 20);
+                this.dataManager.set(ARM_AHEAD, this.entity.getRandom().nextInt(100) < 5);
             } else {
                 this.dataManager.set(ARM_AHEAD, false);
             }
@@ -109,6 +109,7 @@ public class FlightAbility extends Ability implements IHasTimer {
                 }
                 vec3 = entity.getDeltaMovement().scale(0.25F).add(entity.getLookAngle().scale(speed));
             } else {
+                this.dataManager.set(BOOSTING, false);
                 vec3 = entity.getDeltaMovement().multiply(1.05, 0.1F, 1.05); // slight sliding effect
                 vec3 = vec3.add(0, Math.sin(entity.tickCount / 10F) / 50F, 0); // hover
                 vec3 = vec3.add(inputVector(entity, speed * 2)); // unite two vectors, default and with movements.

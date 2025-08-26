@@ -35,7 +35,7 @@ public class VialItem extends Item implements GeoItem {
         String superpower = stack.getOrDefault(TBDataComponents.SUPERPOWER, "");
         if (!superpower.isEmpty()) {
             if (superpower.equals("compoundV")) {
-                return 104166;
+                return -14117156;
             }
             return superpower.hashCode();
         }
@@ -50,7 +50,7 @@ public class VialItem extends Item implements GeoItem {
 
     @Override
     public Component getName(ItemStack stack) {
-        return Objects.equals(stack.getOrDefault(TBDataComponents.SUPERPOWER, ""), "compoundV") ? Component.literal("injection.theboys.compound_v") : super.getName(stack);
+        return Objects.equals(stack.getOrDefault(TBDataComponents.SUPERPOWER, ""), "compoundV") ? Component.translatable("injection.theboys.compound_v") : super.getName(stack);
     }
 
     @Override

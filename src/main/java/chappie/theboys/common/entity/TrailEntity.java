@@ -1,14 +1,14 @@
 package chappie.theboys.common.entity;
 
+import chappie.modulus.networking.ModNetworking;
+import chappie.theboys.client.renderer.TrailRenderState;
 import chappie.theboys.networking.client.ClientSpawnTrail;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -23,6 +23,7 @@ public class TrailEntity extends Entity {
     public int lifeTime;
     public Color color;
     public Map<String, Object> fieldSavingMap;
+    public TrailRenderState.TrailResources trail;
 
     public TrailEntity(EntityType<TrailEntity> entityType, Level world) {
         super(entityType, world);
@@ -67,32 +68,6 @@ public class TrailEntity extends Entity {
         return false;
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity entity) {
-        return new ClientSpawnTrail.Custom(this);
-    }
-
-    @SuppressWarnings("unchecked")
-    public void readSpawnData(int lifeTime, LivingEntity entity, Color color) {
-        this.lifeTime = lifeTime;
-        this.attached = entity;
-        this.color = color;
-
-        if (this.attached == null) return;
-
-        this.yBodyRot = this.attached.yBodyRot;
-
-
-        this.fieldSavingMap = Map.of("isFallFlying", this.attached.isFallFlying(),
-                "fallFlyingTicks", this.attached.getFallFlyingTicks(),
-                "xRot", this.attached.getXRot(),
-                "yRot", this.attached.getYRot(),
-                "swimAmount", this.attached.getSwimAmount(1),
-                "deltaMovement", this.attached.getDeltaMovement(),
-                "isInWater", this.attached.isInWater(),
-                "isVisuallySwimming", this.attached.isVisuallySwimming());
-    }
-
     @Environment(EnvType.CLIENT)
     @Override
     public boolean shouldRender(double x, double y, double z) {
@@ -103,5 +78,11 @@ public class TrailEntity extends Entity {
     }
 
     protected void addAdditionalSaveData(CompoundTag compound) {
+    }
+
+    public static void startTracking(Entity entity, ServerPlayer serverPlayer) {
+        if (entity instanceof TrailEntity e) {
+            ModNetworking.send(new ClientSpawnTrail(e), serverPlayer);
+        }
     }
 }

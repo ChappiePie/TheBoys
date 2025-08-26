@@ -3,8 +3,7 @@ package chappie.theboys.common.item.suit;
 import chappie.theboys.TheBoys;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.Util;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -23,7 +22,6 @@ import org.joml.Vector3f;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class SuitProperties extends Item.Properties {
@@ -38,21 +36,21 @@ public class SuitProperties extends Item.Properties {
     public final String type;
     private final ImmutableList.Builder<ItemAttributeModifiers.Entry> builder = ImmutableList.builder();
     public ArmorType slot;
-    public BiFunction<HumanoidRenderState, ItemStack, Vector3f> armorScale;
+    public Function<ItemStack, Vector3f> armorScale;
     private List<ItemAttributeModifiers.Entry> defaultModifiers;
 
     public SuitProperties(String type, ArmorType slot) {
         this.type = type;
         this.slot = slot;
-        this.armorScale = (renderState, stack) -> BASIC_ARMOR_SCALE.apply(slot.getSlot());
+        this.armorScale = (stack) -> BASIC_ARMOR_SCALE.apply(slot.getSlot());
     }
 
     public SuitProperties attributeModifier(Attribute attribute, Function<UUID, AttributeModifier> modifierFunction) {
-        this.builder.add(new ItemAttributeModifiers.Entry(Holder.direct(attribute), modifierFunction.apply(ARMOR_MODIFIER_UUID_PER_TYPE.get(this.slot)), EquipmentSlotGroup.bySlot(this.slot.getSlot())));
+        this.builder.add(new ItemAttributeModifiers.Entry(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute), modifierFunction.apply(ARMOR_MODIFIER_UUID_PER_TYPE.get(this.slot)), EquipmentSlotGroup.bySlot(this.slot.getSlot())));
         return this;
     }
 
-    public SuitProperties armorScale(BiFunction<HumanoidRenderState, ItemStack, Vector3f> armorScale) {
+    public SuitProperties armorScale(Function<ItemStack, Vector3f> armorScale) {
         this.armorScale = armorScale;
         return this;
     }

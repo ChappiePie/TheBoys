@@ -1,12 +1,5 @@
 {
-  "parent": "builtin/entity",
-  "render_type": "cutout",
-  "texture_size": [
-    96,
-    96
-  ],
   "textures": {
-    "0": "theboys:block/synthesizer",
     "particle": "theboys:block/synthesizer"
   },
   "display": {

@@ -10,7 +10,6 @@
     "client.HumanoidArmorLayerMixin",
     "client.HumanoidModelMixin",
     "client.ItemInHandLayerMixin",
-    "client.ItemInHandRendererMixin",
     "client.ItemRendererMixin",
     "client.LivingEntityRendererMixin",
     "client.LocalPlayerMixin",

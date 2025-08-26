@@ -5,6 +5,7 @@ import chappie.theboys.common.block.entity.SynthesizerBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.model.DefaultedBlockGeoModel;
@@ -14,15 +15,12 @@ public class SynthesizerRenderer extends GeoBlockRenderer<SynthesizerBlockEntity
 
     public SynthesizerRenderer() {
         super(new DefaultedBlockGeoModel<>(TheBoys.id("synthesizer")));
+        this.withScale(0.85F);
     }
 
     @Override
     public void preRender(PoseStack poseStack, SynthesizerBlockEntity animatable, BakedGeoModel model, @Nullable MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int renderColor) {
         super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
-
-        poseStack.pushPose();
-        poseStack.translate(0.0625F * 1.25F, 0, 0.0625F * 1.5F);
-        poseStack.scale(0.85F, 0.85F, 0.85F);
         try {
             float f = animatable.workTimer.value(partialTick);
             float f1 = 360F * animatable.rollTimer.value(partialTick);
@@ -37,12 +35,11 @@ public class SynthesizerRenderer extends GeoBlockRenderer<SynthesizerBlockEntity
             boolean b = animatable.getItem(i).isEmpty();
             model.getBone("bone_%s".formatted(i - 2)).ifPresent(bone -> bone.setHidden(b));
         }
-
     }
 
     @Override
-    public void postRender(PoseStack poseStack, SynthesizerBlockEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int renderColor) {
-        super.postRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
-        poseStack.popPose();
+    protected void rotateBlock(Direction facing, PoseStack poseStack) {
+        super.rotateBlock(facing, poseStack);
+        poseStack.translate(0, 0, 0.0625F * 0.5F);
     }
 }

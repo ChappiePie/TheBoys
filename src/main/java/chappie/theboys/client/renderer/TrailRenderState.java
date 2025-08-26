@@ -1,7 +1,5 @@
 package chappie.theboys.client.renderer;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -12,9 +10,6 @@ import java.awt.*;
 import java.util.Map;
 
 public class TrailRenderState extends LivingEntityRenderState {
-    @Environment(EnvType.CLIENT)
-    public EntityModel<? extends EntityRenderState> model;
-    public ResourceLocation texture;
     public float yBodyRot;
     public LivingEntity attached;
     public int lifeTime;
@@ -23,4 +18,8 @@ public class TrailRenderState extends LivingEntityRenderState {
     public int tickCount;
     public double distanceToSqr;
     public float partialTick;
+    public TrailResources trail;
+
+    public record TrailResources(EntityModel<? extends EntityRenderState> model, ResourceLocation texture) {
+    }
 }
