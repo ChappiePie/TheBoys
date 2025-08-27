@@ -36,8 +36,7 @@ public class TBItems {
     public static final ArrayList<Item> ITEMS = new ArrayList<>();
     public static final ArrayList<ItemStack> ITEMS_TAB = new ArrayList<>();
 
-    public static final ImmutableMap<ArmorType, SuitItem> HOMELANDER_SUIT = registerSuitParts(SuitItem::new, "homelander", (p) -> {
-    }, CHESTPLATE, LEGGINGS, BOOTS);
+    public static final ImmutableMap<ArmorType, SuitItem> HOMELANDER_SUIT = registerSuitParts(SuitItem::new, "homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
     public static final ImmutableMap<ArmorType, SuitItem> ATRAIN_SUIT = registerSuitParts(SuitItem::new, "atrain", (p) -> p.armorScale((stack) ->
             p.getSlot() != EquipmentSlot.HEAD ? SuitProperties.BASIC_ARMOR_SCALE.apply(p.getSlot()) : new Vector3f(-Integer.MAX_VALUE)), HELMET, CHESTPLATE, LEGGINGS, BOOTS);
     //public static final ImmutableMap<ArmorType, SuitItem> STARLIGHT_SUIT = registerSuitParts(SuitItem::new, "starlight", (p) -> p.armorScale((e, stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, BOOTS);

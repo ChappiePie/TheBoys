@@ -2,7 +2,7 @@ package chappie.theboys.util.interfaces;
 
 public interface ISimpleSoundInstance {
 
-    void setVolume(float volume);
+    void theBoys$setVolume(float volume);
 
-    float volume();
+    float theBoys$volume();
 }

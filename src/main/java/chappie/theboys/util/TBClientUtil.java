@@ -25,7 +25,7 @@ public class TBClientUtil {
 
     public static final ResourceLocation GLOW_EYES_OVERLAY = TheBoys.id("textures/gui/glow_eyes_overlay.png");
 
-    public static void setupArms(PlayerModel model, HumanoidArm side, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, Player pPlayer, ModelPart pRendererArm, ModelPart pRendererArmwear, float partialTicks) {
+    public static void setupArms(PlayerModel model, HumanoidArm side, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, Player pPlayer, ModelPart pRendererArm, float partialTicks) {
         TheBoysCap cap = TheBoysCap.getCap(pPlayer);
         if (cap == null) return;
         float timeline = cap.vialAnim.timeline.value(partialTicks);
@@ -75,9 +75,6 @@ public class TBClientUtil {
                 Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(pPlayer, stack, flag1 ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, !flag1, pPoseStack, pBuffer, pCombinedLight);
                 pPoseStack.popPose();
             }
-        }
-        if (pRendererArmwear != null) {
-            pRendererArmwear.copyFrom(pRendererArm);
         }
     }
 

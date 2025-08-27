@@ -110,7 +110,7 @@ public class LaserParticle extends RisingParticle {
 
     private void makeCornerVertex(VertexConsumer pConsumer, Vector3f pVertex, float pU, float pV, int pPackedLight) {
         pConsumer.addVertex(pVertex.x(), pVertex.y(), pVertex.z()).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setUv(pU, pV)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(pPackedLight).setNormal(0, 1, 0); /// @TODO
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(pPackedLight).setNormal(0, 1, 0);
     }
 
     @Environment(EnvType.CLIENT)

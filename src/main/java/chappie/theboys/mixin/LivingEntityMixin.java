@@ -8,7 +8,6 @@ import chappie.theboys.util.interfaces.ILivingEntityEx;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -101,9 +100,7 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
                                     entity.getCommandSenderWorld().destroyBlock(pos, false);
                                 }
 
-                                for (ServerPlayer serverPlayer : level.getEntitiesOfClass(ServerPlayer.class, CommonUtil.boxWithRange(entity.position(), 30))) {
-                                    level.sendParticles(ParticleTypes.EXPLOSION, false, false, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.getCommandSenderWorld().getHeight()) * 10, 0.0D, 0.0D, 1F);
-                                }
+                                level.sendParticles(ParticleTypes.EXPLOSION, false, false, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.getCommandSenderWorld().getHeight()) * 10, 0.0D, 0.0D, 1F);
                             }
                         }
                     }

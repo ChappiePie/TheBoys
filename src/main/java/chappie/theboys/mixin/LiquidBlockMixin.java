@@ -23,11 +23,12 @@ public class LiquidBlockMixin {
     @Inject(method = "getCollisionShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("HEAD"), cancellable = true)
     public void getNewCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext, CallbackInfoReturnable<VoxelShape> cir) {
         if (pContext.isAbove(SpeedAbility.STABLE_SHAPE, pPos, true) && pState.getValue(LiquidBlock.LEVEL) == 0) {
-            if (pContext instanceof EntityCollisionContext context && context.getEntity() instanceof LivingEntity entity
-                    && ((LiquidBlock) (Object) this).getFluidState(pState).is(WATER)) {
-                for (SpeedAbility ability : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
-                    if (ability.isEnabled() && entity.getDeltaMovement().horizontalDistanceSqr() >= 1.0E-7D) {
-                        cir.setReturnValue(SpeedAbility.STABLE_SHAPE);
+            if (pContext instanceof EntityCollisionContext context && context.getEntity() instanceof LivingEntity entity) {
+                if (((LiquidBlock) (Object) this).getFluidState(pState).is(WATER)) {
+                    for (SpeedAbility ability : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
+                        if (ability.isEnabled() && entity.getDeltaMovement().horizontalDistanceSqr() >= 1.0E-7D) {
+                            cir.setReturnValue(SpeedAbility.STABLE_SHAPE);
+                        }
                     }
                 }
             }

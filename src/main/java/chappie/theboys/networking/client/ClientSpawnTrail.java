@@ -42,7 +42,11 @@ public class ClientSpawnTrail implements CustomPacketPayload {
         this.entity = e;
         this.entityId = e.getId();
         this.lifeTime = e.lifeTime;
-        this.ownerId = e.attached.getId();
+        if (e.attached != null) {
+            this.ownerId = e.attached.getId();
+        } else {
+            this.ownerId = -1;
+        }
         this.color = e.color;
     }
 

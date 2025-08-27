@@ -2,8 +2,8 @@ package chappie.theboys.common.item.suit;
 
 import chappie.theboys.TheBoys;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -19,20 +19,12 @@ import net.minecraft.world.item.equipment.ArmorType;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-import java.util.EnumMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Function;
 
 public class SuitProperties extends Item.Properties {
 
     public static final Function<EquipmentSlot, Vector3f> BASIC_ARMOR_SCALE = (slot) -> new Vector3f(slot == EquipmentSlot.LEGS ? -0.35F : -0.79f);
-    private static final EnumMap<ArmorType, UUID> ARMOR_MODIFIER_UUID_PER_TYPE = Util.make(new EnumMap<>(ArmorType.class), (map) -> {
-        map.put(ArmorType.BOOTS, UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"));
-        map.put(ArmorType.LEGGINGS, UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"));
-        map.put(ArmorType.CHESTPLATE, UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"));
-        map.put(ArmorType.HELMET, UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150"));
-    });
     public final String type;
     private final ImmutableList.Builder<ItemAttributeModifiers.Entry> builder = ImmutableList.builder();
     public ArmorType slot;
@@ -45,8 +37,8 @@ public class SuitProperties extends Item.Properties {
         this.armorScale = (stack) -> BASIC_ARMOR_SCALE.apply(slot.getSlot());
     }
 
-    public SuitProperties attributeModifier(Attribute attribute, Function<UUID, AttributeModifier> modifierFunction) {
-        this.builder.add(new ItemAttributeModifiers.Entry(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute), modifierFunction.apply(ARMOR_MODIFIER_UUID_PER_TYPE.get(this.slot)), EquipmentSlotGroup.bySlot(this.slot.getSlot())));
+    public SuitProperties attributeModifier(Attribute attribute, Function<ResourceLocation, AttributeModifier> modifierFunction) {
+        this.builder.add(new ItemAttributeModifiers.Entry(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute), modifierFunction.apply(ResourceLocation.withDefaultNamespace("armor." + this.slot.getName())), EquipmentSlotGroup.bySlot(this.slot.getSlot())));
         return this;
     }
 

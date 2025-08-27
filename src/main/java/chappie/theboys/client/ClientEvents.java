@@ -194,8 +194,8 @@ public class ClientEvents {
                     Vec3 vec3 = new Vec3(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ());
                     double distance = vec3.distanceTo(player.position());
                     if (soundInstance instanceof ISimpleSoundInstance iSound && distance < 40) {
-                        float maxVolume = ((ISimpleSoundInstance) sound).volume() * 100.0F;
-                        iSound.setVolume(1 + maxVolume);
+                        float maxVolume = ((ISimpleSoundInstance) sound).theBoys$volume() * 100.0F;
+                        iSound.theBoys$setVolume(1 + maxVolume);
                         return soundInstance;
                     }
                 }

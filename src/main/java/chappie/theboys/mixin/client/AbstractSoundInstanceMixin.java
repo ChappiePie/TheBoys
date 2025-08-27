@@ -12,12 +12,12 @@ public class AbstractSoundInstanceMixin implements ISimpleSoundInstance {
     protected float volume;
 
     @Override
-    public void setVolume(float volume) {
+    public void theBoys$setVolume(float volume) {
         this.volume = volume;
     }
 
     @Override
-    public float volume() {
+    public float theBoys$volume() {
         return this.volume;
     }
 }
