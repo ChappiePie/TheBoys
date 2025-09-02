@@ -12,7 +12,6 @@
     "client.HumanoidModelMixin",
     "client.ItemInHandLayerMixin",
     "client.LivingEntityRendererMixin",
-    "client.LocalPlayerMixin",
     "client.MinecraftMixin",
     "client.PlayerRendererMixin",
     "client.ScreenAccessor",
@@ -29,7 +28,8 @@
     "LivingEntityRendererAccessor",
     "PlayerMixin",
     "ServerLevelMixin",
-    "SkullBlockEntityAccessor"
+    "SkullBlockEntityAccessor",
+    "client.EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

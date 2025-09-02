@@ -36,7 +36,7 @@ public abstract class GuiGraphicsMixin {
     @Shadow @Final private MultiBufferSource.BufferSource bufferSource;
 
     @Shadow public abstract void flush();
-
+/* TODO another things */
     @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;IIII)V",
             at = @At("TAIL"))
     private void tryRenderGuiItem(LivingEntity entity, Level level, ItemStack stack, int x, int y, int seed, int guiOffset, CallbackInfo ci) {

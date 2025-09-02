@@ -1,7 +1,6 @@
 package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
-import chappie.theboys.common.ability.FocusOnGoalAbility;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import chappie.theboys.common.ability.TranslucentAbility;
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 @Mixin(Entity.class)
-public class EntityMixin implements EntitySavingFields {
+public abstract class EntityMixin implements EntitySavingFields {
     @Unique
     private final Map<String, Object> theBoys$map = Maps.newHashMap();
     @Shadow
@@ -42,43 +41,27 @@ public class EntityMixin implements EntitySavingFields {
         }
     }
 
-    @Inject(method = "getXRot", at = @At("TAIL"), cancellable = true)
+    @Inject(method = "getXRot*", at = @At("TAIL"), cancellable = true)
     public void mixin$getXRot(CallbackInfoReturnable<Float> cir) {
-        var map = ((EntitySavingFields) this).theBoys$map();
+        var map = this.theBoys$map();
         if (map.containsKey("xRot")) {
             this.xRotO = (float) map.get("xRot");
             cir.setReturnValue((float) map.get("xRot"));
-            return;
-        }
-        for (FocusOnGoalAbility a : CommonUtil.listOfType(FocusOnGoalAbility.class, CommonUtil.getAbilities((Entity) (Object) this))) {
-            float f = a.getXRot(cir.getReturnValue(), 1);
-            if (cir.getReturnValue() != f) {
-                cir.setReturnValue(f);
-            }
-            break;
         }
     }
 
-    @Inject(method = "getYRot", at = @At("TAIL"), cancellable = true)
+    @Inject(method = "getYRot*", at = @At("TAIL"), cancellable = true)
     public void mixin$getYRot(CallbackInfoReturnable<Float> cir) {
-        var map = ((EntitySavingFields) this).theBoys$map();
+        var map = this.theBoys$map();
         if (map.containsKey("yRot")) {
             this.yRotO = (float) map.get("yRot");
             cir.setReturnValue((float) map.get("yRot"));
-            return;
-        }
-        for (FocusOnGoalAbility a : CommonUtil.listOfType(FocusOnGoalAbility.class, CommonUtil.getAbilities((Entity) (Object) this))) {
-            float f = a.getYRot(cir.getReturnValue(), 1);
-            if (cir.getReturnValue() != f) {
-                cir.setReturnValue(f);
-            }
-            break;
         }
     }
 
     @Inject(method = "getDeltaMovement", at = @At("TAIL"), cancellable = true)
     public void mixin$getDeltaMovement(CallbackInfoReturnable<Vec3> cir) {
-        var map = ((EntitySavingFields) this).theBoys$map();
+        var map = this.theBoys$map();
         if (map.containsKey("deltaMovement")) {
             cir.setReturnValue((Vec3) map.get("deltaMovement"));
         }
@@ -87,7 +70,7 @@ public class EntityMixin implements EntitySavingFields {
 
     @Inject(method = "isInWater", at = @At("TAIL"), cancellable = true)
     public void mixin$isInWater(CallbackInfoReturnable<Boolean> cir) {
-        var map = ((EntitySavingFields) this).theBoys$map();
+        var map = this.theBoys$map();
         if (map.containsKey("isInWater")) {
             cir.setReturnValue((boolean) map.get("isInWater"));
         }
