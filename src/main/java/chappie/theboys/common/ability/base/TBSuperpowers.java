@@ -18,12 +18,14 @@ import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
 import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.core.Registry;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.EntityHitResult;
 
 import java.awt.*;
+import java.util.List;
 
 public class TBSuperpowers {
     public static final Superpower HOMELANDER = register("homelander", new TBSuperpower(
@@ -53,7 +55,7 @@ public class TBSuperpowers {
             AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH.value()).amount(10.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
             AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST.value()).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
             AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE.value()).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADD_VALUE)),
-            DamageImmunityAbility.of("fire_immunity", "lava", "onFire", "inFire", "hotFloor"))
+            DamageImmunityAbility.of("fire_immunity", List.of(DamageTypeTags.IS_FIRE)))
             .uOffset(16));
 
     public static final Superpower A_TRAIN = register("a_train", new TBSuperpower(

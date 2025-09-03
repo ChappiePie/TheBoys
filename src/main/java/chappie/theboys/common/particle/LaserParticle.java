@@ -1,6 +1,7 @@
 package chappie.theboys.common.particle;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -8,9 +9,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -44,7 +45,7 @@ public class LaserParticle extends RisingParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleRenderType.CUSTOM;
     }
 
     public void move(double pX, double pY, double pZ) {
@@ -72,7 +73,7 @@ public class LaserParticle extends RisingParticle {
     }
 
     @Override
-    public void render(VertexConsumer pBuffer, Camera pRenderInfo, float pPartialTicks) {
+    public void renderCustom(PoseStack poseStack, MultiBufferSource bufferSource, Camera pRenderInfo, float pPartialTicks) {
         Vec3 vec3 = pRenderInfo.getPosition();
         float rot = -Mth.lerp(pPartialTicks, this.rotO, this.rot) * ((float) Math.PI / 180F);
         float pitch = (float) (Mth.lerp(pPartialTicks, this.pitchO, this.pitch) + Math.PI / 2F) * ((float) Math.PI / 180F);
@@ -95,9 +96,8 @@ public class LaserParticle extends RisingParticle {
         }
         int j = this.getLightColor(pPartialTicks);
 
-        var b = Minecraft.getInstance().renderBuffers().bufferSource();
         RenderType renderType = RenderType.entityTranslucentEmissive(TextureAtlas.LOCATION_PARTICLES);
-        pBuffer = b.getBuffer(renderType);
+        VertexConsumer pBuffer = bufferSource.getBuffer(renderType);
         RenderSystem.depthMask(true);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -105,7 +105,6 @@ public class LaserParticle extends RisingParticle {
         this.makeCornerVertex(pBuffer, avector3f[1], this.getU1(), this.getV0(), j);
         this.makeCornerVertex(pBuffer, avector3f[2], this.getU0(), this.getV0(), j);
         this.makeCornerVertex(pBuffer, avector3f[3], this.getU0(), this.getV1(), j);
-        b.endBatch(renderType);
     }
 
     private void makeCornerVertex(VertexConsumer pConsumer, Vector3f pVertex, float pU, float pV, int pPackedLight) {

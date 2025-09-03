@@ -18,12 +18,11 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
@@ -66,20 +65,26 @@ public class SyringeItem extends Item implements GeoItem {
     }
 
     @Override
-    public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
+    public @NotNull ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
         if (pLivingEntity instanceof Player player) {
             PowerCap cap = PowerCap.getCap(player);
             boolean b = false;
             ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
             if (cap != null && !vial.isEmpty()) {
                 player.getCooldowns().addCooldown(pStack, 20);
-                if (this.hasSuperpower(pStack) && cap.getSuperpower() == null) {
+                if (this.hasSuperpower(pStack) && (cap.getSuperpower() == null || player.getAbilities().instabuild && !this.vialSuperpower(pStack).equals("compoundV"))) {
                     if (this.vialSuperpower(pStack).equals("compoundV")) {
-                        var superpowers = Superpower.REGISTRY.stream().filter(p -> Superpower.REGISTRY.getKey(p).getNamespace().equals(TheBoys.MODID)).toList();
-                        cap.setSuperpower(superpowers.get(player.getRandom().nextInt(superpowers.size())));
+                        if (cap.getSuperpower() == null) {
+                            var superpowers = Superpower.REGISTRY.stream().filter(p -> Superpower.REGISTRY.getKey(p).getNamespace().equals(TheBoys.MODID)).toList();
+                            cap.setSuperpower(superpowers.get(player.getRandom().nextInt(superpowers.size())));
+                        }
                     } else {
-                        cap.setSuperpower(Superpower.REGISTRY.get(ResourceLocation.tryParse(vial.getOrDefault(TBDataComponents.SUPERPOWER, ""))).get().value());
+                        String superpower = vial.getOrDefault(TBDataComponents.SUPERPOWER, "");
+                        if (!superpower.isBlank()) {
+                            cap.setSuperpower(Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower)).get().value());
+                        }
                     }
+
                     if (!player.getAbilities().instabuild) {
                         vial.remove(TBDataComponents.SUPERPOWER);
                         pStack.set(TBDataComponents.VIAL, vial);
@@ -118,14 +123,11 @@ public class SyringeItem extends Item implements GeoItem {
     }
 
     private void broadcastChangesOnContainerMenu(Player player) {
-        AbstractContainerMenu abstractContainerMenu = player.containerMenu;
-        if (abstractContainerMenu != null) {
-            abstractContainerMenu.slotsChanged(player.getInventory());
-        }
+        player.containerMenu.slotsChanged(player.getInventory());
     }
 
     @Override
-    public InteractionResult use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+    public @NotNull InteractionResult use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack mainHandItem = pPlayer.getMainHandItem();
         ItemStack offHandItem = pPlayer.getOffhandItem();
         PowerCap cap = PowerCap.getCap(pPlayer);
@@ -145,14 +147,10 @@ public class SyringeItem extends Item implements GeoItem {
                             if (cap.getSuperpower() == null) {
                                 use = true;
                             } else {
-                                if (vialSuperpower(mainHandItem).equals("compoundV")) {
+                                if (vialSuperpower(mainHandItem).equals("compoundV") || pPlayer.getAbilities().instabuild) {
                                     use = true;
                                 } else {
-                                    if (pPlayer.getAbilities().instabuild) {
-                                        use = true;
-                                    } else {
-                                        pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED), true);
-                                    }
+                                    pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED), true);
                                 }
                             }
                         } else {
@@ -197,7 +195,7 @@ public class SyringeItem extends Item implements GeoItem {
             private SyringeRenderer renderer;
 
             @Override
-            public @Nullable GeoItemRenderer<?> getGeoItemRenderer() {
+            public @NotNull GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new SyringeRenderer();
 

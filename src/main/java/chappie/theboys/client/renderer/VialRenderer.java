@@ -43,7 +43,7 @@ public class VialRenderer extends GeoItemRenderer<VialItem> {
         super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
         Optional<GeoBone> boneOptional = model.getBone("bone3");
         int color = -1;
-        if (this.currentItemStack.getItem() instanceof VialItem item) {
+        if (this.currentItemStack.getItem() instanceof VialItem) {
             color = VialItem.getColor(this.currentItemStack);
         }
         if (boneOptional.isPresent() && color != -1) {

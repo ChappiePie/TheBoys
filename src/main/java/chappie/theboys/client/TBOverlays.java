@@ -21,7 +21,6 @@ import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.TBConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -34,12 +33,10 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import org.joml.Matrix4f;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class TBOverlays {
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/gui/ui.png");
@@ -80,11 +77,12 @@ public class TBOverlays {
         // Text above
         MutableComponent text;
         if (tab) {
-            text = Component.translatable("overlay.theboys.abilities").withStyle(ClientUtil.BOLD_MINECRAFT);
+            text = Component.translatable("overlay.theboys.abilities");
         } else {
-            text = power.getDisplayName().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
+            text = power.getDisplayName().copy();
             //text = Component.translatable("theboys.overlay.superpower");
         }
+        text = text.withStyle(ClientUtil.BOLD_MINECRAFT);
 
         if (tab) {
             guiGraphics.fill(x - 5, y + 6, x - 1, y + 16 - 6, textColor);
@@ -101,7 +99,7 @@ public class TBOverlays {
         y += 19;
         if (f != 1) {
             RenderSystem.enableBlend();
-            guiGraphics.fill(x, y, x + 22, y + 22, color);
+            guiGraphics.fill(x, y, x + 22, y + 22, ARGB.color((int) (f1 * 255 / 2), color));
             power.renderIcon(x + 3, y + 3, f1, mc, guiGraphics, partialTick);
             //guiGraphics.blit(TEXTURE, x + 3, y + 3, 0, 128, 16, 16, 256, 256);
 
@@ -110,8 +108,8 @@ public class TBOverlays {
             int newX = x * 4;
             int newY = y * 3;
             text = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
-            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 10, newY + 16, ARGB.color((int) (f1 * 255), 0, 0, 0));
-            guiGraphics.drawString(mc.font, text, newX + 5, newY + 5, ARGB.color((int) (f1 * 255), textColor), true);
+            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 8, newY + 16, ARGB.colorFromFloat(f1 * 0.5F, 0, 0, 0));
+            guiGraphics.drawString(mc.font, text, newX + 5, newY + 5,ARGB.color((int) (f1 * 255), textColor), true);
             poseStack.popPose();
         }
 
@@ -145,7 +143,7 @@ public class TBOverlays {
             } else {
                 for (int i = 0; i < size; i++) {
                     int texY = y + i * 20;
-                    guiGraphics.fill(x, texY, x + maxX + 2, texY + 20 + (i + 1 == size ? 2 : 0), ARGB.color((int) (f2 * 255), color));
+                    guiGraphics.fill(x, texY, x + maxX + 2, texY + 20 + (i + 1 == size ? 2 : 0), ARGB.color((int) (f2 * 255 / 2), color));
                 }
             }
             for (int i = 0; i < size; i++) {
@@ -194,7 +192,7 @@ public class TBOverlays {
                     if (type == 1) {
                         newX = texX * 2 + 10 + 6 - mc.font.width(key) / 2;
                     }
-                    guiGraphics.fill(newX, newY, newX + mc.font.width(key) + 10, newY + 16, ARGB.colorFromFloat(127 * ((f2 == 0.25F ? 0.5F : 1F) * f2), 0, 0, 0));
+                    guiGraphics.fill(newX, newY, newX + mc.font.width(key.getString().toUpperCase()) + 11, newY + 16, ARGB.colorFromFloat(127 * ((f2 == 0.25F ? 0.5F : 1F) * f2), 0, 0, 0));
                     poseStack.translate(0, 0, 0);
                     guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, ARGB.color((int) (((f2 == 0.25F ? 0.5F : 1F) * f2) * 255), textColor), true);
                     poseStack.popPose();
@@ -271,7 +269,7 @@ public class TBOverlays {
                             u += 11.5F;
                         }
                     }
-                    TBOverlays.blit(guiGraphics, RenderType::guiTextured, A_TRAIN, left, top, 0, 24, u * 0.75F, 24, 96, 48);
+                    ClientUtil.blit(guiGraphics, A_TRAIN, left, top, 0, 24, u * 0.75F, 24, u * 0.75F, 24, 96, 48, -1);
                 }
                 poseStack.popPose();
                 break;
@@ -286,62 +284,12 @@ public class TBOverlays {
             SynthesizerScreen.rollTimer.update();
             SynthesizerScreen.timer.update();
             if (player != null && player.isAlive()) {
-                List<SpeedAbility> abilities = CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(player));
-                boolean b = false;
-                for (SpeedAbility ability : abilities) {
-                    if (ability.isEnabled()) {
-                        b = true;
-                        break;
-                    }
-                }
-                boolean finalB = b;
-                APPEAR_ANIM_TICK.predicate = () -> finalB;
+                APPEAR_ANIM_TICK.predicate = () -> CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(player))
+                        .stream().anyMatch(Ability::isEnabled);
                 APPEAR_ANIM_TICK.update();
 
                 ANIM_TICK.update();
             }
         }
-    }
-
-    public static void blit(GuiGraphics guiGraphics,
-                            Function<ResourceLocation, RenderType> renderTypeGetter,
-                            ResourceLocation atlasLocation, float x, float y,
-                            float uOffset, float vOffset, float uWidth, float vHeight,
-                            float textureWidth, float textureHeight) {
-        TBOverlays.blit(guiGraphics, renderTypeGetter, atlasLocation, x, y, uOffset, vOffset, uWidth, vHeight, uWidth, vHeight, textureWidth, textureHeight, -1);
-    }
-
-    public static void blit(GuiGraphics guiGraphics,
-                            Function<ResourceLocation, RenderType> renderTypeGetter,
-                            ResourceLocation atlasLocation, float x, float y,
-                            float uOffset, float vOffset, float uWidth, float vHeight,
-                            float width, float height, float textureWidth, float textureHeight,
-                            int color) {
-        TBOverlays.innerBlit(guiGraphics,
-                renderTypeGetter,
-                atlasLocation,
-                x,
-                x + uWidth,
-                y,
-                y + vHeight,
-                (uOffset + 0.0F) / textureWidth,
-                (uOffset + width) / textureWidth,
-                (vOffset + 0.0F) / textureHeight,
-                (vOffset + height) / textureHeight,
-                color
-        );
-    }
-
-    private static void innerBlit(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderTypeGetter,
-                                  ResourceLocation atlasLocation, float x1, float x2, float y1, float y2,
-                                  float minU, float maxU, float minV, float maxV,
-                                  int color) {
-        RenderType renderType = renderTypeGetter.apply(atlasLocation);
-        Matrix4f matrix4f = guiGraphics.pose().last().pose();
-        VertexConsumer vertexConsumer = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(renderType);
-        vertexConsumer.addVertex(matrix4f, x1, y1, 0.0F).setUv(minU, minV).setColor(color);
-        vertexConsumer.addVertex(matrix4f, x1, y2, 0.0F).setUv(minU, maxV).setColor(color);
-        vertexConsumer.addVertex(matrix4f, x2, y2, 0.0F).setUv(maxU, maxV).setColor(color);
-        vertexConsumer.addVertex(matrix4f, x2, y1, 0.0F).setUv(maxU, minV).setColor(color);
     }
 }

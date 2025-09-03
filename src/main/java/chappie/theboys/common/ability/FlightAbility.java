@@ -9,10 +9,15 @@ import chappie.modulus.util.data.DataAccessor;
 import chappie.modulus.util.events.SetupAnimCallback;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.state.ArmedEntityRenderState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -115,7 +120,6 @@ public class FlightAbility extends Ability implements IHasTimer {
                 vec3 = vec3.add(inputVector(entity, speed * 2)); // unite two vectors, default and with movements.
             }
             entity.setDeltaMovement(vec3);
-            entity.fallDistance = 0.0F;
         } else {
             this.dataManager.set(BOOSTING, false);
         }
@@ -139,6 +143,53 @@ public class FlightAbility extends Ability implements IHasTimer {
             double f1 = Math.cos(Math.toRadians(entity.getYRot()));
             return new Vec3(vec3.x * f1 - vec3.z * f, yya * speedModifier * 16, vec3.z * f1 + vec3.x * f);
         }
+    }
+
+    public boolean causeFallDamage(ServerLevel level, LivingEntity entity, float fallDistance) {
+        boolean sprinting = this.dataManager.get(SPRINTING) || entity.isSprinting();
+        if (this.dataManager.get(BREAK_BLOCKS) && fallDistance > 20 && (sprinting || !this.isEnabled())) {
+            for (int x = 0; x < 5; x++) {
+                for (int y = 0; y < 5; y++) {
+                    for (int z = 0; z < 5; z++) {
+                        double xPos = entity.getX() - 2.5 + x + entity.getCommandSenderWorld().random.nextInt(5);
+                        double yPos = entity.getY() - 2.5 + y + entity.getCommandSenderWorld().random.nextInt(5);
+                        double zPos = entity.getZ() - 2.5 + z + entity.getCommandSenderWorld().random.nextInt(5);
+                        BlockPos pos = new BlockPos((int) xPos, (int) yPos, (int) zPos);
+                        Block block = entity.getCommandSenderWorld().getBlockState(pos).getBlock();
+
+                        if (block == Blocks.STONE) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.COBBLESTONE.defaultBlockState());
+                        } else if (block == Blocks.STONE_BRICKS) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
+                        } else if (block == Blocks.COBBLESTONE) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
+                        } else if (block == Blocks.GRASS_BLOCK) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+                        } else if (block == Blocks.DIRT) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.COARSE_DIRT.defaultBlockState());
+                        } else if (block == Blocks.OAK_LOG) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_OAK_LOG.defaultBlockState());
+                        } else if (block == Blocks.BIRCH_LOG) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_BIRCH_LOG.defaultBlockState());
+                        } else if (block == Blocks.SPRUCE_LOG) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_SPRUCE_LOG.defaultBlockState());
+                        } else if (block == Blocks.JUNGLE_LOG) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_JUNGLE_LOG.defaultBlockState());
+                        } else if (block == Blocks.DARK_OAK_LOG) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_DARK_OAK_LOG.defaultBlockState());
+                        } else if (block == Blocks.ACACIA_LOG) {
+                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_ACACIA_LOG.defaultBlockState());
+                        } else if (block == Blocks.GLASS) {
+                            entity.getCommandSenderWorld().destroyBlock(pos, false);
+                        }
+
+                        level.sendParticles(ParticleTypes.EXPLOSION, false, false, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.getCommandSenderWorld().getHeight()) * 10, 0.0D, 0.0D, 1F);
+                        entity.playSound(SoundEvents.MOOSHROOM_SHEAR, 1.0F, 1.0F);
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override
