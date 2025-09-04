@@ -19,10 +19,9 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.awt.*;
@@ -55,7 +54,7 @@ public class GlowEyesAbility extends Ability implements IHasTimer {
                     new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER));
 
             @Override
-            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
+            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!modelProperties.root().hasChild("head")) return;
                 Color color = dataManager.get(TBCommonUtil.COLOR);
                 float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
@@ -84,11 +83,11 @@ public class GlowEyesAbility extends Ability implements IHasTimer {
                     for (int i = 0; i < 3; i++) {
                         poseStack.pushPose();
                         poseStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
-                        this.copyModel.get().head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
+                        this.copyModel.get().head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
                         poseStack.popPose();
                     }
                     poseStack.translate(0, 0, -(Math.cos(entity.tickCount * entity.tickCount) / 100F));
-                    this.copyModel.get().hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, red, green, blue));
+                    this.copyModel.get().hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
                     poseStack.popPose();
                 }
                 poseStack.popPose();

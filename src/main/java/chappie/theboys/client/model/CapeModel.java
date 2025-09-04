@@ -1,6 +1,8 @@
 package chappie.theboys.client.model;
 
 import chappie.modulus.Modulus;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -8,17 +10,18 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import org.joml.Quaternionf;
 
 public class CapeModel extends Model {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Modulus.id("cape"), "main");
 
-	private final ModelPart cape = this.root.getChild("cape");
+	private final ModelPart root;
+	private final ModelPart cape;
 
 	public CapeModel() {
-		super(Minecraft.getInstance().getEntityModels().bakeLayer(CapeModel.LAYER_LOCATION).getChild("main"), RenderType::entityTranslucent);
+		super(RenderType::entityTranslucent);
+		this.root = Minecraft.getInstance().getEntityModels().bakeLayer(CapeModel.LAYER_LOCATION).getChild("main");
+		this.cape = this.root.getChild("cape");
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -41,5 +44,10 @@ public class CapeModel extends Model {
 							.rotateY((180.0F - playerRenderState.capeLean2 / 2.0F) * (float) (Math.PI / 180.0))
 			);
 		}
+	}
+
+	@Override
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+		this.root.render(poseStack, buffer, packedLight, packedOverlay, color);
 	}
 }

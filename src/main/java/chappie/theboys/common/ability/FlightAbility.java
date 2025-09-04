@@ -8,7 +8,6 @@ import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.data.DataAccessor;
 import chappie.modulus.util.events.SetupAnimCallback;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.entity.state.ArmedEntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -183,7 +182,7 @@ public class FlightAbility extends Ability implements IHasTimer {
                             entity.getCommandSenderWorld().destroyBlock(pos, false);
                         }
 
-                        level.sendParticles(ParticleTypes.EXPLOSION, false, false, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.getCommandSenderWorld().getHeight()) * 10, 0.0D, 0.0D, 1F);
+                        level.sendParticles(ParticleTypes.EXPLOSION, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.getCommandSenderWorld().getHeight()) * 10, 0.0D, 0.0D, 1F);
                         entity.playSound(SoundEvents.MOOSHROOM_SHEAR, 1.0F, 1.0F);
                     }
                 }
@@ -217,12 +216,12 @@ public class FlightAbility extends Ability implements IHasTimer {
             float f3 = this.ability.sprintingTimer.value(properties.partialTicks()) * f;
             float f4 = 1.0F - (f1 + f2) / 2.0F;
             float toRad = (float) Math.toRadians(f);
-            if (!(event.state() instanceof ArmedEntityRenderState state)) return;
-            float bob = Mth.sin(state.ageInTicks * 0.067F) * 0.05F;
+            if (event.model() == null) return;
+            float bob = Mth.sin(event.modelProperties().properties().ageInTicks() * 0.067F) * 0.05F;
 
 
-            boolean right = !entity.isUsingItem() && state.rightArmPose == HumanoidModel.ArmPose.EMPTY && !state.leftArmPose.isTwoHanded();
-            boolean left = !entity.isUsingItem() && state.leftArmPose == HumanoidModel.ArmPose.EMPTY && !state.rightArmPose.isTwoHanded();
+            boolean right = !entity.isUsingItem() && model.rightArmPose == HumanoidModel.ArmPose.EMPTY && !model.leftArmPose.isTwoHanded();
+            boolean left = !entity.isUsingItem() && model.leftArmPose == HumanoidModel.ArmPose.EMPTY && !model.rightArmPose.isTwoHanded();
 
             model.head.xRot /= 1 + f;
             model.head.xRot += bob * f;

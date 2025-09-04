@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
@@ -49,7 +49,7 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
                 cape.xRot -= (float) ((cape.xRot - Math.toRadians(170)) * t);
             }
             pPoseStack.scale(0.85F, 0.85F, 0.85F);
-            this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(this.renderType()), pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.color((int) (alpha * 255), 255, 255, 255));
+            this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(this.renderType()), pPackedLight, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255));
             pPoseStack.popPose();
         }
     }

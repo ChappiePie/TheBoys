@@ -25,7 +25,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.util.Mth;
@@ -154,7 +153,7 @@ public class ClientEvents {
                     ItemStack suitStack = stack.get(TBDataComponents.SUIT);
                     if (suitStack.getItem() instanceof SuitItem item) {
                         if (event.modelProperties().layers().stream().anyMatch(layer -> layer instanceof HumanoidArmorLayer)) {
-                            Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.state(), stack);
+                            Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.entity(), stack);
                             if (slot == EquipmentSlot.HEAD) {
                                 ClientUtil.modified(event.model().hat).setSize(vec3f);
                             }
@@ -309,8 +308,8 @@ public class ClientEvents {
         return canceled;
     }
 
-    public static boolean capeRender(PlayerRenderState playerRenderState) {
-        ItemStack stack = playerRenderState.chestEquipment;
+    public static boolean capeRender(AbstractClientPlayer player) {
+        ItemStack stack = player.getItemBySlot(EquipmentSlot.CHEST);
         if (!stack.isEmpty() && stack.getItem() instanceof ArmorItem) {
             if (stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).getItem() instanceof SuitItem item) {
                 return !(item.getClientSuitProperties() instanceof ClientHeroWithCapeProperties);

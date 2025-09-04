@@ -9,7 +9,6 @@ import chappie.theboys.client.TBOverlays;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -75,6 +74,6 @@ public class IHasOverlay implements AbilityClientProperties {
     }
 
     public void renderIcon(int x, int y, float alpha, Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
-        guiGraphics.blit(RenderType::guiTextured, TBOverlays.TEXTURE, x, y, this.uOffset.get(), this.vOffset.get(), 16, 16, 256, 256);
+        guiGraphics.blit(TBOverlays.TEXTURE, x, y, this.uOffset.get(), this.vOffset.get(), 16, 16, 256, 256);
     }
 }

@@ -57,14 +57,12 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.layered() {
 		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-1.21.4:2025.01.05@zip")
+		parchment("org.parchmentmc.data:parchment-${project.minecraft_version}:${project.parchment_version}@zip")
 	}
 	compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
 	modImplementation("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	modApi modRuntimeOnly("maven.modrinth:modmenu:9.0.0")
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}+${project.minecraft_version}"
 
@@ -74,16 +72,12 @@ dependencies {
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}")
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}")
 
-	/*modImplementation include("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") {
-		exclude group: "maven.modrinth"
-	}*/
-
 	modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
 	modImplementation include("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
 
 	modImplementation "chappie.modulus:modulus:${minecraft_version}-${project.modulus_version}"
 
-	modRuntimeOnly "maven.modrinth:modmenu:${project.mod_menu_version}"
+	modApi modRuntimeOnly("maven.modrinth:modmenu:${project.mod_menu_version}")
 }
 
 processResources {
@@ -95,14 +89,14 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+	it.options.release = 21
 }
 
 java {
 	withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

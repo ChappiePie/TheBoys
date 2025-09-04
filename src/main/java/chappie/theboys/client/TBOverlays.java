@@ -25,11 +25,10 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -61,8 +60,8 @@ public class TBOverlays {
         if (!(entity instanceof LivingEntity e) || PowerCap.getCap(e) == null || !(PowerCap.getCap(e).getSuperpower() instanceof TBSuperpower power))
             return;
         // color of background
-        int color = ARGB.color(127, 0x282828);
-        int textColor = ARGB.color(200, 0xFFFFFF);
+        int color = FastColor.ARGB32.color(127, 0x282828);
+        int textColor = FastColor.ARGB32.color(200, 0xFFFFFF);
         int x = 7;
         int y = 7;
         List<Ability> abilities = CommonUtil.getAbilities(e).stream().filter(a -> IHasOverlay.getInstance(a) != null).sorted(TBOverlays::compareAbilitiesByKey).toList();
@@ -99,7 +98,7 @@ public class TBOverlays {
         y += 19;
         if (f != 1) {
             RenderSystem.enableBlend();
-            guiGraphics.fill(x, y, x + 22, y + 22, ARGB.color((int) (f1 * 255 / 2), color));
+            guiGraphics.fill(x, y, x + 22, y + 22, FastColor.ARGB32.color((int) (f1 * 255 / 2), color));
             power.renderIcon(x + 3, y + 3, f1, mc, guiGraphics, partialTick);
             //guiGraphics.blit(TEXTURE, x + 3, y + 3, 0, 128, 16, 16, 256, 256);
 
@@ -108,8 +107,8 @@ public class TBOverlays {
             int newX = x * 4;
             int newY = y * 3;
             text = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
-            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 8, newY + 16, ARGB.colorFromFloat(f1 * 0.5F, 0, 0, 0));
-            guiGraphics.drawString(mc.font, text, newX + 5, newY + 5,ARGB.color((int) (f1 * 255), textColor), true);
+            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 8, newY + 16, FastColor.ARGB32.colorFromFloat(f1 * 0.5F, 0, 0, 0));
+            guiGraphics.drawString(mc.font, text, newX + 5, newY + 5,FastColor.ARGB32.color((int) (f1 * 255), textColor), true);
             poseStack.popPose();
         }
 
@@ -136,14 +135,14 @@ public class TBOverlays {
             float f2 = Math.min(1.0f - f1, 0.5F) * 2F;
             poseStack.translate(f1 * -maxX, 0, 0);
             //RenderSystem.setShaderColor(1, 1, 1, f2);
-            guiGraphics.fill(x - 5, y + 2, x - 4, y + (type == 1 ? 20 : size * 20), ARGB.color((int) (f2 * 255), textColor));
+            guiGraphics.fill(x - 5, y + 2, x - 4, y + (type == 1 ? 20 : size * 20), FastColor.ARGB32.color((int) (f2 * 255), textColor));
 
             if (type == 1) {
-                guiGraphics.fill(x, y, x + maxX + 2, y + 20 + 2, ARGB.color((int) (f2 * 255), color));
+                guiGraphics.fill(x, y, x + maxX + 2, y + 20 + 2, FastColor.ARGB32.color((int) (f2 * 255), color));
             } else {
                 for (int i = 0; i < size; i++) {
                     int texY = y + i * 20;
-                    guiGraphics.fill(x, texY, x + maxX + 2, texY + 20 + (i + 1 == size ? 2 : 0), ARGB.color((int) (f2 * 255 / 2), color));
+                    guiGraphics.fill(x, texY, x + maxX + 2, texY + 20 + (i + 1 == size ? 2 : 0), FastColor.ARGB32.color((int) (f2 * 255 / 2), color));
                 }
             }
             for (int i = 0; i < size; i++) {
@@ -157,22 +156,22 @@ public class TBOverlays {
 
                 {
                     int cBack = iHasOverlay.getBackgroundColor();
-                    float r = ARGB.red(cBack) / 255F;
-                    float g = ARGB.green(cBack) / 255F;
-                    float b = ARGB.blue(cBack) / 255F;
+                    float r = FastColor.ARGB32.red(cBack) / 255F;
+                    float g = FastColor.ARGB32.green(cBack) / 255F;
+                    float b = FastColor.ARGB32.blue(cBack) / 255F;
 
                     float alpha = !ability.isEnabled() ? 0.25F : 0.75F;
                     RenderSystem.enableBlend();
-                    guiGraphics.blit(RenderType::guiTextured, TEXTURE, texX + 3, texY + 3, 0, 0, 16, 16, 256, 256, ARGB.colorFromFloat(alpha, r, g, b));
+                    guiGraphics.blit(TEXTURE, texX + 3, texY + 3, 0, 0, 16, 16, 256, 256, FastColor.ARGB32.colorFromFloat(alpha, r, g, b));
 
                     if (ability.isEnabled()) {
-                        guiGraphics.blit(RenderType::guiTextured, TEXTURE, texX + 2, texY + 2, 0, 16, 18, 18, 256, 256, ARGB.colorFromFloat(alpha, r, g, b));
+                        guiGraphics.blit(TEXTURE, texX + 2, texY + 2, 0, 16, 18, 18, 256, 256, FastColor.ARGB32.colorFromFloat(alpha, r, g, b));
                     }
                 }
 
                 iHasOverlay.renderIcon(texX + 3, texY + 3, f1, mc, gui, guiGraphics, partialTick, width, height);
                 if (type == 0) {
-                    guiGraphics.drawString(mc.font, ability.builder.displayName(), x + 22, texY + 7, ARGB.color((int) (f2 * 255), textColor), true);
+                    guiGraphics.drawString(mc.font, ability.builder.displayName(), x + 22, texY + 7, FastColor.ARGB32.color((int) (f2 * 255), textColor), true);
                 }
 
                 KeyMap.KeyType keyType = iHasOverlay.getKeyType();
@@ -192,9 +191,9 @@ public class TBOverlays {
                     if (type == 1) {
                         newX = texX * 2 + 10 + 6 - mc.font.width(key) / 2;
                     }
-                    guiGraphics.fill(newX, newY, newX + mc.font.width(key.getString().toUpperCase()) + 11, newY + 16, ARGB.colorFromFloat(127 * ((f2 == 0.25F ? 0.5F : 1F) * f2), 0, 0, 0));
+                    guiGraphics.fill(newX, newY, newX + mc.font.width(key.getString().toUpperCase()) + 11, newY + 16, FastColor.ARGB32.colorFromFloat(127 * ((f2 == 0.25F ? 0.5F : 1F) * f2), 0, 0, 0));
                     poseStack.translate(0, 0, 0);
-                    guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, ARGB.color((int) (((f2 == 0.25F ? 0.5F : 1F) * f2) * 255), textColor), true);
+                    guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, FastColor.ARGB32.color((int) (((f2 == 0.25F ? 0.5F : 1F) * f2) * 255), textColor), true);
                     poseStack.popPose();
                 }
             }
@@ -242,9 +241,10 @@ public class TBOverlays {
                     RenderSystem.enableBlend();
                     RenderSystem.defaultBlendFunc();
                     RenderSystem.disableDepthTest();
-                    int i = ARGB.color(alpha, red, green, blue);
-                    guiGraphics.blit(RenderType::guiTexturedOverlay, TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
-                            guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight(), i);
+                    guiGraphics.setColor(red, green, blue, alpha);
+                    guiGraphics.blit(TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
+                            guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                    guiGraphics.setColor(1, 1, 1, 1);
                 }
             }
         }
@@ -261,7 +261,7 @@ public class TBOverlays {
                 float f1 = (float) (Math.pow(Math.cos(f * Math.PI / 2), 3) * Math.cos(f * Math.PI));
                 poseStack.pushPose();
                 poseStack.translate(f1 * 140.0F, 0, 0);
-                guiGraphics.blit(RenderType::guiTextured, A_TRAIN, left, top, 0, 0, 96, 24, 96, 48);
+                guiGraphics.blit(A_TRAIN, left, top, 0, 0, 96, 24, 96, 48);
                 if (ability.isEnabled()) {
                     float u = 47.5F;
                     for (float multiplier : new float[]{0.25F, 0.375F, 0.5F, 0.625F, 0.75F, 0.875F, 1.0F}) {

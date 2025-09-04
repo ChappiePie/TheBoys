@@ -31,7 +31,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.phys.AABB;
@@ -179,7 +179,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             pPoseStack.scale(f, f, f);
             pPoseStack.translate((this.width / 2F - 200) / f, (h - 95) / f, 0);
             guiGraphics.drawString(this.font, Component.translatable("title.theboys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
-                    ARGB.color(255, 170, 20, 20), true);
+                    FastColor.ARGB32.color(255, 170, 20, 20), true);
             pPoseStack.popPose();
         }
 
@@ -285,11 +285,11 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             for (int i = 0; i < 3; i++) {
                 poseStack.pushPose();
                 poseStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
-                EYES_LAYER_MODEL.head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
+                EYES_LAYER_MODEL.head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
                 poseStack.popPose();
             }
             poseStack.translate(0, 0, -(Math.cos(this.tickCount * this.tickCount) / 100F));
-            EYES_LAYER_MODEL.hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, red, green, blue));
+            EYES_LAYER_MODEL.hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
             poseStack.popPose();
         }
 
@@ -546,8 +546,8 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             this.setFocused(TBConfig.CLIENT.eyesType.get() == this.type);
             //super.renderWidget(guiGraphics, pMouseX, pMouseY, pPartialTick);
             ResourceLocation resourcelocation = this.sprites.get(this.isActive(), this.isHoveredOrFocused());
-            guiGraphics.blit(RenderType::guiTextured, resourcelocation, this.getX(), this.getY(), 0, 24 + (this.isHoveredOrFocused() ? 32 : 0), 32, 32, 128, 128);
-            guiGraphics.blit(RenderType::guiTextured, resourcelocation, this.getX() + 4, this.getY() + 4, type > 3 ? 72 : (type - 1) * 24, 0, 24, 24, 128, 128);
+            guiGraphics.blit(resourcelocation, this.getX(), this.getY(), 0, 24 + (this.isHoveredOrFocused() ? 32 : 0), 32, 32, 128, 128);
+            guiGraphics.blit(resourcelocation, this.getX() + 4, this.getY() + 4, type > 3 ? 72 : (type - 1) * 24, 0, 24, 24, 128, 128);
         }
     }
 

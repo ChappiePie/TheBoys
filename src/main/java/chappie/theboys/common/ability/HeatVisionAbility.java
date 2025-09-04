@@ -18,10 +18,8 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
@@ -91,7 +89,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
         super.initializeClient(consumer);
         consumer.accept(new AbilityClientProperties() {
             @Override
-            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
+            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!modelProperties.root().hasChild("head")) return;
                 Color color = dataManager.get(TBCommonUtil.COLOR);
                 float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
@@ -135,9 +133,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
     protected void onHitEntity(EntityHitResult hitResult) {
         float strength = this.dataManager.get(STRENGTH);
         hitResult.getEntity().setRemainingFireTicks((int) (strength * 5));
-        if (this.entity.level() instanceof ServerLevel serverLevel) {
-            hitResult.getEntity().hurtServer(serverLevel, this.entity.damageSources().mobAttack(entity), strength * 2F);
-        }
+        hitResult.getEntity().hurt(this.entity.damageSources().mobAttack(entity), strength * 2F);
 
         CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
                 true, hitResult.getLocation(), Vec3.ZERO, 0.05F, 4);
