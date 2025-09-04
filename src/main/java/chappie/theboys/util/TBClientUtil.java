@@ -24,12 +24,12 @@ import net.minecraft.world.item.ItemStack;
 
 public class TBClientUtil {
 
-    public static final ModelResourceLocation SYRINGE_MODEL = new ModelResourceLocation(TheBoys.MODID, "syringe", "inventory");
-    public static final ModelResourceLocation SYRINGE_3D_MODEL = new ModelResourceLocation(TheBoys.MODID, "syringe_3d", "inventory");
+    public static final ModelResourceLocation SYRINGE_MODEL = new ModelResourceLocation(TheBoys.id("syringe"), "inventory");
+    public static final ModelResourceLocation SYRINGE_3D_MODEL = new ModelResourceLocation(TheBoys.id("syringe_3d"), "inventory");
 
-    public static final ModelResourceLocation VIAL_MODEL = new ModelResourceLocation(TheBoys.MODID, "vial", "inventory");
-    public static final ModelResourceLocation VIAL_3D_MODEL = new ModelResourceLocation(TheBoys.MODID, "vial_3d", "inventory");
-    public static final ResourceLocation GLOW_EYES_OVERLAY = new ResourceLocation(TheBoys.MODID, "textures/gui/glow_eyes_overlay.png");
+    public static final ModelResourceLocation VIAL_MODEL = new ModelResourceLocation(TheBoys.id("vial"), "inventory");
+    public static final ModelResourceLocation VIAL_3D_MODEL = new ModelResourceLocation(TheBoys.id("vial_3d"), "inventory");
+    public static final ResourceLocation GLOW_EYES_OVERLAY = TheBoys.id("textures/gui/glow_eyes_overlay.png");
 
     public static void setupArms(PlayerModel<? extends LivingEntity> model, HumanoidArm side, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, AbstractClientPlayer pPlayer, ModelPart pRendererArm, ModelPart pRendererArmwear, float partialTicks) {
         TheBoysCap cap = TheBoysCap.getCap(pPlayer);

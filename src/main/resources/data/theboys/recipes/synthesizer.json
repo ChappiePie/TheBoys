@@ -2,8 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "group": "syringe",
   "pattern": [
-    "i",
-    "G"
+    "iGi",
+    "iRi",
+    "iii"
   ],
   "key": {
     "i": {
@@ -11,10 +12,13 @@
     },
     "G": {
       "item": "minecraft:glass"
+    },
+    "R": {
+      "item": "minecraft:redstone"
     }
   },
   "result": {
-    "item": "theboys:vial",
-    "count": 3
+    "item": "theboys:synthesizer",
+    "count": 1
   }
 }

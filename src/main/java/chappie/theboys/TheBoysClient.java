@@ -1,6 +1,7 @@
 package chappie.theboys;
 
 import chappie.modulus.Modulus;
+import chappie.modulus.client.gui.ChappModListWidget;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
 import chappie.theboys.client.ClientEvents;
@@ -27,17 +28,22 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.lwjgl.glfw.GLFW;
 
 public class TheBoysClient implements ClientModInitializer {
 
     public static final ToggleKeyMapping OVERLAY = new ToggleKeyMapping("key.%s.overlay".formatted(TheBoys.MODID), GLFW.GLFW_KEY_LEFT_ALT, "key.categories.%s".formatted(Modulus.MODID), () -> TBConfig.CLIENT.abilitiesOverlayToggle.get());
+
+    static {
+        ChappModListWidget.MOD_CLICKED.put(TheBoys.MODID, (e) ->
+                Minecraft.getInstance().setScreen(new EyeOptionsScreen(e.parent)));
+    }
 
     @Override
     public void onInitializeClient() {
@@ -58,7 +64,7 @@ public class TheBoysClient implements ClientModInitializer {
         ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : ((SyringeItem) stack.getItem()).getColor(stack), TBItems.SYRINGE);
         ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : ((VialItem) stack.getItem()).getColor(stack), TBItems.VIAL);
 
-        ItemProperties.register(TBItems.SYRINGE, new ResourceLocation(TheBoys.MODID, "has_vial"), (pStack, pLevel, pEntity, pSeed) -> {
+        ItemProperties.register(TBItems.SYRINGE, TheBoys.id("has_vial"), (pStack, pLevel, pEntity, pSeed) -> {
             if (pStack.getTag() != null && pStack.getTag().contains("vial")) {
                 return 1;
             }

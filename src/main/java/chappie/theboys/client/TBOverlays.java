@@ -40,8 +40,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TBOverlays {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(TheBoys.MODID, "textures/gui/ui.png");
-    private static final ResourceLocation A_TRAIN = new ResourceLocation(TheBoys.MODID, "textures/gui/atrain.png");
+    public static final ResourceLocation TEXTURE = TheBoys.id("textures/gui/ui.png");
+    private static final ResourceLocation A_TRAIN = TheBoys.id("textures/gui/atrain.png");
     private static final IHasTimer.Timer APPEAR_ANIM_TICK = new IHasTimer.Timer(() -> 15, () -> false);
 
     private static final IHasTimer.Timer ANIM_TICK = new IHasTimer.Timer(() -> 10, TheBoysClient.OVERLAY::isDown);
@@ -49,7 +49,7 @@ public class TBOverlays {
     public static void render(Minecraft mc, float partialTick, GuiGraphics guiGraphics) {
         TBOverlays.renderHud(mc, mc.gui, guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         TBOverlays.renderATrain(guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
-        TBOverlays.renderEyes(mc, partialTick);
+        TBOverlays.renderEyes(mc, partialTick, guiGraphics);
     }
 
     public static void renderHud(Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
@@ -104,7 +104,7 @@ public class TBOverlays {
             int newX = x * 4;
             int newY = y * 3;
             text = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
-            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 10, newY + 16, FastColor.ARGB32.color(127, 0, 0, 0));
+            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 10, newY + 16, ClientUtil.ARGB.color(127, 0, 0, 0));
             guiGraphics.drawString(mc.font, text, newX + 5, newY + 5, textColor, true);
             poseStack.popPose();
             guiGraphics.setColor(1, 1, 1, 1);
@@ -155,9 +155,9 @@ public class TBOverlays {
                 float a = f2;
                 {
                     int cBack = iHasOverlay.getBackgroundColor();
-                    float r = FastColor.ARGB32.red(cBack) / 255F;
-                    float g = FastColor.ARGB32.green(cBack) / 255F;
-                    float b = FastColor.ARGB32.blue(cBack) / 255F;
+                    float r = ClientUtil.ARGB.red(cBack) / 255F;
+                    float g = ClientUtil.ARGB.green(cBack) / 255F;
+                    float b = ClientUtil.ARGB.blue(cBack) / 255F;
 
                     guiGraphics.setColor(r, g, b, !ability.isEnabled() ? 0.25F : 0.75F);
                     RenderSystem.enableBlend();
@@ -193,7 +193,7 @@ public class TBOverlays {
                     if (type == 1) {
                         newX = texX * 2 + 10 + 6 - mc.font.width(key) / 2;
                     }
-                    guiGraphics.fill(newX, newY, newX + mc.font.width(key) + 10, newY + 16, FastColor.ARGB32.color(127, 0, 0, 0));
+                    guiGraphics.fill(newX, newY, newX + mc.font.width(key) + 10, newY + 16, ClientUtil.ARGB.color(127, 0, 0, 0));
                     poseStack.translate(0, 0, 0);
                     guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, textColor, true);
                     poseStack.popPose();
@@ -232,7 +232,7 @@ public class TBOverlays {
         return Integer.compare(o, o1);
     }
 
-    public static void renderEyes(Minecraft client, float partialTick) {
+    public static void renderEyes(Minecraft client, float partialTick, GuiGraphics guiGraphics) {
         if (TBConfig.CLIENT_SPEC.isLoaded() && !TBConfig.CLIENT.eyesOverlay.get()) return;
         Entity entity = client.getCameraEntity();
         if (entity != null && entity.isAlive()) {
@@ -244,9 +244,11 @@ public class TBOverlays {
                     RenderSystem.enableBlend();
                     RenderSystem.defaultBlendFunc();
                     RenderSystem.disableDepthTest();
-                    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                    RenderSystem.setShaderColor(red, green, blue, alpha);
                     RenderSystem.setShader(GameRenderer::getPositionTexShader);
-                    ClientUtil.renderTextureOverlay(TBClientUtil.GLOW_EYES_OVERLAY, client.getWindow().getGuiScaledHeight(), client.getWindow().getGuiScaledWidth(), red, green, blue, alpha);
+                    guiGraphics.blit(TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
+                            guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 }
             }
         }

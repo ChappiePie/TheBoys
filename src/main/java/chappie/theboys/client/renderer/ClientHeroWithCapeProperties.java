@@ -16,7 +16,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -65,7 +64,7 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
     }
 
     public RenderType renderType() {
-        return RenderType.entityTranslucent(new ResourceLocation(TheBoys.MODID, "textures/suits/%s/cape.png".formatted(this.type())));
+        return RenderType.entityTranslucent(TheBoys.id("textures/suits/%s/cape.png".formatted(this.type())));
     }
 
     private float getRotation(LivingEntity pLivingEntity, AbstractClientPlayer player, float partialTicks) {

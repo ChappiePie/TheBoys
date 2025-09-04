@@ -71,12 +71,17 @@ public class SyringeItem extends Item implements GeoItem {
             if (cap != null && pStack.hasTag()) {
                 player.getCooldowns().addCooldown(this, 20);
                 CompoundTag vialTag = pStack.getOrCreateTag().getCompound("vial");
-                if (this.hasSuperpower(pStack) && cap.getSuperpower() == null) {
+                if (this.hasSuperpower(pStack) && (cap.getSuperpower() == null || player.getAbilities().instabuild && !this.vialSuperpower(pStack).equals("compoundV"))) {
                     if (this.vialSuperpower(pStack).equals("compoundV")) {
-                        var superpowers = Superpower.REGISTRY.stream().filter(p -> Superpower.REGISTRY.getKey(p).getNamespace().equals(TheBoys.MODID)).toList();
-                        cap.setSuperpower(superpowers.get(player.getRandom().nextInt(superpowers.size())));
+                        if (cap.getSuperpower() == null) {
+                            var superpowers = Superpower.REGISTRY.stream().filter(p -> Superpower.REGISTRY.getKey(p).getNamespace().equals(TheBoys.MODID)).toList();
+                            cap.setSuperpower(superpowers.get(player.getRandom().nextInt(superpowers.size())));
+                        }
                     } else {
-                        cap.setSuperpower(Superpower.REGISTRY.get(new ResourceLocation(vialTag.getCompound("tag").getString("superpower"))));
+                        String superpower = vialTag.getCompound("tag").getString("superpower");
+                        if (!superpower.isBlank()) {
+                            cap.setSuperpower(Superpower.REGISTRY.get(new ResourceLocation(superpower)));
+                        }
                     }
                     if (!player.getAbilities().instabuild) {
                         vialTag.getCompound("tag").remove("superpower");
@@ -133,14 +138,10 @@ public class SyringeItem extends Item implements GeoItem {
                             if (cap.getSuperpower() == null) {
                                 use = true;
                             } else {
-                                if (vialSuperpower(mainHandItem).equals("compoundV")) {
+                                if (vialSuperpower(mainHandItem).equals("compoundV") || pPlayer.getAbilities().instabuild) {
                                     use = true;
                                 } else {
-                                    if (pPlayer.getAbilities().instabuild) {
-                                        use = true;
-                                    } else {
-                                        pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED), true);
-                                    }
+                                    pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED), true);
                                 }
                             }
                         } else {

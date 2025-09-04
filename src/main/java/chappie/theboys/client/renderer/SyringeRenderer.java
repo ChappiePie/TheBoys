@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
@@ -29,7 +28,7 @@ public class SyringeRenderer extends GeoItemRenderer<SyringeItem> {
     public final IHasTimer.Timer timeline = new IHasTimer.Timer(() -> 150, () -> false);
 
     public SyringeRenderer() {
-        super(new DefaultedItemGeoModel<SyringeItem>(new ResourceLocation(TheBoys.MODID, "syringe")).withAltTexture(new ResourceLocation(TheBoys.MODID, "syringe/3d")));
+        super(new DefaultedItemGeoModel<SyringeItem>(TheBoys.id("syringe")).withAltTexture(TheBoys.id("syringe/3d")));
     }
 
     @Override
@@ -66,9 +65,9 @@ public class SyringeRenderer extends GeoItemRenderer<SyringeItem> {
             color = item.getColor(this.currentItemStack);
         }
         if (boneOptional.isPresent() && color != -1) {
-            float r = FastColor.ARGB32.red(color) / 255F;
-            float g = FastColor.ARGB32.green(color) / 255F;
-            float b = FastColor.ARGB32.blue(color) / 255F;
+            float r = ClientUtil.ARGB.red(color) / 255F;
+            float g = ClientUtil.ARGB.green(color) / 255F;
+            float b = ClientUtil.ARGB.blue(color) / 255F;
             GeoBone bone = boneOptional.get();
             VertexConsumer vertexConsumer = ModelBakery.WATER_FLOW.buffer(bufferSource, ClientUtil.ModRenderTypes::glow);
             poseStack.pushPose();

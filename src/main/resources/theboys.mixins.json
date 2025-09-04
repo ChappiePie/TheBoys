@@ -12,7 +12,6 @@
     "client.ItemInHandRendererMixin",
     "client.ItemRendererMixin",
     "client.LivingEntityRendererMixin",
-    "client.LocalPlayerMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",
     "client.PlayerRendererMixin",
@@ -29,7 +28,8 @@
     "LivingEntityMixin",
     "LivingEntityRendererAccessor",
     "PlayerMixin",
-    "ServerLevelMixin"
+    "ServerLevelMixin",
+    "client.EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
@@ -23,7 +22,7 @@ import java.util.Optional;
 public class VialRenderer extends GeoItemRenderer<VialItem> {
 
     public VialRenderer() {
-        super(new DefaultedItemGeoModel<VialItem>(new ResourceLocation(TheBoys.MODID, "vial")).withAltTexture(new ResourceLocation(TheBoys.MODID, "syringe/3d")));
+        super(new DefaultedItemGeoModel<VialItem>(TheBoys.id("vial")).withAltTexture(TheBoys.id("syringe/3d")));
     }
 
     @Override
@@ -47,9 +46,9 @@ public class VialRenderer extends GeoItemRenderer<VialItem> {
             color = item.getColor(this.currentItemStack);
         }
         if (boneOptional.isPresent() && color != -1) {
-            float r = FastColor.ARGB32.red(color) / 255F;
-            float g = FastColor.ARGB32.green(color) / 255F;
-            float b = FastColor.ARGB32.blue(color) / 255F;
+            float r = ClientUtil.ARGB.red(color) / 255F;
+            float g = ClientUtil.ARGB.green(color) / 255F;
+            float b = ClientUtil.ARGB.blue(color) / 255F;
             GeoBone bone = boneOptional.get();
             VertexConsumer vertexConsumer = ModelBakery.WATER_FLOW.buffer(bufferSource, ClientUtil.ModRenderTypes::glow);
             poseStack.pushPose();

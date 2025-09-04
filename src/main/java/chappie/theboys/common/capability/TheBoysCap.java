@@ -36,14 +36,6 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
         if (this.livingEntity.isAlive()) {
             this.vialAnim.tick(this.livingEntity);
             this.syringeAnim.tick(this.livingEntity);
-//            if (this.livingEntity.level().isClientSide()) {
-//                PlayerAnimCap cap = PlayerAnimCap.getCap(player);
-//                if (cap != null) {
-//                    if (player.isCrouching()) {
-//                        cap.triggerAnim("theboys_arm_controller", "dab");
-//                    }
-//                }
-//            }
         }
     }
 

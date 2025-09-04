@@ -32,7 +32,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelPart;
@@ -176,7 +175,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             pPoseStack.scale(f, f, f);
             pPoseStack.translate((this.width / 2F - 200) / f, (h - 95) / f, 0);
             guiGraphics.drawString(this.font, Component.translatable("title.theboys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
-                    FastColor.ARGB32.color(255, 170, 20, 20), true);
+                    ClientUtil.ARGB.color(255, 170, 20, 20), true);
             pPoseStack.popPose();
         }
 

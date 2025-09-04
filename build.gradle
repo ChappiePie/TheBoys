@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = project.mod_version
+version = "${project.minecraft_version}-${project.mod_version}"
 group = project.maven_group
 
 base {
@@ -80,7 +80,7 @@ dependencies {
 	modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
 	modImplementation include("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
 
-	modImplementation "chappie.modulus:modulus:${project.modulus_version}"
+	modImplementation "chappie.modulus:modulus:${minecraft_version}-${project.modulus_version}"
 }
 
 processResources {

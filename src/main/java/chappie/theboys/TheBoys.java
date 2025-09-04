@@ -1,7 +1,5 @@
 package chappie.theboys;
 
-import chappie.modulus.client.gui.ChappModListWidget;
-import chappie.theboys.client.gui.EyeOptionsScreen;
 import chappie.theboys.common.ability.base.TBAbilityTypes;
 import chappie.theboys.common.ability.base.TBSuperpowers;
 import chappie.theboys.common.block.TBBlocks;
@@ -19,7 +17,6 @@ import chappie.theboys.util.tooltip.SuperpowerTooltip;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.config.ModConfig;
 import org.slf4j.Logger;
@@ -29,11 +26,6 @@ public class TheBoys implements ModInitializer {
     public static final String MODID = "theboys";
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
-
-    static {
-        ChappModListWidget.MOD_CLICKED.put(MODID, (e) ->
-                Minecraft.getInstance().setScreen(new EyeOptionsScreen(e.parent)));
-    }
 
     public static ResourceLocation id(String id) {
         return new ResourceLocation(MODID, id);
