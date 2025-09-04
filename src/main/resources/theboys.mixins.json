@@ -4,18 +4,19 @@
   "minVersion": "0.8",
   "client": [
     "client.AbstractSoundInstanceMixin",
-    "client.EntityRenderersAccessor",
     "client.GameRendererMixin",
-    "client.GuiGraphicsMixin",
     "client.GuiMixin",
     "client.HumanoidArmorLayerMixin",
     "client.HumanoidModelMixin",
     "client.ItemInHandLayerMixin",
+    "client.ItemInHandRendererMixin",
+    "client.ItemRendererMixin",
     "client.LivingEntityRendererMixin",
+    "client.LocalPlayerMixin",
     "client.MinecraftMixin",
+    "client.ModelBakeryMixin",
     "client.PlayerRendererMixin",
     "client.ScreenAccessor",
-    "client.SelectItemModelPropertiesMixin",
     "client.SoundEngineMixin"
   ],
   "mixins": [
@@ -27,9 +28,7 @@
     "LivingEntityMixin",
     "LivingEntityRendererAccessor",
     "PlayerMixin",
-    "ServerLevelMixin",
-    "SkullBlockEntityAccessor",
-    "client.EntityMixin"
+    "ServerLevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

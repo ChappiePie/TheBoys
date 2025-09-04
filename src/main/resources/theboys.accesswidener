@@ -1,8 +1,7 @@
 accessWidener v2 named
+extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderSlot (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;)V
+
 accessible method net/minecraft/client/gui/components/AbstractSliderButton getSprite ()Lnet/minecraft/resources/ResourceLocation;
 accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleSprite ()Lnet/minecraft/resources/ResourceLocation;
 
-accessible field net/minecraft/world/item/equipment/ArmorMaterial defense Ljava/util/Map;
-
 accessible method net/minecraft/world/level/block/LiquidBlock getFluidState (Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/material/FluidState;
-accessible field net/minecraft/world/item/component/ItemAttributeModifiers showInTooltip Z

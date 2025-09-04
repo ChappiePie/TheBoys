@@ -1,7 +1,6 @@
 package chappie.theboys.common.particle;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -11,10 +10,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -73,7 +69,7 @@ public class LaserParticle extends RisingParticle {
     }
 
     @Override
-    public void renderCustom(PoseStack poseStack, MultiBufferSource bufferSource, Camera pRenderInfo, float pPartialTicks) {
+    public void render(VertexConsumer pBuffer, Camera pRenderInfo, float pPartialTicks) {
         Vec3 vec3 = pRenderInfo.getPosition();
         float rot = -Mth.lerp(pPartialTicks, this.rotO, this.rot) * ((float) Math.PI / 180F);
         float pitch = (float) (Mth.lerp(pPartialTicks, this.pitchO, this.pitch) + Math.PI / 2F) * ((float) Math.PI / 180F);
@@ -96,8 +92,6 @@ public class LaserParticle extends RisingParticle {
         }
         int j = this.getLightColor(pPartialTicks);
 
-        RenderType renderType = RenderType.entityTranslucentEmissive(TextureAtlas.LOCATION_PARTICLES);
-        VertexConsumer pBuffer = bufferSource.getBuffer(renderType);
         RenderSystem.depthMask(true);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
