@@ -102,17 +102,17 @@ public class TBSuperpowers {
             AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
     ));
 
-//    public static final Superpower STARLIGHT = register("starlight", new TBSuperpower(
-//            AbilityBuilder.of("lasers", TBAbilityTypes.GLOW_EYES)
-//                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling")
-//                    .change(TBCommonUtil.COLOR, Color.YELLOW),
-//            AbilityBuilder.of("energy_charging", TBAbilityTypes.ENERGY_CHARGING)
-//                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
-//            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-//            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
-//            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
-//            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
-//    ));
+    public static final Superpower STARLIGHT = register("starlight", new TBSuperpower(
+            AbilityBuilder.of("lasers", TBAbilityTypes.GLOW_EYES)
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling")
+                    .change(TBCommonUtil.COLOR, Color.YELLOW),
+            AbilityBuilder.of("energy_charging", TBAbilityTypes.ENERGY_CHARGING)
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
+            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
+            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADDITION)),
+            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(1.0D).operation(AttributeModifier.Operation.ADDITION)),
+            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADDITION))
+    ));
 //
 //    public static final Superpower TEST = register("test", new TBSuperpower(
 //            AbilityBuilder.of("speed", TBAbilityTypes.SPEED).change(TBCommonUtil.COLOR, Color.RED)

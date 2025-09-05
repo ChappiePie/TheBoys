@@ -1,9 +1,9 @@
 package chappie.theboys.client.renderer;
 
-import chappie.modulus.client.model.CapeModel;
 import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.TheBoys;
+import chappie.theboys.client.model.CapeModel;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.item.suit.SuitItem;
 import chappie.theboys.util.ClientSuitProperties;
@@ -43,14 +43,10 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
             cape.xRot = (float) Math.toRadians(rotation + 10F);
 
             for (FlightAbility a : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
-                float t = a.sprintingTimer.value(partialTicks);
-                //cape.xRot += (float) ((Math.toRadians(10F + Mth.sin((player.tickCount + partialTicks) / 20F) * 5F) - cape.xRot / 2F) * a.timer.value(partialTicks));
-                //cape.xRot += (float) ((Math.toRadians(10F) - cape.xRot) * sprintingTimer.value(partialTicks));
-                cape.xRot -= cape.xRot * t;
+                cape.xRot -= cape.xRot * a.sprintingTimer.value(partialTicks);
             }
 
             pPoseStack.pushPose();
-            //model.body.translateAndRotate(pPoseStack);
             if (player.isCrouching()) {
                 pPoseStack.translate(0, 0.15, 0.025);
                 pPoseStack.mulPose(Axis.XP.rotationDegrees(22.5F));

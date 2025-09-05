@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.11-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -73,10 +73,6 @@ dependencies {
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}")
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}")
 
-	/*modImplementation include("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") {
-		exclude group: "maven.modrinth"
-	}*/
-
 	modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
 	modImplementation include("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
 
@@ -98,8 +94,8 @@ tasks.withType(JavaCompile).configureEach {
 java {
 	withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
@@ -110,12 +106,17 @@ jar {
 
 publishing {
 	publications {
-		create("mavenJava", MavenPublication) {
+		mavenJava(MavenPublication) {
+			artifact(remapJar) {
+				builtBy remapJar
+			}
+			artifact(sourcesJar) {
+				builtBy remapSourcesJar
+			}
 			artifactId = project.archives_base_name
-			from components.java
 		}
 	}
-
 	repositories {
+		mavenLocal()
 	}
 }

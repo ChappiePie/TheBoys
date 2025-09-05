@@ -29,7 +29,6 @@ public class ServerSetEyeOptions implements FabricPacket {
         return PACKET;
     }
 
-    @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(this.eyesHeight);
         buf.writeInt(this.eyesLength);

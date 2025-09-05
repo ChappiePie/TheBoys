@@ -4,6 +4,7 @@
   "minVersion": "0.8",
   "client": [
     "client.AbstractSoundInstanceMixin",
+    "client.CapeLayerMixin",
     "client.GameRendererMixin",
     "client.GuiMixin",
     "client.HumanoidArmorLayerMixin",
@@ -20,7 +21,6 @@
   ],
   "mixins": [
     "ArmorItemMixin",
-    "EntityAccessor",
     "EntityMixin",
     "InventoryMixin",
     "ItemStackMixin",

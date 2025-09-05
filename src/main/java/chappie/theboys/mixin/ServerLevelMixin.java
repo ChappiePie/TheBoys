@@ -28,8 +28,6 @@ public abstract class ServerLevelMixin {
     @Final
     List<ServerPlayer> players;
 
-    @Shadow public abstract List<ServerPlayer> players();
-
     @Inject(method = "explode", at = @At("TAIL"))
     public void getDistance(Entity source, DamageSource damageSource, ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, CallbackInfoReturnable<Explosion> cir, @Local Explosion explosion) {
         for (ServerPlayer player : this.players) {
