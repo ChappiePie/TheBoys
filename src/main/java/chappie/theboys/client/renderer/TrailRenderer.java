@@ -1,5 +1,6 @@
 package chappie.theboys.client.renderer;
 
+import chappie.modulus.util.ClientUtil;
 import chappie.theboys.common.entity.TrailEntity;
 import chappie.theboys.mixin.LivingEntityRendererAccessor;
 import chappie.theboys.util.interfaces.EntitySavingFields;
@@ -11,7 +12,6 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
 
@@ -23,7 +23,7 @@ public class TrailRenderer extends EntityRenderer<TrailEntity> {
 
     @Override
     public void render(TrailEntity entityIn, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn) {
-        LivingEntity attached = entityIn.entity;
+        LivingEntity attached = entityIn.attached;
         if (attached == null || entityIn.tickCount < 1 || Minecraft.getInstance().options.getCameraType()
                 .isFirstPerson() && attached.distanceToSqr(entityIn) < 10D && entityIn.tickCount < 5) return;
         float f = 1F - (entityIn.tickCount / (float) entityIn.lifeTime);
@@ -40,7 +40,7 @@ public class TrailRenderer extends EntityRenderer<TrailEntity> {
         float red = (entityIn.color.getRed() + (int) ((255 - entityIn.color.getRed()) * f)) / 255F;
         float green = (entityIn.color.getGreen() + (int) ((255 - entityIn.color.getGreen()) * f)) / 255F;
         float blue = (entityIn.color.getBlue() + (int) ((255 - entityIn.color.getBlue()) * f)) / 255F;
-        entityIn.model.renderToBuffer(poseStack, bufferIn.getBuffer(RenderType.entityTranslucent(entityIn.texture)), packedLightIn, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
+        entityIn.model.renderToBuffer(poseStack, bufferIn.getBuffer(RenderType.entityTranslucent(entityIn.texture)), packedLightIn, OverlayTexture.NO_OVERLAY, ClientUtil.ARGB.colorFromFloat(alpha, red, green, blue));
         poseStack.popPose();
         ((EntitySavingFields) attached).theBoys$reset();
         super.render(entityIn, entityYaw, partialTicks, poseStack, bufferIn, packedLightIn);

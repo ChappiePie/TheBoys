@@ -9,17 +9,11 @@ import com.google.common.collect.ImmutableMap;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.ArmorMaterials;
-import net.minecraft.world.item.equipment.ArmorType;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -28,7 +22,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static net.minecraft.world.item.equipment.ArmorType.*;
+import static net.minecraft.world.item.ArmorItem.Type.*;
 
 
 public class TBItems {
@@ -36,11 +30,11 @@ public class TBItems {
     public static final ArrayList<Item> ITEMS = new ArrayList<>();
     public static final ArrayList<ItemStack> ITEMS_TAB = new ArrayList<>();
 
-    public static final ImmutableMap<ArmorType, SuitItem> HOMELANDER_SUIT = registerSuitParts(SuitItem::new, "homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
-    public static final ImmutableMap<ArmorType, SuitItem> ATRAIN_SUIT = registerSuitParts(SuitItem::new, "atrain", (p) -> p.armorScale((stack) ->
+    public static final ImmutableMap<ArmorItem.Type, SuitItem> HOMELANDER_SUIT = registerSuitParts(SuitItem::new, "homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
+    public static final ImmutableMap<ArmorItem.Type, SuitItem> ATRAIN_SUIT = registerSuitParts(SuitItem::new, "atrain", (p) -> p.armorScale((stack) ->
             p.getSlot() != EquipmentSlot.HEAD ? SuitProperties.BASIC_ARMOR_SCALE.apply(p.getSlot()) : new Vector3f(-Integer.MAX_VALUE)), HELMET, CHESTPLATE, LEGGINGS, BOOTS);
-    //public static final ImmutableMap<ArmorType, SuitItem> STARLIGHT_SUIT = registerSuitParts(SuitItem::new, "starlight", (p) -> p.armorScale((e, stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, BOOTS);
-    public static final ImmutableMap<ArmorType, SuitItem> TRANSLUCENT_SUIT = registerSuitParts(SuitItem::new, "translucent", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
+    //public static final ImmutableMap<ArmorItem.Type, SuitItem> STARLIGHT_SUIT = registerSuitParts(SuitItem::new, "starlight", (p) -> p.armorScale((e, stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, BOOTS);
+    public static final ImmutableMap<ArmorItem.Type, SuitItem> TRANSLUCENT_SUIT = registerSuitParts(SuitItem::new, "translucent", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
 
     public static final SyringeItem SYRINGE = register("syringe", SyringeItem::new, new Properties(), false);
     public static final VialItem VIAL = register("vial", VialItem::new, new Properties(), false);
@@ -62,13 +56,13 @@ public class TBItems {
                 }
             }).build());
 
-    private static ImmutableMap<ArmorType, SuitItem> registerSuitParts(Function<SuitProperties, SuitItem> item, String type, Consumer<SuitProperties> consumer, ArmorType... slots) {
-        return TBItems.registerSuitParts(item, type, consumer, ArmorMaterials.LEATHER.defense, 0.0F, slots);
+    private static ImmutableMap<ArmorItem.Type, SuitItem> registerSuitParts(Function<SuitProperties, SuitItem> item, String type, Consumer<SuitProperties> consumer, ArmorItem.Type... slots) {
+        return TBItems.registerSuitParts(item, type, consumer, ArmorMaterials.LEATHER.value().defense(), 0.0F, slots);
     }
 
-    private static ImmutableMap<ArmorType, SuitItem> registerSuitParts(Function<SuitProperties, SuitItem> item, String type, Consumer<SuitProperties> consumer, Map<ArmorType, Integer> defense, double toughness, ArmorType... slots) {
-        ImmutableMap.Builder<ArmorType, SuitItem> builder = ImmutableMap.builder();
-        for (ArmorType slot : slots) {
+    private static ImmutableMap<ArmorItem.Type, SuitItem> registerSuitParts(Function<SuitProperties, SuitItem> item, String type, Consumer<SuitProperties> consumer, Map<ArmorItem.Type, Integer> defense, double toughness, ArmorItem.Type... slots) {
+        ImmutableMap.Builder<ArmorItem.Type, SuitItem> builder = ImmutableMap.builder();
+        for (ArmorItem.Type slot : slots) {
             SuitProperties properties = new SuitProperties(type, slot);
             consumer.accept(properties);
             properties.defense(defense.get(properties.slot)).toughness(toughness).stacksTo(1);
@@ -82,7 +76,9 @@ public class TBItems {
     }
 
     public static <T extends Item> T register(String id, Function<Properties, T> item, Properties properties, boolean ownSort) {
-        T registered = Registry.register(BuiltInRegistries.ITEM, TheBoys.id(id), item.apply(properties.setId(ResourceKey.create(Registries.ITEM, TheBoys.id(id)))));
+        T registered = Registry.register(BuiltInRegistries.ITEM, TheBoys.id(id), item.apply(properties
+        //        .setId(ResourceKey.create(Registries.ITEM, TheBoys.id(id)))
+        ));
         ITEMS.add(registered);
         if (ownSort) {
             ITEMS_TAB.add(new ItemStack(registered));

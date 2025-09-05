@@ -98,8 +98,8 @@ public class SpeedAbility extends Ability implements IHasTimer {
                     for (LivingEntity e : entity.getCommandSenderWorld().getEntitiesOfClass(LivingEntity.class,
                             CommonUtil.boxWithRange(entity.position(), 0.5D))) {
                         if (e != entity) {
-                            if (entity.getCommandSenderWorld() instanceof ServerLevel level) {
-                                e.hurtServer(level, e.damageSources().inWall(), speedLevel);
+                            if (entity.getCommandSenderWorld() instanceof ServerLevel) {
+                                e.hurt(e.damageSources().inWall(), speedLevel);
                             }
                         }
                     }

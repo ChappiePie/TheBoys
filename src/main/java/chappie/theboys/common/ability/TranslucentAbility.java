@@ -3,12 +3,12 @@ package chappie.theboys.common.ability;
 import chappie.modulus.common.ability.base.Ability;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.AbilityClientProperties;
+import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.events.RendererChangeCallback;
 import chappie.theboys.util.TBClientUtil;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public class TranslucentAbility extends Ability implements IHasTimer {
                 if (alpha < 1) {
                     RenderType renderType = TBClientUtil.RenderTypes.entityInvisibility(event.renderer().getTextureLocation(event.getEntity()));
                     event.renderer().getModel().renderToBuffer(event.poseStack(), event.multiBufferSource().getBuffer(renderType),
-                            event.packedLight(), event.packedOverlay(), FastColor.ARGB32.colorFromFloat((event.alpha() / 255F) * alpha, event.red() / 255F, event.green() / 255F, event.blue() / 255F));
+                            event.packedLight(), event.packedOverlay(), ClientUtil.ARGB.colorFromFloat((event.alpha() / 255F) * alpha, event.red() / 255F, event.green() / 255F, event.blue() / 255F));
                     return true;
                 }
                 return false;

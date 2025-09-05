@@ -9,6 +9,7 @@ import chappie.theboys.common.block.entity.TBBlockEntities;
 import chappie.theboys.common.block.menu.TBMenus;
 import chappie.theboys.common.entity.TBEntities;
 import chappie.theboys.common.item.TBItems;
+import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.particle.TBParticleTypes;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.util.TBConfig;
@@ -41,6 +42,7 @@ public class TheBoys implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        TBDataComponents.init();
         TBItems.init();
         TBAbilityTypes.init();
         TBSuperpowers.init();

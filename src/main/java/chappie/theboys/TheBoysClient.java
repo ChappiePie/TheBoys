@@ -7,6 +7,8 @@ import chappie.theboys.client.ClientEvents;
 import chappie.theboys.client.TBOverlays;
 import chappie.theboys.client.gui.EyeOptionsScreen;
 import chappie.theboys.client.gui.SynthesizerScreen;
+import chappie.theboys.client.model.CapeModel;
+import chappie.theboys.client.model.SuitModel;
 import chappie.theboys.client.renderer.TrailRenderer;
 import chappie.theboys.client.renderer.block.SynthesizerRenderer;
 import chappie.theboys.common.block.entity.TBBlockEntities;
@@ -15,6 +17,7 @@ import chappie.theboys.common.entity.TBEntities;
 import chappie.theboys.common.item.SyringeItem;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.VialItem;
+import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.particle.LaserParticle;
 import chappie.theboys.common.particle.TBParticleTypes;
 import chappie.theboys.networking.TBNetworking;
@@ -25,14 +28,16 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 public class TheBoysClient implements ClientModInitializer {
@@ -42,6 +47,9 @@ public class TheBoysClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         TBNetworking.registerClientMessages();
+        EntityModelLayerRegistry.registerModelLayer(SuitModel.SUIT, () -> SuitModel.createLayerDefinition(CubeDeformation.NONE, false));
+        EntityModelLayerRegistry.registerModelLayer(SuitModel.SUIT_SLIM, () -> SuitModel.createLayerDefinition(CubeDeformation.NONE, true));
+        EntityModelLayerRegistry.registerModelLayer(CapeModel.LAYER_LOCATION, CapeModel::createBodyLayer);
         KeyBindingHelper.registerKeyBinding(OVERLAY);
         ClientEntityEvents.ENTITY_LOAD.register((e, w) -> {
             if (e instanceof Player) {
@@ -58,8 +66,8 @@ public class TheBoysClient implements ClientModInitializer {
         ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : ((SyringeItem) stack.getItem()).getColor(stack), TBItems.SYRINGE);
         ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : ((VialItem) stack.getItem()).getColor(stack), TBItems.VIAL);
 
-        ItemProperties.register(TBItems.SYRINGE, new ResourceLocation(TheBoys.MODID, "has_vial"), (pStack, pLevel, pEntity, pSeed) -> {
-            if (pStack.getTag() != null && pStack.getTag().contains("vial")) {
+        ItemProperties.register(TBItems.SYRINGE, TheBoys.id("has_vial"), (pStack, pLevel, pEntity, pSeed) -> {
+            if (!pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY).isEmpty()) {
                 return 1;
             }
             return 0;

@@ -32,6 +32,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
     @Inject(method = "renderHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/player/AbstractClientPlayer;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderType;entitySolid(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;"))
     private void renderHandPost(PoseStack pMatrixStack, MultiBufferSource pBuffer, int pCombinedLight, AbstractClientPlayer pPlayer, ModelPart pRendererArm, ModelPart pRendererArmwear, CallbackInfo ci) {
         HumanoidArm side = pRendererArm == this.getModel().rightArm ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
-        TBClientUtil.setupArms(this.getModel(), side, pMatrixStack, pBuffer, pCombinedLight, pPlayer, pRendererArm, pRendererArmwear, ClientUtil.getPartialTick());
+        TBClientUtil.setupArms(this.getModel(), side, pMatrixStack, pBuffer, pCombinedLight, pPlayer, pRendererArm, ClientUtil.getPartialTick());
+        pRendererArmwear.copyFrom(pRendererArm);
     }
 }

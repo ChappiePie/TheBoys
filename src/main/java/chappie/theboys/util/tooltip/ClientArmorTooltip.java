@@ -1,9 +1,9 @@
 package chappie.theboys.util.tooltip;
 
+import chappie.modulus.util.ClientUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 
 public class ClientArmorTooltip implements ClientTooltipComponent {
@@ -42,9 +42,9 @@ public class ClientArmorTooltip implements ClientTooltipComponent {
     private void renderSlot(int pX, int pY, int pItemIndex, Font pFont, GuiGraphics guiGraphics) {
         guiGraphics.renderItem(this.itemStack, pX + 1, pY + 1, pItemIndex);
 
-        int color = FastColor.ARGB32.color(57, 46, 86);
-        int colorLight = FastColor.ARGB32.color(37, 26, 66);
-        int colorDark = FastColor.ARGB32.color(77, 66, 106);
+        int color = ClientUtil.ARGB.color(57, 46, 86);
+        int colorLight = ClientUtil.ARGB.color(37, 26, 66);
+        int colorDark = ClientUtil.ARGB.color(77, 66, 106);
 
         int b = 2;
         guiGraphics.fill(pX + b, pY + b, pX + 18 + b, pY + 18 + b, colorLight);

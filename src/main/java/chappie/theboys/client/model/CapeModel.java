@@ -1,27 +1,22 @@
 package chappie.theboys.client.model;
 
-import chappie.modulus.Modulus;
+import chappie.theboys.TheBoys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
-import org.joml.Quaternionf;
 
 public class CapeModel extends Model {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Modulus.id("cape"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(TheBoys.id("cape"), "main");
+	public final ModelPart main;
 
-	private final ModelPart root;
-	private final ModelPart cape;
-
-	public CapeModel() {
+	public CapeModel(ModelPart root) {
 		super(RenderType::entityTranslucent);
-		this.root = Minecraft.getInstance().getEntityModels().bakeLayer(CapeModel.LAYER_LOCATION).getChild("main");
-		this.cape = this.root.getChild("cape");
+		this.main = root.getChild("main");
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -35,19 +30,8 @@ public class CapeModel extends Model {
 		return LayerDefinition.create(meshdefinition, 64, 32);
 	}
 
-	public void setupAnim(HumanoidRenderState renderState) {
-		if (renderState instanceof PlayerRenderState playerRenderState) {
-			this.cape.rotateBy(
-					new Quaternionf()
-							.rotateX((6.0F + playerRenderState.capeLean / 2.0F + playerRenderState.capeFlap) * (float) (Math.PI / 180.0))
-							.rotateZ(playerRenderState.capeLean2 / 2.0F * (float) (Math.PI / 180.0))
-							.rotateY((180.0F - playerRenderState.capeLean2 / 2.0F) * (float) (Math.PI / 180.0))
-			);
-		}
-	}
-
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-		this.root.render(poseStack, buffer, packedLight, packedOverlay, color);
+		this.main.render(poseStack, buffer, packedLight, packedOverlay, color);
 	}
 }

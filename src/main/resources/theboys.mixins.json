@@ -4,6 +4,7 @@
   "minVersion": "0.8",
   "client": [
     "client.AbstractSoundInstanceMixin",
+    "client.CapeLayerMixin",
     "client.GameRendererMixin",
     "client.GuiMixin",
     "client.HumanoidArmorLayerMixin",
@@ -12,7 +13,6 @@
     "client.ItemInHandRendererMixin",
     "client.ItemRendererMixin",
     "client.LivingEntityRendererMixin",
-    "client.LocalPlayerMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",
     "client.PlayerRendererMixin",
@@ -28,7 +28,8 @@
     "LivingEntityMixin",
     "LivingEntityRendererAccessor",
     "PlayerMixin",
-    "ServerLevelMixin"
+    "ServerLevelMixin",
+    "SkullBlockEntityAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

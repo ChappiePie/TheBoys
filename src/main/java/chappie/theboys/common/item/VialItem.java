@@ -57,7 +57,7 @@ public class VialItem extends Item implements GeoItem {
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
         String superpower = stack.getOrDefault(TBDataComponents.SUPERPOWER, "");
         if (!superpower.isEmpty() && !superpower.equals("compoundV")) {
-            Superpower sup = Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower)).get().value();
+            Superpower sup = Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower));
             if (sup instanceof TBSuperpower tbs) {
                 return Optional.of(new SuperpowerTooltip(tbs));
             }

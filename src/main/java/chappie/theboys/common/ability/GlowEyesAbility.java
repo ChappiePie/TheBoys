@@ -3,6 +3,7 @@ package chappie.theboys.common.ability;
 import chappie.modulus.common.ability.base.Ability;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.AbilityClientProperties;
+import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.model.ModelProperties;
 import chappie.theboys.TheBoys;
@@ -21,7 +22,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.awt.*;
@@ -83,11 +83,11 @@ public class GlowEyesAbility extends Ability implements IHasTimer {
                     for (int i = 0; i < 3; i++) {
                         poseStack.pushPose();
                         poseStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
-                        this.copyModel.get().head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
+                        this.copyModel.get().head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ClientUtil.ARGB.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
                         poseStack.popPose();
                     }
                     poseStack.translate(0, 0, -(Math.cos(entity.tickCount * entity.tickCount) / 100F));
-                    this.copyModel.get().hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
+                    this.copyModel.get().hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ClientUtil.ARGB.colorFromFloat(alpha, red, green, blue));
                     poseStack.popPose();
                 }
                 poseStack.popPose();

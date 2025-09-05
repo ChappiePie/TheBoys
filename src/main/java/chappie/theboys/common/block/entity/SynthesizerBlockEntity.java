@@ -26,6 +26,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -136,7 +137,7 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
         if (fuel.isEmpty()) {
             return 0;
         } else {
-            return this.level != null ? this.level.fuelValues().burnDuration(fuel) : 0;
+            return AbstractFurnaceBlockEntity.getFuel().getOrDefault(fuel.getItem(), 0);
         }
     }
 
@@ -341,8 +342,8 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
                 Item item = fuelStack.getItem();
                 fuelStack.shrink(1);
                 if (fuelStack.isEmpty()) {
-                    ItemStack item2 = item.getCraftingRemainder();
-                    this.items.set(1, item2);
+                    Item item2 = item.getCraftingRemainingItem();
+                    this.items.set(1, item2 == null ? ItemStack.EMPTY : new ItemStack(item2));
                 }
             }
         }

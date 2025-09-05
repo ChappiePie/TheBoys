@@ -60,8 +60,8 @@ public class TBOverlays {
         if (!(entity instanceof LivingEntity e) || PowerCap.getCap(e) == null || !(PowerCap.getCap(e).getSuperpower() instanceof TBSuperpower power))
             return;
         // color of background
-        int color = FastColor.ARGB32.color(127, 0x282828);
-        int textColor = FastColor.ARGB32.color(200, 0xFFFFFF);
+        int color = ClientUtil.ARGB.color(127, 0x282828);
+        int textColor = ClientUtil.ARGB.color(200, 0xFFFFFF);
         int x = 7;
         int y = 7;
         List<Ability> abilities = CommonUtil.getAbilities(e).stream().filter(a -> IHasOverlay.getInstance(a) != null).sorted(TBOverlays::compareAbilitiesByKey).toList();
@@ -76,12 +76,11 @@ public class TBOverlays {
         // Text above
         MutableComponent text;
         if (tab) {
-            text = Component.translatable("overlay.theboys.abilities");
+            text = Component.translatable("overlay.theboys.abilities").withStyle(ClientUtil.BOLD_MINECRAFT);
         } else {
-            text = power.getDisplayName().copy();
+            text = power.getDisplayName().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
             //text = Component.translatable("theboys.overlay.superpower");
         }
-        text = text.withStyle(ClientUtil.BOLD_MINECRAFT);
 
         if (tab) {
             guiGraphics.fill(x - 5, y + 6, x - 1, y + 16 - 6, textColor);
@@ -97,8 +96,9 @@ public class TBOverlays {
         x += 7;
         y += 19;
         if (f != 1) {
+            guiGraphics.setColor(1, 1, 1, f1);
+            guiGraphics.fill(x, y, x + 22, y + 22, color);
             RenderSystem.enableBlend();
-            guiGraphics.fill(x, y, x + 22, y + 22, FastColor.ARGB32.color((int) (f1 * 255 / 2), color));
             power.renderIcon(x + 3, y + 3, f1, mc, guiGraphics, partialTick);
             //guiGraphics.blit(TEXTURE, x + 3, y + 3, 0, 128, 16, 16, 256, 256);
 
@@ -107,9 +107,10 @@ public class TBOverlays {
             int newX = x * 4;
             int newY = y * 3;
             text = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
-            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 8, newY + 16, FastColor.ARGB32.colorFromFloat(f1 * 0.5F, 0, 0, 0));
-            guiGraphics.drawString(mc.font, text, newX + 5, newY + 5,FastColor.ARGB32.color((int) (f1 * 255), textColor), true);
+            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 10, newY + 16, FastColor.ARGB32.color(127, 0, 0, 0));
+            guiGraphics.drawString(mc.font, text, newX + 5, newY + 5, textColor, true);
             poseStack.popPose();
+            guiGraphics.setColor(1, 1, 1, 1);
         }
 
         // Abilities icons and text
@@ -134,15 +135,15 @@ public class TBOverlays {
 
             float f2 = Math.min(1.0f - f1, 0.5F) * 2F;
             poseStack.translate(f1 * -maxX, 0, 0);
-            //RenderSystem.setShaderColor(1, 1, 1, f2);
-            guiGraphics.fill(x - 5, y + 2, x - 4, y + (type == 1 ? 20 : size * 20), FastColor.ARGB32.color((int) (f2 * 255), textColor));
+            guiGraphics.setColor(1, 1, 1, f2);
+            guiGraphics.fill(x - 5, y + 2, x - 4, y + (type == 1 ? 20 : size * 20), textColor);
 
             if (type == 1) {
-                guiGraphics.fill(x, y, x + maxX + 2, y + 20 + 2, FastColor.ARGB32.color((int) (f2 * 255), color));
+                guiGraphics.fill(x, y, x + maxX + 2, y + 20 + 2, color);
             } else {
                 for (int i = 0; i < size; i++) {
                     int texY = y + i * 20;
-                    guiGraphics.fill(x, texY, x + maxX + 2, texY + 20 + (i + 1 == size ? 2 : 0), FastColor.ARGB32.color((int) (f2 * 255 / 2), color));
+                    guiGraphics.fill(x, texY, x + maxX + 2, texY + 20 + (i + 1 == size ? 2 : 0), color);
                 }
             }
             for (int i = 0; i < size; i++) {
@@ -154,26 +155,30 @@ public class TBOverlays {
                 int texY = y + (type == 1 ? 0 : j);
 
 
+                float a = f2;
                 {
                     int cBack = iHasOverlay.getBackgroundColor();
                     float r = FastColor.ARGB32.red(cBack) / 255F;
                     float g = FastColor.ARGB32.green(cBack) / 255F;
                     float b = FastColor.ARGB32.blue(cBack) / 255F;
 
-                    float alpha = !ability.isEnabled() ? 0.25F : 0.75F;
+                    guiGraphics.setColor(r, g, b, !ability.isEnabled() ? 0.25F : 0.75F);
                     RenderSystem.enableBlend();
-                    guiGraphics.blit(TEXTURE, texX + 3, texY + 3, 0, 0, 16, 16, 256, 256, FastColor.ARGB32.colorFromFloat(alpha, r, g, b));
+                    guiGraphics.blit(TEXTURE, texX + 3, texY + 3, 0, 0, 16, 16, 256, 256);
 
+                    guiGraphics.setColor(1, 1, 1, a);
                     if (ability.isEnabled()) {
-                        guiGraphics.blit(TEXTURE, texX + 2, texY + 2, 0, 16, 18, 18, 256, 256, FastColor.ARGB32.colorFromFloat(alpha, r, g, b));
+                        guiGraphics.blit(TEXTURE, texX + 2, texY + 2, 0, 16, 18, 18, 256, 256);
                     }
+                    guiGraphics.setColor(1, 1, 1, a);
                 }
 
                 iHasOverlay.renderIcon(texX + 3, texY + 3, f1, mc, gui, guiGraphics, partialTick, width, height);
                 if (type == 0) {
-                    guiGraphics.drawString(mc.font, ability.builder.displayName(), x + 22, texY + 7, FastColor.ARGB32.color((int) (f2 * 255), textColor), true);
+                    guiGraphics.drawString(mc.font, ability.builder.displayName(), x + 22, texY + 7, textColor, true);
                 }
 
+                guiGraphics.setColor(1, 1, 1, (a == 0.25F ? 0.5F : 1F) * f2);
                 KeyMap.KeyType keyType = iHasOverlay.getKeyType();
                 if (keyType != null) {
                     MutableComponent key;
@@ -191,16 +196,17 @@ public class TBOverlays {
                     if (type == 1) {
                         newX = texX * 2 + 10 + 6 - mc.font.width(key) / 2;
                     }
-                    guiGraphics.fill(newX, newY, newX + mc.font.width(key.getString().toUpperCase()) + 11, newY + 16, FastColor.ARGB32.colorFromFloat(127 * ((f2 == 0.25F ? 0.5F : 1F) * f2), 0, 0, 0));
+                    guiGraphics.fill(newX, newY, newX + mc.font.width(key) + 10, newY + 16, FastColor.ARGB32.color(127, 0, 0, 0));
                     poseStack.translate(0, 0, 0);
-                    guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, FastColor.ARGB32.color((int) (((f2 == 0.25F ? 0.5F : 1F) * f2) * 255), textColor), true);
+                    guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, textColor, true);
                     poseStack.popPose();
                 }
+                guiGraphics.setColor(1, 1, 1, 1);
             }
             poseStack.popPose();
         }
     }
-
+    
     public static int compareAbilitiesByKey(Ability a, Ability a1) {
         int o = Integer.MAX_VALUE;
         int o1 = Integer.MAX_VALUE;
@@ -241,7 +247,7 @@ public class TBOverlays {
                     RenderSystem.enableBlend();
                     RenderSystem.defaultBlendFunc();
                     RenderSystem.disableDepthTest();
-                    guiGraphics.setColor(red, green, blue, alpha);
+                    guiGraphics.setColor(red / 255F, green / 255F, blue / 255F, alpha / 255F);
                     guiGraphics.blit(TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
                             guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
                     guiGraphics.setColor(1, 1, 1, 1);

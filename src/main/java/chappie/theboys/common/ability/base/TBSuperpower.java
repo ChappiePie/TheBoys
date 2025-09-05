@@ -5,7 +5,6 @@ import chappie.modulus.common.ability.base.Superpower;
 import chappie.theboys.client.TBOverlays;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.FastColor;
 
 import java.util.LinkedList;
 
@@ -33,6 +32,6 @@ public class TBSuperpower extends Superpower {
     }
 
     public void renderIcon(int x, int y, float alpha, Minecraft mc, GuiGraphics guiGraphics, float partialTick) {
-        guiGraphics.blit(TBOverlays.TEXTURE, x, y, this.uOffset, this.vOffset, 16, 16, 256, 256, FastColor.ARGB32.white(alpha));
+        guiGraphics.blit(TBOverlays.TEXTURE, x, y, this.uOffset, this.vOffset, 16, 16, 256, 256);
     }
 }

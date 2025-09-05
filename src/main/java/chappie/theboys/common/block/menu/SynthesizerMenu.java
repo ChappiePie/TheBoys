@@ -16,6 +16,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 
 public class SynthesizerMenu extends AbstractContainerMenu {
     public final Container container;
@@ -105,7 +106,7 @@ public class SynthesizerMenu extends AbstractContainerMenu {
                     if (!this.moveItemStackTo(itemStack2, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (player.level().fuelValues().isFuel(itemStack2) && !this.slots.get(1).hasItem()) {
+                } else if (this.isFuel(itemStack2) && !this.slots.get(1).hasItem()) {
                     if (!this.moveItemStackTo(itemStack2, 1, 2, false)) {
                         return ItemStack.EMPTY;
                     }
@@ -198,7 +199,7 @@ public class SynthesizerMenu extends AbstractContainerMenu {
     }
 
     private boolean isFuel(ItemStack stack) {
-        return this.level.fuelValues().isFuel(stack);
+        return AbstractFurnaceBlockEntity.isFuel(stack);
     }
 
     static class FuelSlot extends Slot {

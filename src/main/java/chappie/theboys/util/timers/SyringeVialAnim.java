@@ -48,7 +48,7 @@ public class SyringeVialAnim implements IHasTimer {
             }
             this.triggerAnim = false;
             if (entity instanceof Player player) {
-                player.getCooldowns().addCooldown(mainHandItem, 20);
+                player.getCooldowns().addCooldown(mainHandItem.getItem(), 20);
             }
         }
 

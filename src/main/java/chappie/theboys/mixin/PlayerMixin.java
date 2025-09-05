@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity {
 
+    private static final EntityDimensions FLIGHT_DIMENSIONS = EntityDimensions.scalable(0.6F, 0.6F).withEyeHeight(0.51F);
     protected PlayerMixin(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -26,7 +27,7 @@ public abstract class PlayerMixin extends LivingEntity {
         if (player != null && player.isAlive()) {
             for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
                 if (player.isSprinting() && ability.isEnabled()) {
-                    cir.setReturnValue(EntityDimensions.scalable(0.6F, 0.6F).withEyeHeight(0.51F));
+                    cir.setReturnValue(FLIGHT_DIMENSIONS);
                 }
             }
         }

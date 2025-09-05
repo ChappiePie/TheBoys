@@ -13,6 +13,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
@@ -22,6 +23,11 @@ import net.minecraft.world.item.ItemStack;
 
 public class TBClientUtil {
 
+    public static final ModelResourceLocation SYRINGE_MODEL = new ModelResourceLocation(TheBoys.id("syringe"), "inventory");
+    public static final ModelResourceLocation SYRINGE_3D_MODEL = new ModelResourceLocation(TheBoys.id("syringe_3d"), "inventory");
+
+    public static final ModelResourceLocation VIAL_MODEL = new ModelResourceLocation(TheBoys.id("vial"), "inventory");
+    public static final ModelResourceLocation VIAL_3D_MODEL = new ModelResourceLocation(TheBoys.id("vial_3d"), "inventory");
     public static final ResourceLocation GLOW_EYES_OVERLAY = TheBoys.id("textures/gui/glow_eyes_overlay.png");
 
     public static void setupArms(PlayerModel model, HumanoidArm side, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, Player pPlayer, ModelPart pRendererArm, float partialTicks) {

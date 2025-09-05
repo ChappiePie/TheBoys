@@ -8,7 +8,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 
 public class ClientSuperpowerTooltip implements ClientTooltipComponent {
     private static final ResourceLocation SLOT_SPRITE = ResourceLocation.withDefaultNamespace("container/bundle/slot");
@@ -45,9 +44,9 @@ public class ClientSuperpowerTooltip implements ClientTooltipComponent {
     private void renderSlot(int pX, int pY, Font pFont, GuiGraphics guiGraphics) {
         guiGraphics.blitSprite(SLOT_SPRITE, pX, pY, 0, 18, 20);
         int border = 1;
-        guiGraphics.fill(pX + border, pY + border, pX + 18 + border, pY + 18 + border, FastColor.ARGB32.color(57, 57, 57));
+        guiGraphics.fill(pX + border, pY + border, pX + 18 + border, pY + 18 + border, ClientUtil.ARGB.color(57, 57, 57));
         guiGraphics.fill(pX - border, pY - border, pX + 18 - border, pY + 18 - border, -1);
-        guiGraphics.fill(pX, pY, pX + 18, pY + 18, FastColor.ARGB32.color(157, 157, 157));
+        guiGraphics.fill(pX, pY, pX + 18, pY + 18, ClientUtil.ARGB.color(157, 157, 157));
 
         guiGraphics.drawString(pFont, this.superpower.getDisplayName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
         RenderSystem.enableBlend();

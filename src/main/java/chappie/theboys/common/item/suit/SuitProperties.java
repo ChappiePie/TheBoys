@@ -11,11 +11,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.equipment.ArmorType;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
@@ -27,11 +27,11 @@ public class SuitProperties extends Item.Properties {
     public static final Function<EquipmentSlot, Vector3f> BASIC_ARMOR_SCALE = (slot) -> new Vector3f(slot == EquipmentSlot.LEGS ? -0.35F : -0.79f);
     public final String type;
     private final ImmutableList.Builder<ItemAttributeModifiers.Entry> builder = ImmutableList.builder();
-    public ArmorType slot;
+    public ArmorItem.Type slot;
     public Function<ItemStack, Vector3f> armorScale;
     private List<ItemAttributeModifiers.Entry> defaultModifiers;
 
-    public SuitProperties(String type, ArmorType slot) {
+    public SuitProperties(String type, ArmorItem.Type slot) {
         this.type = type;
         this.slot = slot;
         this.armorScale = (stack) -> BASIC_ARMOR_SCALE.apply(slot.getSlot());

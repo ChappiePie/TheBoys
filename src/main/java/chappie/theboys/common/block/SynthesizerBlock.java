@@ -8,7 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -81,9 +81,9 @@ public class SynthesizerBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (level.isClientSide) {
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         } else {
             if (level.getBlockEntity(pos) instanceof SynthesizerBlockEntity e) {
                 if (!e.isOpened()) {
@@ -100,7 +100,7 @@ public class SynthesizerBlock extends BaseEntityBlock {
                     }
                 }
             }
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
     }
 

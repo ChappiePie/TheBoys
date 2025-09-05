@@ -11,36 +11,47 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerExplosion;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.Optional;
 
 @Mixin(ServerLevel.class)
-public class ServerLevelMixin {
+public abstract class ServerLevelMixin {
 
     @Shadow
     @Final
     List<ServerPlayer> players;
 
     @Inject(method = "explode", at = @At("TAIL"))
-    public void getDistance(@Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, Holder<SoundEvent> explosionSound, CallbackInfo ci, @Local ServerExplosion serverExplosion) {
+    public void getDistance(@Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, Holder<SoundEvent> explosionSound, CallbackInfoReturnable<Explosion> cir, @Local Explosion explosion) {
         for (ServerPlayer player : this.players) {
             if (player.distanceToSqr(x, y, z) > 4096.0D) {
                 for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(player))) {
                     if (a.isEnabled()) {
-                        ParticleOptions particleOptions = serverExplosion.isSmall() ? smallExplosionParticles : largeExplosionParticles;
-                        player.connection.send(new ClientboundExplodePacket(new Vec3(x, y, z), Optional.ofNullable(serverExplosion.getHitPlayers().get(player)), particleOptions, explosionSound));
+                        player.connection
+                                .send(
+                                        new ClientboundExplodePacket(
+                                                x,
+                                                y,
+                                                z,
+                                                radius,
+                                                explosion.getToBlow(),
+                                                explosion.getHitPlayers().get(player),
+                                                explosion.getBlockInteraction(),
+                                                explosion.getSmallExplosionParticles(),
+                                                explosion.getLargeExplosionParticles(),
+                                                explosion.getExplosionSound()
+                                        )
+                                );
                     }
                 }
             }

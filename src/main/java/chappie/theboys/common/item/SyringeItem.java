@@ -12,7 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -71,7 +71,7 @@ public class SyringeItem extends Item implements GeoItem {
             boolean b = false;
             ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
             if (cap != null && !vial.isEmpty()) {
-                player.getCooldowns().addCooldown(pStack, 20);
+                player.getCooldowns().addCooldown(pStack.getItem(), 20);
                 if (this.hasSuperpower(pStack) && (cap.getSuperpower() == null || player.getAbilities().instabuild && !this.vialSuperpower(pStack).equals("compoundV"))) {
                     if (this.vialSuperpower(pStack).equals("compoundV")) {
                         if (cap.getSuperpower() == null) {
@@ -81,7 +81,7 @@ public class SyringeItem extends Item implements GeoItem {
                     } else {
                         String superpower = vial.getOrDefault(TBDataComponents.SUPERPOWER, "");
                         if (!superpower.isBlank()) {
-                            cap.setSuperpower(Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower)).get().value());
+                            cap.setSuperpower(Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower)));
                         }
                     }
 
@@ -127,7 +127,7 @@ public class SyringeItem extends Item implements GeoItem {
     }
 
     @Override
-    public @NotNull InteractionResult use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack mainHandItem = pPlayer.getMainHandItem();
         ItemStack offHandItem = pPlayer.getOffhandItem();
         PowerCap cap = PowerCap.getCap(pPlayer);
@@ -138,7 +138,7 @@ public class SyringeItem extends Item implements GeoItem {
                 if (offHandItem.isEmpty()) {
                     if (pPlayer.isCrouching()) {
                         boysCap.vialAnim.triggerAnim(true, true);
-                        return InteractionResult.PASS;
+                        return InteractionResultHolder.pass(mainHandItem);
                     }
 
                     if (boysCap.vialAnim.timeline.value(1) == 0) {
@@ -175,7 +175,7 @@ public class SyringeItem extends Item implements GeoItem {
             }
         }
 
-        return InteractionResult.PASS;
+        return InteractionResultHolder.pass(mainHandItem);
     }
 
     @Override

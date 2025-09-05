@@ -1,6 +1,7 @@
 package chappie.theboys.mixin.client;
 
 import chappie.theboys.common.item.TBItems;
+import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.item.suit.SuitItem;
 import chappie.theboys.util.TBClientUtil;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -11,7 +12,6 @@ import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -44,10 +44,9 @@ public abstract class ItemRendererMixin {
     @Inject(method = "render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderModelLists(Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/item/ItemStack;IILcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V"))
     private void tryRenderGuiItem(ItemStack pStack, ItemDisplayContext pDisplayContext, boolean pLeftHand, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, int pCombinedOverlay, BakedModel pModel, CallbackInfo ci) {
-        if (pStack.getItem() instanceof ArmorItem armorItem && pStack.getOrCreateTag().contains("Suit")) {
-            CompoundTag tag = pStack.getOrCreateTag().getCompound("Suit");
-            ItemStack stack = ItemStack.of(tag.getCompound("Tags"));
-            if (stack.getItem() instanceof SuitItem item
+        if (pStack.getItem() instanceof ArmorItem armorItem) {
+            ItemStack stack = pStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
+            if (!stack.isEmpty() && stack.getItem() instanceof SuitItem item
                     && armorItem.getEquipmentSlot() == item.properties.getSlot()) {
                 BakedModel pBakedModel = this.getModel(stack, this.minecraft.level, this.minecraft.player, 0);
                 pPoseStack.pushPose();

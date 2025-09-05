@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -76,7 +75,7 @@ public class SyringeRenderer extends GeoItemRenderer<SyringeItem> {
             bone.setScaleY(1F);
             for (GeoCube cube : bone.getCubes()) {
                 poseStack.pushPose();
-                renderCube(poseStack, cube, vertexConsumer, packedLight, packedOverlay, FastColor.ARGB32.color(FastColor.ARGB32.alpha(renderColor), color));
+                renderCube(poseStack, cube, vertexConsumer, packedLight, packedOverlay, ClientUtil.ARGB.color(ClientUtil.ARGB.alpha(renderColor), color));
                 poseStack.popPose();
             }
             bufferSource.getBuffer(this.getRenderType(animatable, this.getTextureLocation(animatable), bufferSource, partialTick));
