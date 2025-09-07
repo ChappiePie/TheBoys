@@ -13,6 +13,7 @@
     "client.ItemInHandLayerMixin",
     "client.LivingEntityRendererMixin",
     "client.MinecraftMixin",
+    "client.PlayerCapeModelMixin",
     "client.PlayerRendererMixin",
     "client.ScreenAccessor",
     "client.SelectItemModelPropertiesMixin",
