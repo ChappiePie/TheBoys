@@ -51,11 +51,6 @@ public class TBOverlays {
         TBOverlays.renderEyes(guiGraphics, mc, partialTick);
     }
 
-    /*
-    TODO Update abilities overlay to look better
-     */
-
-
     public static void renderHud(Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
         Entity entity = mc.getCameraEntity();
         if (!(entity instanceof LivingEntity e) || PowerCap.getCap(e) == null || !(PowerCap.getCap(e).getSuperpower() instanceof TBSuperpower power))
@@ -69,20 +64,15 @@ public class TBOverlays {
         int size = abilities.size();
         float f = ANIM_TICK.value(partialTick);
         float f1 = (float) (Math.pow(Math.cos(f * Math.PI / 2), 10) * Math.cos(f * Math.PI));
+        f1 = Math.max(0, Math.min(f1, 1));
         PoseStack poseStack = guiGraphics.pose();
 
         boolean tab = f1 < 0.25F;
         //InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_TAB);
 
         // Text above
-        MutableComponent text;
-        if (tab) {
-            text = Component.translatable("overlay.theboys.abilities");
-        } else {
-            text = power.getDisplayName().copy();
-            //text = Component.translatable("theboys.overlay.superpower");
-        }
-        text = text.withStyle(ClientUtil.BOLD_MINECRAFT);
+        MutableComponent text = (tab ? Component.translatable("overlay.theboys.abilities") :
+                power.getDisplayName().copy()).withStyle(ClientUtil.BOLD_MINECRAFT);
 
         if (tab) {
             guiGraphics.fill(x - 5, y + 6, x - 1, y + 16 - 6, textColor);
@@ -92,7 +82,7 @@ public class TBOverlays {
         }
 
         guiGraphics.fill(x, y, x + mc.font.width(text) + 5, y + 16, color);
-        guiGraphics.drawString(mc.font, text, x + 3, y + 5, textColor, true);
+        guiGraphics.drawString(mc.font, text, x + 3, y + 4, textColor, true);
 
         // Superpower icon
         x += 7;
@@ -107,12 +97,13 @@ public class TBOverlays {
             poseStack.scale(0.5F, 0.5F, 1F);
             int newX = x * 4;
             int newY = y * 3;
-            text = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
-            guiGraphics.fill(newX, newY, newX + mc.font.width(text) + 8, newY + 16, ARGB.colorFromFloat(f1 * 0.5F, 0, 0, 0));
-            guiGraphics.drawString(mc.font, text, newX + 5, newY + 5,ARGB.color((int) (f1 * 255), textColor), true);
+            MutableComponent overlayKey = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
+            if (f1 > 0.5F) {
+                guiGraphics.fill(newX, newY, newX + mc.font.width(overlayKey) + 8, newY + 16, ARGB.colorFromFloat(f1 * 0.5F, 0, 0, 0));
+                guiGraphics.drawString(mc.font, overlayKey, newX + 5, newY + 5, ARGB.color((int) (f1 * 255), textColor), true);
+            }
             poseStack.popPose();
         }
-
         // Abilities icons and text
         if (f1 != 1 && size != 0) {
             poseStack.pushPose();
@@ -134,12 +125,12 @@ public class TBOverlays {
             }
 
             float f2 = Math.min(1.0f - f1, 0.5F) * 2F;
-            poseStack.translate(f1 * -maxX, 0, 0);
+            poseStack.translate(f1 * -(maxX + (type == 2 ? 30 : 0)), 0, 0);
             //RenderSystem.setShaderColor(1, 1, 1, f2);
             guiGraphics.fill(x - 5, y + 2, x - 4, y + (type == 1 ? 20 : size * 20), ARGB.color((int) (f2 * 255), textColor));
 
             if (type == 1) {
-                guiGraphics.fill(x, y, x + maxX + 2, y + 20 + 2, ARGB.color((int) (f2 * 255), color));
+                guiGraphics.fill(x, y, x + maxX + 2, y + 20 + 2, ARGB.color((int) (f2 * 255 / 2), color));
             } else {
                 for (int i = 0; i < size; i++) {
                     int texY = y + i * 20;
