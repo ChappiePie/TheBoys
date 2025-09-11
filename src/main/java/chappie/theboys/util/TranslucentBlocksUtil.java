@@ -24,7 +24,7 @@ public class TranslucentBlocksUtil {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && Minecraft.getInstance().getCameraEntity() != null) {
             for (XRayAbility xRayAbility : CommonUtil.listOfType(XRayAbility.class, CommonUtil.getAbilities(Minecraft.getInstance().getCameraEntity()))) {
                 if (xRayAbility.hitPos != null && xRayAbility.translucentTimer.value(ClientUtil.getPartialTick()) != 0) {
-                    AABB aabb = new AABB(BlockPos.containing(xRayAbility.hitPos)).inflate(xRayAbility.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER));
+                    AABB aabb = new AABB(xRayAbility.blockHitPos).inflate(xRayAbility.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER));
                     if (aabb.intersects(new AABB(pos))) {
                         return true;
                     }
@@ -41,14 +41,14 @@ public class TranslucentBlocksUtil {
                 Vec3 vec = xRayAbility.hitPos;
                 if (vec != null) {
                     float distantMul = xRayAbility.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER);
-                    AABB aabb = new AABB(BlockPos.containing(vec)).inflate(distantMul);
+                    AABB aabb = new AABB(xRayAbility.blockHitPos).inflate(distantMul);
                     if (aabb.intersects(new AABB(pos))) {
                         float alpha = (float) (vec.distanceTo(Vec3.atCenterOf(pos)) / (distantMul + 1));
                         alpha = (1f - Math.max(0.5F, Math.min(alpha, 1F))) * t;
                         alpha = 1.0F - alpha;
                         if (alpha != 1) {
                             RandomSource random = RandomSource.create();
-                            if (Minecraft.getInstance().getBlockRenderer().getModelRenderer() instanceof IWithAlpha i) {
+                            if (pos instanceof IWithAlpha i) {
                                 i.theBoys$setAlpha(alpha);
                                 Minecraft.getInstance().getBlockRenderer().getModelRenderer()
                                         .tesselateBlock(level, instance.getBlockModel(state), state, pos, poseStack, consumer, true, random, state.getSeed(pos), OverlayTexture.NO_OVERLAY);

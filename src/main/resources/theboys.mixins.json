@@ -25,6 +25,7 @@
   ],
   "mixins": [
     "ArmorItemMixin",
+    "BlockPosMixin",
     "EntityMixin",
     "InventoryMixin",
     "ItemStackMixin",
