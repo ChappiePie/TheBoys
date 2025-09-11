@@ -27,8 +27,7 @@ public class TBConfig {
         public final ForgeConfigSpec.IntValue eyesType;
         public final ForgeConfigSpec.IntValue eyesHeight, eyesHeight2;
         public final ForgeConfigSpec.IntValue eyesLength, eyesLength2;
-
-
+        
         Client(ForgeConfigSpec.Builder builder) {
 
             builder.comment("Client Settings").push("client");

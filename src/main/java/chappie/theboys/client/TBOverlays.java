@@ -25,6 +25,7 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -74,15 +75,20 @@ public class TBOverlays {
         MutableComponent text = (tab ? Component.translatable("overlay.theboys.abilities") :
                 power.getDisplayName().copy()).withStyle(ClientUtil.BOLD_MINECRAFT);
 
-        if (tab) {
-            guiGraphics.fill(x - 5, y + 6, x - 1, y + 16 - 6, textColor);
-        } else {
-            guiGraphics.fill(x - 3, y + 4, x - 2, y + 16 - 4, textColor);
-            guiGraphics.fill(x - 2, y + 6, x - 1, y + 16 - 6, textColor);
-        }
+        if (false) {
+            if (tab) {
+                guiGraphics.fill(x - 5, y + 6, x - 1, y + 16 - 6, textColor);
+            } else {
+                guiGraphics.fill(x - 3, y + 4, x - 2, y + 16 - 4, textColor);
+                guiGraphics.fill(x - 2, y + 6, x - 1, y + 16 - 6, textColor);
+            }
 
-        guiGraphics.fill(x, y, x + mc.font.width(text) + 5, y + 16, color);
-        guiGraphics.drawString(mc.font, text, x + 3, y + 4, textColor, true);
+            guiGraphics.fill(x, y, x + mc.font.width(text) + 5, y + 16, color);
+            guiGraphics.drawString(mc.font, text, x + 3, y + 4, textColor, true);
+        } else {
+            x -= 5;
+            y -= 20;
+        }
 
         // Superpower icon
         x += 7;
@@ -96,7 +102,7 @@ public class TBOverlays {
             poseStack.pushPose();
             poseStack.scale(0.5F, 0.5F, 1F);
             int newX = x * 4;
-            int newY = y * 3;
+            int newY = y * 2 + 30;
             MutableComponent overlayKey = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
             if (f1 > 0.5F) {
                 guiGraphics.fill(newX, newY, newX + mc.font.width(overlayKey) + 8, newY + 16, ARGB.colorFromFloat(f1 * 0.5F, 0, 0, 0));
@@ -108,7 +114,7 @@ public class TBOverlays {
         if (f1 != 1 && size != 0) {
             poseStack.pushPose();
 
-            int type = 0;
+            int type = Minecraft.getInstance().screen instanceof ChatScreen ? 0 : 2;
             int maxX = 94;
             if (type == 1) {
                 maxX = size * 20;
@@ -178,7 +184,7 @@ public class TBOverlays {
                     poseStack.pushPose();
                     poseStack.translate(0, 0, 10);
                     poseStack.scale(0.5F, 0.5F, 1F);
-                    int newX = texX * 4;
+                    int newX = texX * 2 + 30;
                     int newY = texY * 2 + 30;
                     if (type == 1) {
                         newX = texX * 2 + 10 + 6 - mc.font.width(key) / 2;

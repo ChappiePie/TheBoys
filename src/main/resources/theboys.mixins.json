@@ -15,9 +15,11 @@
     "client.LayerRenderStateMixin",
     "client.LivingEntityRendererMixin",
     "client.MinecraftMixin",
+    "client.ModelBlockRendererMixin",
     "client.PlayerCapeModelMixin",
     "client.PlayerRendererMixin",
     "client.ScreenAccessor",
+    "client.SectionCompilerMixin",
     "client.SelectItemModelPropertiesMixin",
     "client.SoundEngineMixin"
   ],
@@ -32,6 +34,7 @@
     "PlayerMixin",
     "ServerLevelMixin",
     "SkullBlockEntityAccessor",
+    "client.BlockRenderInfoMixin",
     "client.EntityMixin"
   ],
   "injectors": {

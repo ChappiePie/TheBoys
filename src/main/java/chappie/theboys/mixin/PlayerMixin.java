@@ -26,7 +26,7 @@ public abstract class PlayerMixin extends LivingEntity {
         if (player != null && player.isAlive()) {
             for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
                 if (player.isSprinting() && ability.isEnabled()) {
-                    cir.setReturnValue(EntityDimensions.scalable(0.6F, 0.6F).withEyeHeight(0.51F));
+                    cir.setReturnValue(FlightAbility.FLIGHT_DIMENSIONS);
                 }
             }
         }

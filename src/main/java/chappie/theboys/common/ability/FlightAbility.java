@@ -14,6 +14,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
@@ -25,6 +26,7 @@ import java.util.function.Consumer;
 
 public class FlightAbility extends Ability implements IHasTimer {
 
+    public static final EntityDimensions FLIGHT_DIMENSIONS =  EntityDimensions.scalable(0.6F, 0.6F).withEyeHeight(0.51F);
     public static final DataAccessor<Float> SPRINT_SPEED = new DataAccessor<>("sprint_speed", DataAccessor.DataSerializer.FLOAT);
     public static final DataAccessor<Float> SPEED = new DataAccessor<>("speed", DataAccessor.DataSerializer.FLOAT);
     public static final DataAccessor<Boolean> BREAK_BLOCKS = new DataAccessor<>("break_blocks", DataAccessor.DataSerializer.BOOLEAN);

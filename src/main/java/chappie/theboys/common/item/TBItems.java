@@ -63,7 +63,7 @@ public class TBItems {
             }).build());
 
     private static ImmutableMap<ArmorType, SuitItem> registerSuitParts(Function<SuitProperties, SuitItem> item, String type, Consumer<SuitProperties> consumer, ArmorType... slots) {
-        return TBItems.registerSuitParts(item, type, consumer, ArmorMaterials.LEATHER.defense, 0.0F, slots);
+        return TBItems.registerSuitParts(item, type, consumer, ArmorMaterials.LEATHER.defense(), 0.0F, slots);
     }
 
     private static ImmutableMap<ArmorType, SuitItem> registerSuitParts(Function<SuitProperties, SuitItem> item, String type, Consumer<SuitProperties> consumer, Map<ArmorType, Integer> defense, double toughness, ArmorType... slots) {

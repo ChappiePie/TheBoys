@@ -134,7 +134,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
 
     protected void onHitEntity(EntityHitResult hitResult) {
         float strength = this.dataManager.get(STRENGTH);
-        hitResult.getEntity().setRemainingFireTicks((int) (strength * 5));
+        hitResult.getEntity().setRemainingFireTicks(60 + (int) (strength * 5));
         if (this.entity.level() instanceof ServerLevel serverLevel) {
             hitResult.getEntity().hurtServer(serverLevel, this.entity.damageSources().mobAttack(entity), strength * 2F);
         }

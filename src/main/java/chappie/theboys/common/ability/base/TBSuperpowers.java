@@ -49,6 +49,9 @@ public class TBSuperpowers {
             AbilityBuilder.of("super_hearing", TBAbilityTypes.SUPER_HEARING)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(64)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD).action(KeyCondition.Action.HELD), "enabling"),
+            AbilityBuilder.of("xray", TBAbilityTypes.XRAY)
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(112)))
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FOURTH).action(KeyCondition.Action.HELD), "enabling"),
 
             AbilityBuilder.of("damage_resistance", AbilityType.DAMAGE_RESISTANCE).additionalData((a) -> a.dataManager.set(DamageResistanceAbility.AMPLIFIER, 8F)),
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE.value()).amount(2.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
