@@ -68,7 +68,11 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}+${project.minecraft_version}"
 
-	modImplementation include("software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}")
+
+	modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
+	modImplementation ("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
+
+	modImplementation ("software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}")
 	implementation("com.eliotlash.mclib:mclib:20")
 
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}")
@@ -77,9 +81,6 @@ dependencies {
 	/*modImplementation include("foundry.veil:Veil-fabric-${project.minecraft_version}:${project.veil_version}") {
 		exclude group: "maven.modrinth"
 	}*/
-
-	modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
-	modImplementation include("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
 
 	modImplementation "chappie.modulus:modulus:${minecraft_version}-${project.modulus_version}"
 
