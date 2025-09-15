@@ -16,6 +16,7 @@ import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.base.TBSuperpower;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
+import chappie.theboys.mixin.client.GameRendererAccessor;
 import chappie.theboys.util.TBClientUtil;
 import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.TBConfig;
@@ -26,6 +27,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.renderer.LevelTargetBundle;
+import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -47,9 +50,9 @@ public class TBOverlays {
     private static final IHasTimer.Timer ANIM_TICK = new IHasTimer.Timer(() -> 10, TheBoysClient.OVERLAY::isDown);
 
     public static void render(Minecraft mc, float partialTick, GuiGraphics guiGraphics) {
-        TBOverlays.renderHud(mc, mc.gui, guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         TBOverlays.renderATrain(guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         TBOverlays.renderEyes(guiGraphics, mc, partialTick);
+        TBOverlays.renderHud(mc, mc.gui, guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
     }
 
     public static void renderHud(Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
@@ -234,11 +237,24 @@ public class TBOverlays {
             if (client.options.getCameraType() == CameraType.FIRST_PERSON) {
                 for (HeatVisionAbility a : CommonUtil.listOfType(HeatVisionAbility.class, CommonUtil.getAbilities(entity))) {
                     Color color = a.dataManager.get(TBCommonUtil.COLOR);
-                    int red = color.getRed(), green = color.getGreen(), blue = color.getBlue(), alpha = (int) (a.eyesTimer.value(partialTick) * 255);
+                    float timer = a.eyesTimer.value(partialTick);
+                    int red = color.getRed(), green = color.getGreen(), blue = color.getBlue(), alpha = (int) (timer * 255);
 
+                    if (a.isEnabled() && TBConfig.CLIENT.heatVisionHardcored.get()) {
+                        float t = timer * 20;
+                        if (!(t < 1.0F)) {
+                            PostChain postChain = client.getShaderManager().getPostChain(ResourceLocation.withDefaultNamespace("blur"), LevelTargetBundle.MAIN_TARGETS);
+                            if (postChain != null) {
+                                postChain.setUniform("Radius", t);
+                                postChain.process(client.getMainRenderTarget(), ((GameRendererAccessor) client.gameRenderer).resourcePool());
+                            }
+                        }
+                        client.getMainRenderTarget().bindWrite(false);
+                    }
                     RenderSystem.enableBlend();
                     RenderSystem.defaultBlendFunc();
                     RenderSystem.disableDepthTest();
+
                     int i = ARGB.color(alpha, red, green, blue);
                     guiGraphics.blit(RenderType::guiTexturedOverlay, TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
                             guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight(), i);

@@ -13,6 +13,7 @@ import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.item.suit.SuitItem;
 import chappie.theboys.util.TBCommonUtil;
+import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.interfaces.ISimpleSoundInstance;
 import chappie.theboys.util.timers.SyringeVialAnim;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -108,7 +109,7 @@ public class ClientEvents {
     public static void setupAnim(SetupAnimCallback.SetupAnimEvent event) {
         TheBoysCap theBoysCap = TheBoysCap.getCap(event.entity());
         float partialTicks = event.modelProperties().partialTicks();
-        if (event.entity() instanceof Player pPlayer) {
+        if (event.entity() instanceof Player pPlayer && theBoysCap != null) {
             boolean flag1 = pPlayer.getMainArm() == HumanoidArm.RIGHT;
             int i = flag1 ? 1 : -1;
             ModelPart mainHand = flag1 ? event.model().rightArm : event.model().leftArm;
@@ -152,7 +153,7 @@ public class ClientEvents {
                 ItemStack stack = event.entity().getItemBySlot(slot);
                 if (stack.getItem() instanceof ArmorItem && !stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).isEmpty()) {
                     ItemStack suitStack = stack.get(TBDataComponents.SUIT);
-                    if (suitStack.getItem() instanceof SuitItem item) {
+                    if (suitStack != null && suitStack.getItem() instanceof SuitItem item) {
                         if (event.modelProperties().layers().stream().anyMatch(layer -> layer instanceof HumanoidArmorLayer)) {
                             Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.state(), stack);
                             if (slot == EquipmentSlot.HEAD) {
@@ -193,7 +194,7 @@ public class ClientEvents {
                 ) {
                     Vec3 vec3 = new Vec3(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ());
                     double distance = vec3.distanceTo(player.position());
-                    if (soundInstance instanceof ISimpleSoundInstance iSound && distance < 40) {
+                    if (soundInstance instanceof ISimpleSoundInstance iSound && distance < 40) { // @TODO make new distance and base distance for homelander
                         float maxVolume = ((ISimpleSoundInstance) sound).theBoys$volume() * 100.0F;
                         iSound.theBoys$setVolume(1 + maxVolume);
                         return soundInstance;
@@ -267,12 +268,13 @@ public class ClientEvents {
         }
     }
 
-    public static boolean renderHeatVisionFP(InteractionHand hand, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public static void renderHeatVisionFP(InteractionHand hand, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || !mc.options.getCameraType().isFirstPerson() || hand == InteractionHand.OFF_HAND)
-            return false;
         AbstractClientPlayer player = mc.player;
-        boolean canceled = false;
+        TheBoysCap cap = TheBoysCap.getCap(player);
+        if (player == null || cap == null || !mc.options.getCameraType().isFirstPerson() || hand == InteractionHand.OFF_HAND)
+            return;
+
         poseStack.pushPose();
         for (HeatVisionAbility a : CommonUtil.listOfType(HeatVisionAbility.class, CommonUtil.getAbilities(player))) {
             float f = a.timer.value(partialTicks);
@@ -290,12 +292,12 @@ public class ClientEvents {
             double distance = player.getEyePosition().distanceTo(hitResult.getLocation());
             float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
             poseStack.pushPose();
-            float f1 = TheBoysCap.getCap(player).eyesLength();
-            poseStack.scale(1F, f1, 1F);
+            poseStack.scale(1F, cap.eyesLength(), 1F);
             for (int i = 0; i < 2; i++) {
-                AABB box = new AABB(i == 0 ? 0.1F : -0.1F, -0.25, -0.15F, 0, -0.25, -0.15F + -distance * f).inflate(0.03D);
+                float f1 = i == 0 ? 0.1F : -0.1F;
+                AABB box = new AABB(f1, -0.25, -0.15F, 0, -0.25, -0.15F + -distance * f).inflate(0.03D);
                 poseStack.pushPose();
-                poseStack.translate(i == 0 ? 0.2F : -0.2F, 0.25, 0);
+                poseStack.translate(f1 + (TBConfig.CLIENT.heatVisionHardcored.get() ? 0 : f1), 0.25, 0);
                 ClientUtil.renderFilledBox(poseStack, bufferSource.getBuffer(ClientUtil.ModRenderTypes.MAIN_LASER), box, 1F, 1F, 1F, f, packedLight);
                 VertexConsumer vertexConsumer = bufferSource.getBuffer(ClientUtil.ModRenderTypes.LASER);
                 ClientUtil.renderFilledBox(poseStack, vertexConsumer, box.inflate(0.015D), red, green, blue, f * 0.2F, packedLight);
@@ -303,10 +305,8 @@ public class ClientEvents {
                 poseStack.popPose();
             }
             poseStack.popPose();
-            canceled = true;
         }
         poseStack.popPose();
-        return canceled;
     }
 
     public static boolean capeRender(PlayerRenderState playerRenderState) {

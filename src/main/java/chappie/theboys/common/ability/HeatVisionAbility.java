@@ -82,6 +82,13 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 } else if (hitResult instanceof BlockHitResult rtr) {
                     this.onHitBlock(rtr);
                 }
+                CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
+                        new LaserParticle.LaserParticleOptions(this.entity.getId(), this.dataManager.get(TBCommonUtil.COLOR).getRGB()),
+                        true, hitResult.getLocation(), new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.04F, 4);
+
+                CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
+                        ParticleTypes.SMOKE,
+                        true, hitResult.getLocation(), new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.03F, 10);
             }
         }
     }
@@ -138,13 +145,6 @@ public class HeatVisionAbility extends GlowEyesAbility {
         if (this.entity.level() instanceof ServerLevel serverLevel) {
             hitResult.getEntity().hurtServer(serverLevel, this.entity.damageSources().mobAttack(entity), strength * 2F);
         }
-
-        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
-                true, hitResult.getLocation(), Vec3.ZERO, 0.05F, 4);
-
-        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
-                ParticleTypes.SMOKE, true, hitResult.getLocation(),
-                new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.15F, 10);
     }
 
     protected void onHitBlock(BlockHitResult hitResult) {
@@ -169,17 +169,11 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
 
                 if (this.blocksInFire.getValue() > 3) {
-                    this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
+                    //this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
                     this.blocksInFire = null;
                 }
             }
         }
-        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
-                true, hitResult.getLocation(), this.entity.getViewVector(0).multiply(0.25, 0, 0.25), 0.001F, 4);
-
-        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
-                ParticleTypes.SMOKE, true, hitResult.getLocation(),
-                new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.05F, 10);
     }
 
     @Override

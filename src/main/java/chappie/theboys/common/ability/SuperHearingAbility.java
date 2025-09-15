@@ -13,6 +13,7 @@ import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.GameEventTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -29,6 +30,7 @@ import net.minecraft.world.level.gameevent.PositionSource;
 import net.minecraft.world.level.gameevent.vibrations.VibrationInfo;
 import net.minecraft.world.level.gameevent.vibrations.VibrationSystem;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -70,12 +72,12 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
     }
 
     @Override
-    public Data getVibrationData() {
+    public @NotNull Data getVibrationData() {
         return this.vibrationData;
     }
 
     @Override
-    public User getVibrationUser() {
+    public @NotNull User getVibrationUser() {
         return this.vibrationUser;
     }
 
@@ -145,7 +147,12 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
                 double f = Mth.lerp(d, vec3.y, vec32.y);
                 double g = Mth.lerp(d, vec3.z, vec32.z);
                 VibrationParticleOption option = new VibrationParticleOption(positionSource, i);
-                level.sendParticles(option, e, f, g, 1, 0.0, 0.0, 0.0, 0.0);
+                if (this.entity instanceof ServerPlayer player) {
+                    level.sendParticles(player, option, false, true, e, f, g, 1, 0.0, 0.0, 0.0, 0.0);
+                }
+                /*else {
+                    level.sendParticles(option, e, f, g, 1, 0.0, 0.0, 0.0, 0.0); // It's probably better not to send particles from an entity that hears to other players.
+                }*/
                 data.setReloadVibrationParticle(false);
             }
         }
@@ -205,7 +212,7 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
         }
 
         @Override
-        public PositionSource getPositionSource() {
+        public @NotNull PositionSource getPositionSource() {
             return this.positionSource;
         }
 
@@ -243,7 +250,7 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
         }
 
         @Override
-        public TagKey<GameEvent> getListenableEvents() {
+        public @NotNull TagKey<GameEvent> getListenableEvents() {
             return GameEventTags.VIBRATIONS;
         }
     }

@@ -22,6 +22,7 @@ public class TBConfig {
     public static class Client {
 
         public final ForgeConfigSpec.BooleanValue eyesOverlay;
+        public final ForgeConfigSpec.BooleanValue heatVisionHardcored;
         public final ForgeConfigSpec.BooleanValue abilitiesOverlayToggle;
 
         public final ForgeConfigSpec.IntValue eyesType;
@@ -32,6 +33,7 @@ public class TBConfig {
 
             builder.comment("Client Settings").push("client");
             this.abilitiesOverlayToggle = builder.comment("Should abilities overlay key be toggleable").translation("config.theboys.abilitiesOverlayToggle").define("abilitiesOverlayToggle", false);
+            this.heatVisionHardcored = builder.comment("Should heat vision be complicated in rendering").translation("config.theboys.heatVisionHardcored").define("heatVisionHardcored", false);
             this.eyesOverlay = builder.comment("Should heat vision eyes overlay be shown in first person").translation("config.theboys.eyesOverlay").define("eyesOverlay", true);
 
             builder.push("eyes");
