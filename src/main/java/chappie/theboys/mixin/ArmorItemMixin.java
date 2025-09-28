@@ -40,11 +40,14 @@ public abstract class ArmorItemMixin extends Item {
                         pStack.remove(TBDataComponents.SUIT);
                         return true;
                     } else {
-                        if (suitItem.getItem() != pOther.getItem()) {
-                            pAccess.set(suitItem);
-                            pStack.set(TBDataComponents.SUIT, pOther.copyWithCount(1));
-                            pOther.shrink(1);
-                            return true;
+                        if (suitItem.getItem() != pOther.getItem() && pOther.getItem() instanceof SuitItem item) {
+                            EquipmentSlot slot = item.equipmentSlot(pStack, pOther, pPlayer);
+                            if (slot == null || pPlayer.getEquipmentSlotForItem(pStack).equals(slot)) {
+                                pAccess.set(suitItem);
+                                pStack.set(TBDataComponents.SUIT, pOther.copyWithCount(1));
+                                pOther.shrink(1);
+                                return true;
+                            }
                         }
                     }
                 }

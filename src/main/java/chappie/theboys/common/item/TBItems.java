@@ -39,8 +39,11 @@ public class TBItems {
     public static final ImmutableMap<ArmorType, SuitItem> HOMELANDER_SUIT = registerSuitParts(SuitItem::new, "homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
     public static final ImmutableMap<ArmorType, SuitItem> ATRAIN_SUIT = registerSuitParts(SuitItem::new, "atrain", (p) -> p.armorScale((stack) ->
             p.getSlot() != EquipmentSlot.HEAD ? SuitProperties.BASIC_ARMOR_SCALE.apply(p.getSlot()) : new Vector3f(-Integer.MAX_VALUE)), HELMET, CHESTPLATE, LEGGINGS, BOOTS);
-    //public static final ImmutableMap<ArmorType, SuitItem> STARLIGHT_SUIT = registerSuitParts(SuitItem::new, "starlight", (p) -> p.armorScale((e, stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, BOOTS);
-    public static final ImmutableMap<ArmorType, SuitItem> TRANSLUCENT_SUIT = registerSuitParts(SuitItem::new, "translucent", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
+    //public static final ImmutableMap<ArmorType, SuitItem> STARLIGHT_SUIT = registerSuitParts(SuitItem::new, "starlight", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, BOOTS);
+    public static final ImmutableMap<ArmorType, SuitItem> BLACK_NOIR_SUIT = registerSuitParts(SuitItem::new, "black_noir", (p) -> {}, HELMET, CHESTPLATE, LEGGINGS, BOOTS);
+    //public static final ImmutableMap<ArmorType, SuitItem> STORMFRONT_SUIT = registerSuitParts(SuitItem::new, "stormfront", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
+    public static final ImmutableMap<ArmorType, SuitItem> THE_DEEP_SUIT = registerSuitParts(SuitItem::new, "the_deep", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
+    public static final ImmutableMap<ArmorType, SuitItem> TRANSLUCENT_SUIT = registerSuitParts(SuitItem::new, "translucent", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
 
     public static final SyringeItem SYRINGE = register("syringe", SyringeItem::new, new Properties(), false);
     public static final VialItem VIAL = register("vial", VialItem::new, new Properties(), false);

@@ -155,25 +155,25 @@ public class ClientEvents {
                     ItemStack suitStack = stack.get(TBDataComponents.SUIT);
                     if (suitStack != null && suitStack.getItem() instanceof SuitItem item) {
                         if (event.modelProperties().layers().stream().anyMatch(layer -> layer instanceof HumanoidArmorLayer)) {
-                            Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.state(), stack);
+                            Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, stack);
                             if (slot == EquipmentSlot.HEAD) {
-                                ClientUtil.modified(event.model().hat).setSize(vec3f);
+                                ClientUtil.modified(event.model().hat).modulus$setSize(vec3f);
                             }
                             if (event.model() instanceof PlayerModel model) {
                                 switch (slot) {
                                     case CHEST -> {
-                                        ClientUtil.modified(model.jacket).setSize(vec3f);
-                                        ClientUtil.modified(model.rightSleeve).setSize(vec3f);
-                                        ClientUtil.modified(model.leftSleeve).setSize(vec3f);
+                                        ClientUtil.modified(model.jacket).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.rightSleeve).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.leftSleeve).modulus$setSize(vec3f);
                                     }
                                     case LEGS -> {
-                                        ClientUtil.modified(model.jacket).setSize(vec3f);
-                                        ClientUtil.modified(model.rightPants).setSize(vec3f);
-                                        ClientUtil.modified(model.leftPants).setSize(vec3f);
+                                        ClientUtil.modified(model.jacket).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.rightPants).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.leftPants).modulus$setSize(vec3f);
                                     }
                                     case FEET -> {
-                                        ClientUtil.modified(model.rightPants).setSize(vec3f);
-                                        ClientUtil.modified(model.leftPants).setSize(vec3f);
+                                        ClientUtil.modified(model.rightPants).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.leftPants).modulus$setSize(vec3f);
                                     }
                                 }
                             }

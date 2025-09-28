@@ -1,25 +1,38 @@
 package chappie.theboys.util;
 
+import chappie.modulus.util.ClientUtil;
+import chappie.modulus.util.CommonUtil;
+import chappie.modulus.util.render.IRenderStateEntity;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.TBItems;
+import chappie.theboys.common.item.datacomponents.TBDataComponents;
+import chappie.theboys.common.item.suit.SuitItem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.TriState;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.Equippable;
+import org.joml.Vector3f;
 
 public class TBClientUtil {
 
@@ -74,6 +87,57 @@ public class TBClientUtil {
                 }
                 Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(pPlayer, stack, flag1 ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, !flag1, pPoseStack, pBuffer, pCombinedLight);
                 pPoseStack.popPose();
+            }
+        }
+
+        {
+            ItemStack chestStack = pPlayer.getItemBySlot(EquipmentSlot.CHEST);
+            if (!chestStack.isEmpty()) {
+                if (chestStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).getItem() instanceof SuitItem item) {
+                    PlayerModel playerModel = new PlayerModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER), CommonUtil.smallArms(pPlayer));
+                    model.copyPropertiesTo(playerModel);
+                    item.getClientSuitProperties().setupSuitScale(playerModel, pPlayer, EquipmentSlot.CHEST, chestStack);
+                    ResourceLocation texture = item.getClientSuitProperties().suitTexture(EquipmentSlot.CHEST, chestStack, "");
+                    Vector3f vec3f = item.getClientSuitProperties().entityWearScale(EquipmentSlot.CHEST, stack);
+                    ClientUtil.modified(model.rightSleeve).modulus$setSize(vec3f);
+                    ClientUtil.modified(model.leftSleeve).modulus$setSize(vec3f);
+                    if (pRendererArm == model.rightArm) {
+                        playerModel.rightArm.render(pPoseStack, pBuffer.getBuffer(RenderType.entityTranslucent(texture)), pCombinedLight, OverlayTexture.NO_OVERLAY);
+                    } else {
+                        playerModel.leftArm.render(pPoseStack, pBuffer.getBuffer(RenderType.entityTranslucent(texture)), pCombinedLight, OverlayTexture.NO_OVERLAY);
+                    }
+                }
+            }
+        }
+    }
+
+    public static <S extends HumanoidRenderState, A extends HumanoidModel<S>> void modifySizeOfArmor(ItemStack armorItem, EquipmentSlot slot, A model, S renderState) {
+        Equippable equippable = armorItem.get(DataComponents.EQUIPPABLE);
+        if (equippable != null && equippable.slot() == slot) {
+            ItemStack suitItem = armorItem.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
+            if (!suitItem.isEmpty() && suitItem.getItem() instanceof SuitItem item) {
+                Vector3f vec3f = item.getClientSuitProperties().armorScale(slot, armorItem);
+                if (slot == EquipmentSlot.HEAD) {
+                    ClientUtil.modified(model.head).modulus$setSize(vec3f);
+                    ClientUtil.modified(model.hat).modulus$setSize(vec3f);
+                } else if (slot == EquipmentSlot.CHEST) {
+
+                    ClientUtil.modified(model.body).modulus$setSize(vec3f.add(0.05F, 0.05F, 0.05F, new Vector3f()));
+                    if (renderState instanceof IRenderStateEntity<?> e && CommonUtil.smallArms(e.modulus$entity())) {
+                        ClientUtil.modified(model.rightArm).modulus$setSizeAndPos(vec3f.add(-0.5F, 0, 0), new Vector3f(0.5F, 0, 0));
+                        ClientUtil.modified(model.leftArm).modulus$setSizeAndPos(vec3f.add(-0.5F, 0, 0), new Vector3f(-0.5F, 0, 0));
+                    } else {
+                        ClientUtil.modified(model.rightArm).modulus$setSize(vec3f);
+                        ClientUtil.modified(model.leftArm).modulus$setSize(vec3f);
+                    }
+                } else if (slot == EquipmentSlot.LEGS) {
+                    ClientUtil.modified(model.body).modulus$setSize(vec3f);
+                    ClientUtil.modified(model.rightLeg).modulus$setSize(vec3f);
+                    ClientUtil.modified(model.leftLeg).modulus$setSize(vec3f);
+                } else if (slot == EquipmentSlot.FEET) {
+                    ClientUtil.modified(model.rightLeg).modulus$setSize(vec3f);
+                    ClientUtil.modified(model.leftLeg).modulus$setSize(vec3f);
+                }
             }
         }
     }

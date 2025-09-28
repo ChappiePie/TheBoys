@@ -24,7 +24,7 @@ import java.util.function.Function;
 
 public class SuitProperties extends Item.Properties {
 
-    public static final Function<EquipmentSlot, Vector3f> BASIC_ARMOR_SCALE = (slot) -> new Vector3f(slot == EquipmentSlot.LEGS ? -0.35F : -0.79f);
+    public static final Function<EquipmentSlot, Vector3f> BASIC_ARMOR_SCALE = (slot) -> new Vector3f(slot == EquipmentSlot.LEGS ? -0.39F : -0.89f);
     public final String type;
     private final ImmutableList.Builder<ItemAttributeModifiers.Entry> builder = ImmutableList.builder();
     public ArmorType slot;

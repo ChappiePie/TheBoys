@@ -5,7 +5,6 @@ import chappie.theboys.client.renderer.ClientHeroWithCapeProperties;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.ClientSuitProperties;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.core.dispenser.EquipmentDispenseItemBehavior;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -36,8 +35,8 @@ public class SuitItem extends Item {
             case "homelander", "stormfront" -> new ClientHeroWithCapeProperties(this);
             case "starlight" -> new ClientSuitProperties(this) {
                 @Override
-                public ResourceLocation suitTexture(EquipmentSlot slot, HumanoidRenderState renderState, ItemStack armorStack, String type) {
-                    return slot == EquipmentSlot.FEET ? ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/suits/%s/layer_1.png".formatted(this.type())) : super.suitTexture(slot, renderState, armorStack, type);
+                public ResourceLocation suitTexture(EquipmentSlot slot, ItemStack armorStack, String type) {
+                    return slot == EquipmentSlot.FEET ? ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/suits/%s/layer_1.png".formatted(this.type())) : super.suitTexture(slot, armorStack, type);
                 }
             };
             default -> new ClientSuitProperties(this);
