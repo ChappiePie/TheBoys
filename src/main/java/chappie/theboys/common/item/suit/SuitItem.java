@@ -62,17 +62,15 @@ public class SuitItem extends Item {
                     EquipmentSlot suitSlot = item.equipmentSlot(pStack, suitStack, player);
                     if (suitSlot == null || slot.equals(suitSlot)) {
                         ItemStack suitItem = pStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
-                        if (!suitItem.isEmpty()) {
-                            pStack.remove(TBDataComponents.SUIT);
-                        }
+                        pStack.set(TBDataComponents.SUIT, suitStack.copyWithCount(1));
                         if (suitItem.isEmpty()) {
-                            pStack.set(TBDataComponents.SUIT, suitStack.copyWithCount(1));
+                            player.setItemInHand(usedHand, suitStack.copyAndClear());
                             if (!player.getAbilities().instabuild) {
                                 suitStack.shrink(1);
                             }
+                        } else {
+                            player.setItemInHand(usedHand, suitItem.copyWithCount(1));
                         }
-                        ItemStack itemStack4 = suitStack.copyAndClear();
-                        player.setItemInHand(usedHand, itemStack4);
                         if (!player.isSilent()) {
                             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARMOR_EQUIP_LEATHER, player.getSoundSource(), 1.0F, 1.0F);
                         }

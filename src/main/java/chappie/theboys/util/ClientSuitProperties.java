@@ -59,9 +59,9 @@ public class ClientSuitProperties {
             Vector3f vec = this.suitScale(slot, armorItem);
             iPart.modulus$setSize(vec);
             if (CommonUtil.smallArms(entity)) {
-                if (part == model.rightArm) {
+                if (part == model.rightArm || part == model.rightSleeve) {
                     iPart.modulus$setSizeAndPos(vec.add(-0.5F, 0, 0), new Vector3f(0.5F, 0, 0));
-                } else if (part == model.leftArm) {
+                } else if (part == model.leftArm || part == model.leftSleeve) {
                     iPart.modulus$setSizeAndPos(vec.add(-0.5F, 0, 0), new Vector3f(-0.5F, 0, 0));
                 }
             }

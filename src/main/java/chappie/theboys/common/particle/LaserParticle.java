@@ -65,12 +65,12 @@ public class LaserParticle extends RisingParticle {
 
     @Override
     public int getLightColor(float partialTick) {
-        float f = ((float)this.age + partialTick) / (float)this.lifetime;
+        float f = ((float) this.age + partialTick) / (float) this.lifetime;
         f = Mth.clamp(f, 0.0F, 1.0F);
         int i = super.getLightColor(partialTick);
         int j = i & 0xFF;
         int k = i >> 16 & 0xFF;
-        j += (int)(f * 15.0F * 16.0F);
+        j += (int) (f * 15.0F * 16.0F);
         if (j > 240) {
             j = 240;
         }
@@ -119,27 +119,27 @@ public class LaserParticle extends RisingParticle {
     }
 
     @Environment(EnvType.CLIENT)
-        public record LaserParticleFactory(SpriteSet sprite) implements ParticleProvider<LaserParticleOptions> {
+    public record LaserParticleFactory(SpriteSet sprite) implements ParticleProvider<LaserParticleOptions> {
 
         @Override
-            public Particle createParticle(LaserParticleOptions pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
-                float rot = 0, pitch = 0;
-                if (pLevel.getEntity(pType.entityId()) instanceof LivingEntity e) {
-                    rot = e.getYRot();
-                    pitch = Math.min(e.getXRot(), 45);
-                }
-                LaserParticle particle = new LaserParticle(pType.color(), pLevel, pX, pY + 0.25F, pZ, pXSpeed, pYSpeed, pZSpeed, pitch, rot);
-                particle.pickSprite(this.sprite);
-                particle.scale(2F);
-
-                return particle;
+        public Particle createParticle(LaserParticleOptions pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+            float rot = 0, pitch = 0;
+            if (pLevel.getEntity(pType.entityId()) instanceof LivingEntity e) {
+                rot = e.getYRot();
+                pitch = Math.min(e.getXRot(), 45);
             }
+            LaserParticle particle = new LaserParticle(pType.color(), pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, pitch, rot);
+            particle.pickSprite(this.sprite);
+            particle.scale(2F);
+
+            return particle;
         }
+    }
 
     public record LaserParticleOptions(int entityId, int color) implements ParticleOptions {
         public static final MapCodec<LaserParticleOptions> CODEC = RecordCodecBuilder.mapCodec(
                 instance -> instance.group(Codec.INT.fieldOf("entityId").forGetter(optionsBase -> optionsBase.entityId),
-                        Codec.INT.fieldOf("color").forGetter(optionsBase -> optionsBase.color))
+                                Codec.INT.fieldOf("color").forGetter(optionsBase -> optionsBase.color))
                         .apply(instance, LaserParticleOptions::new)
         );
         public static final StreamCodec<RegistryFriendlyByteBuf, LaserParticleOptions> STREAM_CODEC = StreamCodec.composite(

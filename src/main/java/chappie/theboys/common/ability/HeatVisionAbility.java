@@ -82,6 +82,10 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 } else if (hitResult instanceof BlockHitResult rtr) {
                     this.onHitBlock(rtr);
                 }
+
+                CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
+                        new LaserParticle.LaserParticleOptions(this.entity.getId(), Color.WHITE.getRGB()),
+                        true, hitResult.getLocation(), new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.01F, 1);
                 CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
                         new LaserParticle.LaserParticleOptions(this.entity.getId(), this.dataManager.get(TBCommonUtil.COLOR).getRGB()),
                         true, hitResult.getLocation(), new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.04F, 4);
@@ -169,7 +173,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
 
                 if (this.blocksInFire.getValue() > 3) {
-                    //this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
+                    this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
                     this.blocksInFire = null;
                 }
             }
