@@ -36,7 +36,7 @@ public class SuitItem extends Item {
             case "starlight" -> new ClientSuitProperties(this) {
                 @Override
                 public ResourceLocation suitTexture(EquipmentSlot slot, ItemStack armorStack, String type) {
-                    return slot == EquipmentSlot.FEET ? ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/suits/%s/layer_1.png".formatted(this.type())) : super.suitTexture(slot, armorStack, type);
+                    return slot == EquipmentSlot.FEET ? TheBoys.id("textures/suits/%s/layer_1.png".formatted(this.type())) : super.suitTexture(slot, armorStack, type);
                 }
             };
             default -> new ClientSuitProperties(this);

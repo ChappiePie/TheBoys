@@ -25,14 +25,18 @@
     "client.SoundEngineMixin"
   ],
   "mixins": [
+    "AbstractSchoolingFishMixin",
     "ArmorItemMixin",
     "BlockPosMixin",
+    "DolphinMixin",
     "EntityMixin",
     "InventoryMixin",
     "ItemStackMixin",
     "LiquidBlockMixin",
     "LivingEntityMixin",
     "LivingEntityRendererAccessor",
+    "MobEffectUtilMixin",
+    "MobMixin",
     "PlayerMixin",
     "ServerLevelMixin",
     "SkullBlockEntityAccessor",

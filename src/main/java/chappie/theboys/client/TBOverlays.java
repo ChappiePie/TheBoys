@@ -43,8 +43,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TBOverlays {
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/gui/ui.png");
-    private static final ResourceLocation A_TRAIN = ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/gui/atrain.png");
+    public static final ResourceLocation TEXTURE = TheBoys.id("textures/gui/ui.png");
+    private static final ResourceLocation A_TRAIN = TheBoys.id("textures/gui/atrain.png");
     private static final IHasTimer.Timer APPEAR_ANIM_TICK = new IHasTimer.Timer(() -> 15, () -> false);
 
     private static final IHasTimer.Timer ANIM_TICK = new IHasTimer.Timer(() -> 10, TheBoysClient.OVERLAY::isDown);

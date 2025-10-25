@@ -31,7 +31,7 @@ public class SyringeRenderer extends GeoItemRenderer<SyringeItem> {
     public final IHasTimer.Timer timeline = new IHasTimer.Timer(() -> 150, () -> false);
 
     public SyringeRenderer() {
-        super(new DefaultedItemGeoModel<SyringeItem>(ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "syringe")).withAltTexture(ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "syringe/3d")));
+        super(new DefaultedItemGeoModel<SyringeItem>(TheBoys.id("syringe")).withAltTexture(TheBoys.id("syringe/3d")));
     }
 
     @Override

@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class LightingAbility extends Ability implements IHasTimer {
-    public static final ResourceLocation WHITE = ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/models/white.png");
+    public static final ResourceLocation WHITE = TheBoys.id("textures/models/white.png");
 
     public Timer timer = new Timer(() -> 10, this::isEnabled);
 

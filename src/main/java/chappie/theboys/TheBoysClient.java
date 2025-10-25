@@ -17,6 +17,7 @@ import chappie.theboys.common.block.menu.TBMenus;
 import chappie.theboys.common.entity.TBEntities;
 import chappie.theboys.common.particle.LaserParticle;
 import chappie.theboys.common.particle.TBParticleTypes;
+import chappie.theboys.common.particle.WaterSplashParticle;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.conditional.HasVialDataProperty;
@@ -67,6 +68,7 @@ public class TheBoysClient implements ClientModInitializer {
         FirstPersonAdditionalHandCallback.EVENT.register(ClientEvents::firstPersonAdditionalHand);
         ClientTickEvents.END_CLIENT_TICK.register(TBOverlays::clientTick);
         ParticleFactoryRegistry.getInstance().register(TBParticleTypes.LASER, LaserParticle.LaserParticleFactory::new);
+        ParticleFactoryRegistry.getInstance().register(TBParticleTypes.WATER_SPLASH, WaterSplashParticle.Provider::new);
         EntityRendererRegistry.register(TBEntities.TRAIL, TrailRenderer::new);
 
         ConditionalItemModelProperties.ID_MAPPER.put(TheBoys.id("has_vial"), HasVialDataProperty.MAP_CODEC);

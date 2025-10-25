@@ -43,7 +43,7 @@ public class ClientSuitProperties {
     }
 
     public ResourceLocation suitTexture(EquipmentSlot slot, ItemStack armorStack, String type) {
-        return ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/suits/%s/layer_%s.png".formatted(this.type(), slot == EquipmentSlot.LEGS ? 1 : 0));
+        return TheBoys.id("textures/suits/%s/layer_%s.png".formatted(this.type(), slot == EquipmentSlot.LEGS ? 1 : 0));
     }
 
     public void render(PoseStack pPoseStack, MultiBufferSource pBuffer, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {

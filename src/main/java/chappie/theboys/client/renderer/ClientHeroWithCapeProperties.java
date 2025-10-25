@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -55,6 +54,6 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
     }
 
     public RenderType renderType() {
-        return RenderType.entityTranslucent(ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/suits/%s/cape.png".formatted(this.type())));
+        return RenderType.entityTranslucent(TheBoys.id("textures/suits/%s/cape.png".formatted(this.type())));
     }
 }

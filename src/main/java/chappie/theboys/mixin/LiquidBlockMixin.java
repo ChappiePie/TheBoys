@@ -1,5 +1,6 @@
 package chappie.theboys.mixin;
 
+import chappie.modulus.common.ability.base.Ability;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.SpeedAbility;
 import net.minecraft.core.BlockPos;
@@ -24,10 +25,12 @@ public class LiquidBlockMixin {
     public void getNewCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext, CallbackInfoReturnable<VoxelShape> cir) {
         if (pContext.isAbove(SpeedAbility.STABLE_SHAPE, pPos, true) && pState.getValue(LiquidBlock.LEVEL) == 0) {
             if (pContext instanceof EntityCollisionContext context && context.getEntity() instanceof LivingEntity entity) {
-                if (((LiquidBlock) (Object) this).getFluidState(pState).is(WATER)) {
-                    for (SpeedAbility ability : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
-                        if (ability.isEnabled() && entity.getDeltaMovement().horizontalDistanceSqr() >= 1.0E-7D) {
-                            cir.setReturnValue(SpeedAbility.STABLE_SHAPE);
+                if (((LiquidBlock) (Object) this).getFluidState(pState).is(WATER) && entity.getDeltaMovement().horizontalDistanceSqr() >= 1.0E-7D) {
+                    for (Ability ability : CommonUtil.getAbilities(entity)) {
+                        if (ability instanceof SpeedAbility) {
+                            if (ability.isEnabled()) {
+                                cir.setReturnValue(SpeedAbility.STABLE_SHAPE);
+                            }
                         }
                     }
                 }

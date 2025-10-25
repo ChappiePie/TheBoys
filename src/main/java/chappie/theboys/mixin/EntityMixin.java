@@ -1,6 +1,7 @@
 package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
+import chappie.theboys.common.ability.FishSwarmAbility;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import chappie.theboys.common.ability.TranslucentAbility;
@@ -37,6 +38,19 @@ public abstract class EntityMixin implements EntitySavingFields {
         if (entity.getCommandSenderWorld() instanceof ServerLevel serverLevel) {
             for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(entity))) {
                 listenerConsumer.accept(a.dynamicGameEventListener, serverLevel);
+            }
+        }
+    }
+
+    @Inject(method = "updateSwimming()V", at = @At("HEAD"), cancellable = true)
+    public void mixin$updateSwimming(CallbackInfo ci) {
+        Entity entity = (Entity) (Object) this;
+        for (FishSwarmAbility a : CommonUtil.listOfType(FishSwarmAbility.class, CommonUtil.getAbilities(entity))) {
+            if (a.isEnabled()) {
+                ci.cancel();
+                if (entity.isSwimming()) {
+                    entity.setSwimming(false);
+                }
             }
         }
     }

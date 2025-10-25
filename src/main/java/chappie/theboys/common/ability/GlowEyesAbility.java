@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 public class GlowEyesAbility extends Ability implements IHasTimer {
 
-    public static final ResourceLocation GLOW_EYES = ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "textures/models/glow_eyes.png");
+    public static final ResourceLocation GLOW_EYES = TheBoys.id("textures/models/glow_eyes.png");
 
     public Timer eyesTimer = new Timer(() -> 4, this::isEnabled);
 

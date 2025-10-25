@@ -23,7 +23,7 @@ import java.util.Optional;
 public class VialRenderer extends GeoItemRenderer<VialItem> {
 
     public VialRenderer() {
-        super(new DefaultedItemGeoModel<VialItem>(ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "vial")).withAltTexture(ResourceLocation.fromNamespaceAndPath(TheBoys.MODID, "syringe/3d")));
+        super(new DefaultedItemGeoModel<VialItem>(TheBoys.id("vial")).withAltTexture(TheBoys.id("syringe/3d")));
     }
 
     @Override
