@@ -24,7 +24,7 @@ public class AbstractSchoolingFishMixin {
                 CommonUtil.boxWithRange(fish.position(), FishSwarmAbility.DETECTION_RADIUS))) {
             for (FishSwarmAbility ability : CommonUtil.listOfType(FishSwarmAbility.class,
                     CommonUtil.getAbilities(player))) {
-                if (ability.isEnabled() && fish.position().distanceTo(player.position()) >= ability.dataManager.get(TBCommonUtil.DISTANCE)) {
+                if (ability.isEnabled() && fish.position().distanceTo(player.position()) <= ability.dataManager.get(TBCommonUtil.DISTANCE)) {
                     ci.cancel();
                     break;
                 }

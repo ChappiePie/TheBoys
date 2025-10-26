@@ -25,7 +25,7 @@ public class MobMixin {
                     CommonUtil.boxWithRange(fish.position(), FishSwarmAbility.DETECTION_RADIUS))) {
                 for (FishSwarmAbility a : CommonUtil.listOfType(FishSwarmAbility.class,
                         CommonUtil.getAbilities(player))) {
-                    if (a.isEnabled() && fish.position().distanceTo(player.position()) >= a.dataManager.get(TBCommonUtil.DISTANCE)) {
+                    if (a.isEnabled() && fish.position().distanceTo(player.position()) <= a.dataManager.get(TBCommonUtil.DISTANCE)) {
                         if (fish.isEyeInFluid(FluidTags.WATER)) {
                             fish.setDeltaMovement(fish.getDeltaMovement().add(0.0, 0.005, 0.0));
                         }
