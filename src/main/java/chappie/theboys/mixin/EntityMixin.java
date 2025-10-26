@@ -55,6 +55,17 @@ public abstract class EntityMixin implements EntitySavingFields {
         }
     }
 
+    @Inject(method = "isShiftKeyDown()Z", at = @At("HEAD"), cancellable = true)
+    public void mixin$isShiftKeyDown(CallbackInfoReturnable<Boolean> cir) {
+        Entity entity = (Entity) (Object) this;
+        for (SpeedAbility a : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
+            if (a.isEnabled()) {
+                cir.setReturnValue(false);
+            }
+        }
+    }
+
+
     @Inject(method = "getXRot*", at = @At("TAIL"), cancellable = true)
     public void mixin$getXRot(CallbackInfoReturnable<Float> cir) {
         var map = this.theBoys$map();

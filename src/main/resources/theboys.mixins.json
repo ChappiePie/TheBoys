@@ -15,6 +15,7 @@
     "client.ItemStackRenderStateMixin",
     "client.LayerRenderStateMixin",
     "client.LivingEntityRendererMixin",
+    "client.LocalPlayerMixin",
     "client.MinecraftMixin",
     "client.ModelBlockRendererMixin",
     "client.PlayerCapeModelMixin",

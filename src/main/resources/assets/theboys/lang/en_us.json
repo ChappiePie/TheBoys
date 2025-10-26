@@ -6,6 +6,8 @@
   "abilities.theboys.super_hearing": "Super Hearing",
   "abilities.theboys.translucent": "Translucent",
   "abilities.theboys.xray": "X-Ray",
+  "abilities.theboys.dolphin_companion": "Dolphin Companion",
+  "abilities.theboys.fish_swarm": "Fish surf",
 
   "block.theboys.synthesizer": "Synthesizer",
   "item.theboys.synthesizer": "Synthesizer",
@@ -26,7 +28,16 @@
   "gui.theboys.eyeOptions.profileName": "Profile name",
   "gui.theboys.eyeOptions.skinPreset": "Skin preset",
 
-  "item.theboys.atrain_helmet": "A-Train Glasses",
+  "item.theboys.black_noir_helmet": "Black Noir Helmet",
+  "item.theboys.black_noir_chestplate": "Black Noir Chest",
+  "item.theboys.black_noir_leggings": "Black Noir Leggings",
+  "item.theboys.black_noir_boots": "Black Noir Boots",
+
+  "item.theboys.the_deep_chestplate": "The Deep Chest",
+  "item.theboys.the_deep_leggings": "The Deep Leggings",
+  "item.theboys.the_deep_boots": "The Deep Boots",
+
+  "item.theboys.atrain_glasses": "A-Train Glasses",
   "item.theboys.atrain_chestplate": "A-Train Chest",
   "item.theboys.atrain_leggings": "A-Train Leggings",
   "item.theboys.atrain_boots": "A-Train Boots",
@@ -59,6 +70,7 @@
   "superpower.theboys.stormfront": "Stormfront",
   "superpower.theboys.test": "Test",
   "superpower.theboys.transclucent": "Transclucent",
+  "superpower.theboys.the_deep": "The Deep",
   "key.theboys.overlay": "Abilities Overlay",
   "overlay.theboys.abilities": "Abilities",
   "theseven.motto": "The Seven: Let justice be done though the heavens fall.",

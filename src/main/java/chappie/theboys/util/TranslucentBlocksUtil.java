@@ -22,13 +22,17 @@ public class TranslucentBlocksUtil {
 
     public static boolean canSeeThrough(BlockPos.MutableBlockPos pos) {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && Minecraft.getInstance().getCameraEntity() != null) {
-            for (XRayAbility xRayAbility : CommonUtil.listOfType(XRayAbility.class, CommonUtil.getAbilities(Minecraft.getInstance().getCameraEntity()))) {
-                if (xRayAbility.hitPos != null && xRayAbility.translucentTimer.value(ClientUtil.getPartialTick()) != 0) {
-                    AABB aabb = new AABB(xRayAbility.blockHitPos).inflate(xRayAbility.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER));
-                    if (aabb.intersects(new AABB(pos))) {
-                        return true;
+            try {
+                for (XRayAbility xRayAbility : CommonUtil.listOfType(XRayAbility.class, CommonUtil.getAbilities(Minecraft.getInstance().getCameraEntity()))) {
+                    if (xRayAbility.hitPos != null && xRayAbility.translucentTimer.value(ClientUtil.getPartialTick()) != 0) {
+                        AABB aabb = new AABB(xRayAbility.blockHitPos).inflate(xRayAbility.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER));
+                        if (aabb.intersects(new AABB(pos))) {
+                            return true;
+                        }
                     }
                 }
+            } catch (Exception ignored) {
+                return false;
             }
         }
         return false;

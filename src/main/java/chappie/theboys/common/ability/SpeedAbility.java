@@ -34,6 +34,8 @@ public class SpeedAbility extends Ability implements IHasTimer {
     private final Cooldown upgradeCooldown = new Cooldown();
     private final Cooldown cooldown = new Cooldown();
 
+    public final Cooldown crouchCooldown = new Cooldown();
+
     private double xOld, zOld;
 
     public SpeedAbility(LivingEntity entity, AbilityBuilder builder) {
@@ -52,6 +54,16 @@ public class SpeedAbility extends Ability implements IHasTimer {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
+        if (enabled && !entity.isSwimming() && !entity.isFallFlying()) {
+            if (this.conditionManager.test("double_crouch") && this.crouchCooldown.end()) {
+                this.crouchCooldown.start(2);
+                entity.setYRot(180.0F + entity.getYRot());
+                entity.yRotO = entity.getYRot();
+                if (entity.getVehicle() != null) {
+                    entity.getVehicle().onPassengerTurned(entity);
+                }
+            }
+        }
         if (entity.getCommandSenderWorld().isClientSide) return;
         for (Timer timer : this.timers()) {
             timer.update();
@@ -59,13 +71,9 @@ public class SpeedAbility extends Ability implements IHasTimer {
         if (enabled && !entity.isSwimming() && !entity.isFallFlying() && entity instanceof ILivingEntityEx ex) {
             int speedLevel = this.dataManager.get(SPEED_LVL);
 
-            double scale = Math.pow(10, 3);
-            double x = Math.ceil(ex.theBoys$oldPos().x * scale) / scale;
-            double x1 = Math.ceil(entity.getX() * scale) / scale;
-            double z = Math.ceil(ex.theBoys$oldPos().z * scale) / scale;
-            double z1 = Math.ceil(entity.getZ() * scale) / scale;
-
-            boolean isMoving = x != x1 || z != z1;
+            double dx = entity.getX() - ex.theBoys$oldPos().x;
+            double dz = entity.getZ() - ex.theBoys$oldPos().z;
+            boolean isMoving = (dx*dx + dz*dz) > 1.0e-6;
 
             if (entity instanceof Player player && player.tickCount % 100 == 0) {
                 player.getFoodData().eat(1, 1.0F);
@@ -154,6 +162,6 @@ public class SpeedAbility extends Ability implements IHasTimer {
 
     @Override
     public Iterable<Timer> timers() {
-        return List.of(this.cooldown, this.upgradeCooldown);
+        return List.of(this.cooldown, this.upgradeCooldown, crouchCooldown);
     }
 }

@@ -23,12 +23,6 @@ public class TranslucentAbility extends Ability implements IHasTimer {
         super(entity, builder);
     }
 
-    @Override
-    public void update(LivingEntity entity, boolean enabled) {
-        super.update(entity, enabled);
-
-    }
-
     public float getAlpha(float partialTicks) {
         return 1.0F - this.timer.value(partialTicks);
     }

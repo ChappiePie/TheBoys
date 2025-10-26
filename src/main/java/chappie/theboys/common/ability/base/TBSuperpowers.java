@@ -15,6 +15,7 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.ability.FocusOnGoalAbility;
 import chappie.theboys.common.ability.HeatVisionAbility;
+import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
 import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.core.Registry;
@@ -65,7 +66,9 @@ public class TBSuperpowers {
             AbilityBuilder.of("speed", TBAbilityTypes.SPEED)
                     .change(TBCommonUtil.COLOR, Color.BLUE)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(80)))
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling"),
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling")
+                    .condition((a) -> new DoubleKeyCondition(a).keyType(KeyMap.KeyType.CROUCH)
+                            .shouldStop(() -> !(a instanceof SpeedAbility a1 && a1.crouchCooldown.end() && a.isEnabled())), "double_crouch"),
             AbilityBuilder.of("focus", TBAbilityTypes.FOCUS_ON_GOAL)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(96).backgroundColor(() -> {
                         if (a instanceof FocusOnGoalAbility a1 && !a1.hasSpeedAbility()) {
@@ -100,7 +103,7 @@ public class TBSuperpowers {
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.TOGGLE), "enabling"),
             AbilityBuilder.of("damage_resistance", AbilityType.DAMAGE_RESISTANCE).additionalData((a) -> a.dataManager.set(DamageResistanceAbility.AMPLIFIER, 4F)),
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
-            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(5.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(2.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
             AttributeModifierAbility.of("armor", b -> b.attribute(Attributes.ARMOR).amount(5.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
             AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADD_VALUE))
     ));
