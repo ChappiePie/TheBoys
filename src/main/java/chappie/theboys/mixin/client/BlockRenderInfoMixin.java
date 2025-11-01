@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 @SuppressWarnings("UnstableApiUsage")
-@Mixin(value = BlockRenderInfo.class, remap = false)
+@Mixin(value = BlockRenderInfo.class)
 public class BlockRenderInfoMixin {
 	@Shadow public BlockPos blockPos;
 

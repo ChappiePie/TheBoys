@@ -42,7 +42,9 @@
     "ServerLevelMixin",
     "SkullBlockEntityAccessor",
     "client.BlockRenderInfoMixin",
-    "client.EntityMixin"
+    "client.EntityMixin",
+    "client.sodium.MixinBlockOcclusionCache",
+    "client.sodium.MixinBlockRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
