@@ -12,7 +12,7 @@ import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.particle.TBParticleTypes;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.util.TBConfig;
-import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.minecraft.resources.ResourceLocation;
@@ -42,8 +42,8 @@ public class TheBoys implements ModInitializer {
         TBBlockEntities.init();
         TBMenus.init();
 
-        ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.CLIENT, TBConfig.CLIENT_SPEC);
-        ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, TBConfig.COMMON_SPEC);
+        ConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.CLIENT, TBConfig.CLIENT_SPEC);
+        ConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, TBConfig.COMMON_SPEC);
 
         EntityTrackingEvents.START_TRACKING.register(TrailEntity::startTracking);
         TBNetworking.registerMessages();

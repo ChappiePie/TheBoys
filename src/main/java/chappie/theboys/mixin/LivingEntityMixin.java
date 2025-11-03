@@ -7,9 +7,8 @@ import chappie.theboys.util.interfaces.EntitySavingFields;
 import chappie.theboys.util.interfaces.ILivingEntityEx;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,10 +54,22 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
         }
     }
 
-    @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
-    public void mixin$causeFallDamage(float fallDistance, float multiplier, DamageSource source, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "getDefaultDimensions", at = @At("TAIL"), cancellable = true)
+    public void mixin$getFallFlying(Pose pPose, CallbackInfoReturnable<EntityDimensions> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity.getCommandSenderWorld() instanceof ServerLevel level) {
+        if (entity != null && entity.isAlive() && entity instanceof Player) {
+            for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(entity))) {
+                if (entity.isSprinting() && ability.isEnabled()) {
+                    cir.setReturnValue(FlightAbility.FLIGHT_DIMENSIONS);
+                }
+            }
+        }
+    }
+
+    @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
+    public void mixin$causeFallDamage(double fallDistance, float damageMultiplier, DamageSource damageSource, CallbackInfoReturnable<Boolean> cir) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        if (entity.level() instanceof ServerLevel level) {
             for (FlightAbility a : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(entity))) {
                 if (a.causeFallDamage(level, entity, fallDistance)) {
                     cir.setReturnValue(true);

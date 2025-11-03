@@ -39,12 +39,13 @@ public class SynthesizerStartButton extends ImageButton {
         text = text.withStyle(ChatFormatting.UNDERLINE);
         int i = this.active ? 16777215 : 10526880;
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(this.getX() + this.getWidth() / 2F, this.getY() + this.getHeight() * 0.75F, 0);
-        guiGraphics.pose().scale(0.75F, 0.75F, 1);
-        guiGraphics.pose().translate(0, -this.getHeight() / 2F, 0);
+        var pose = guiGraphics.pose();
+        pose.pushMatrix();
+        pose.translate(this.getX() + this.getWidth() / 2F, this.getY() + this.getHeight() * 0.75F);
+        pose.scale(0.75F, 0.75F);
+        pose.translate(0, -this.getHeight() / 2F);
         guiGraphics.drawCenteredString(Minecraft.getInstance().font, text, 0, 0, i | Mth.ceil(this.alpha * 255.0F) << 24);
-        guiGraphics.pose().popPose();
+        pose.popMatrix();
         //guiGraphics.drawCenteredString(font, text, this.getX() + this.getWidth() / 2, this.getY(), i | Mth.ceil(this.alpha * 255.0F) << 24);
     }
 }

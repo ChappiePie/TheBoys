@@ -30,7 +30,7 @@ public abstract class EntityMixin {
         Entity entity = (Entity) (Object) this;
         for (FocusOnGoalAbility a : CommonUtil.listOfType(FocusOnGoalAbility.class, CommonUtil.getAbilities(entity))) {
             if (!a.dataManager.get(FocusOnGoalAbility.TARGET_ID).equals(a.entity.getId())) {
-                Entity targetEntity = entity.getCommandSenderWorld().getEntity(a.dataManager.get(FocusOnGoalAbility.TARGET_ID));
+                Entity targetEntity = entity.level().getEntity(a.dataManager.get(FocusOnGoalAbility.TARGET_ID));
                 if (targetEntity == null) return;
                 Vec3 target = targetEntity.getEyePosition(ClientUtil.getPartialTick());
                 Vec3 eyePos = entity.getEyePosition(ClientUtil.getPartialTick());

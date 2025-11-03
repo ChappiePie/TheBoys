@@ -9,15 +9,14 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.util.TBCommonUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ArmedModel;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -55,7 +54,7 @@ public class GlowEyesAbility extends Ability implements IHasTimer {
                     new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER));
 
             @Override
-            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
+            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!modelProperties.root().hasChild("head")) return;
                 Color color = dataManager.get(TBCommonUtil.COLOR);
                 float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
@@ -80,15 +79,19 @@ public class GlowEyesAbility extends Ability implements IHasTimer {
                         poseStack.scale(1F, f1, 1F);
                     }
                     poseStack.scale(f, f, f);
-                    VertexConsumer vertexConsumer = bufferIn.getBuffer(RenderType.beaconBeam(GLOW_EYES, true));
-                    for (int i = 0; i < 3; i++) {
-                        poseStack.pushPose();
-                        poseStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
-                        this.copyModel.get().head.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
-                        poseStack.popPose();
-                    }
-                    poseStack.translate(0, 0, -(Math.cos(entity.tickCount * entity.tickCount) / 100F));
-                    this.copyModel.get().hat.render(poseStack, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, red, green, blue));
+                    nodeCollector.submitCustomGeometry(poseStack, RenderType.beaconBeam(GLOW_EYES, true), (pose, consumer) -> {
+                        PoseStack renderStack = new PoseStack();
+                        renderStack.last().pose().set(pose.pose());
+                        renderStack.last().normal().set(pose.normal());
+                        for (int i = 0; i < 3; i++) {
+                            renderStack.pushPose();
+                            renderStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
+                            this.copyModel.get().head.render(renderStack, consumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
+                            renderStack.popPose();
+                        }
+                        renderStack.translate(0, 0, -(Math.cos(entity.tickCount * entity.tickCount) / 100F));
+                        this.copyModel.get().hat.render(renderStack, consumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, red, green, blue));
+                    });
                     poseStack.popPose();
                 }
                 poseStack.popPose();

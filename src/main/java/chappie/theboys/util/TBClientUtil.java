@@ -8,24 +8,20 @@ import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.item.suit.SuitItem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.util.TriState;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
@@ -38,7 +34,39 @@ public class TBClientUtil {
 
     public static final ResourceLocation GLOW_EYES_OVERLAY = TheBoys.id("textures/gui/glow_eyes_overlay.png");
 
-    public static void setupArms(PlayerModel model, HumanoidArm side, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, Player pPlayer, ModelPart pRendererArm, float partialTicks) {
+    public static void copyHumanoidModelProperties(HumanoidModel<?> source, HumanoidModel<?> target) {
+        copyPartPose(source.root(), target.root());
+        copyPartPose(source.head, target.head);
+        copyPartPose(source.hat, target.hat);
+        copyPartPose(source.body, target.body);
+        copyPartPose(source.rightArm, target.rightArm);
+        copyPartPose(source.leftArm, target.leftArm);
+        copyPartPose(source.rightLeg, target.rightLeg);
+        copyPartPose(source.leftLeg, target.leftLeg);
+        if (source instanceof PlayerModel sourcePlayer && target instanceof PlayerModel targetPlayer) {
+            copyPartPose(sourcePlayer.leftSleeve, targetPlayer.leftSleeve);
+            copyPartPose(sourcePlayer.rightSleeve, targetPlayer.rightSleeve);
+            copyPartPose(sourcePlayer.leftPants, targetPlayer.leftPants);
+            copyPartPose(sourcePlayer.rightPants, targetPlayer.rightPants);
+            copyPartPose(sourcePlayer.jacket, targetPlayer.jacket);
+        }
+    }
+
+    private static void copyPartPose(ModelPart source, ModelPart target) {
+        target.x = source.x;
+        target.y = source.y;
+        target.z = source.z;
+        target.xRot = source.xRot;
+        target.yRot = source.yRot;
+        target.zRot = source.zRot;
+        target.xScale = source.xScale;
+        target.yScale = source.yScale;
+        target.zScale = source.zScale;
+        target.visible = source.visible;
+        target.skipDraw = source.skipDraw;
+    }
+
+    public static void setupArms(PlayerModel model, HumanoidArm side, PoseStack pPoseStack, SubmitNodeCollector renderTasks, int pCombinedLight, Player pPlayer, ModelPart pRendererArm, float partialTicks) {
         TheBoysCap cap = TheBoysCap.getCap(pPlayer);
         if (cap == null) return;
         float timeline = cap.vialAnim.timeline.value(partialTicks);
@@ -85,7 +113,7 @@ public class TBClientUtil {
 
                     pPoseStack.mulPose(Axis.YN.rotationDegrees(t1 * 20));
                 }
-                Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(pPlayer, stack, flag1 ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, !flag1, pPoseStack, pBuffer, pCombinedLight);
+                Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(pPlayer, stack, flag1 ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, pPoseStack, renderTasks, pCombinedLight);
                 pPoseStack.popPose();
             }
         }
@@ -95,16 +123,16 @@ public class TBClientUtil {
             if (!chestStack.isEmpty()) {
                 if (chestStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).getItem() instanceof SuitItem item) {
                     PlayerModel playerModel = new PlayerModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER), CommonUtil.smallArms(pPlayer));
-                    model.copyPropertiesTo(playerModel);
+                    copyHumanoidModelProperties(model, playerModel);
                     item.getClientSuitProperties().setupSuitScale(playerModel, pPlayer, EquipmentSlot.CHEST, chestStack);
                     ResourceLocation texture = item.getClientSuitProperties().suitTexture(EquipmentSlot.CHEST, chestStack, "");
                     Vector3f vec3f = item.getClientSuitProperties().entityWearScale(EquipmentSlot.CHEST, stack);
                     ClientUtil.modified(model.rightSleeve).modulus$setSize(vec3f);
                     ClientUtil.modified(model.leftSleeve).modulus$setSize(vec3f);
                     if (pRendererArm == model.rightArm) {
-                        playerModel.rightArm.render(pPoseStack, pBuffer.getBuffer(RenderType.entityTranslucent(texture)), pCombinedLight, OverlayTexture.NO_OVERLAY);
+                        renderTasks.submitModelPart(playerModel.rightArm, pPoseStack, RenderType.entityTranslucent(texture), pCombinedLight, OverlayTexture.NO_OVERLAY, null);
                     } else {
-                        playerModel.leftArm.render(pPoseStack, pBuffer.getBuffer(RenderType.entityTranslucent(texture)), pCombinedLight, OverlayTexture.NO_OVERLAY);
+                        renderTasks.submitModelPart(playerModel.leftArm, pPoseStack, RenderType.entityTranslucent(texture), pCombinedLight, OverlayTexture.NO_OVERLAY, null);
                     }
                 }
             }
@@ -139,18 +167,6 @@ public class TBClientUtil {
                     ClientUtil.modified(model.leftLeg).modulus$setSize(vec3f);
                 }
             }
-        }
-    }
-
-    public static class RenderTypes extends RenderType {
-
-        public RenderTypes(String pName, VertexFormat pFormat, VertexFormat.Mode pMode, int pBufferSize, boolean pAffectsCrumbling, boolean pSortOnUpload, Runnable pSetupState, Runnable pClearState) {
-            super(pName, pFormat, pMode, pBufferSize, pAffectsCrumbling, pSortOnUpload, pSetupState, pClearState);
-        }
-
-        public static RenderType entityInvisibility(ResourceLocation pLocation) {
-            RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder().setShaderState(RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL_SHADER).setTextureState(new RenderStateShard.TextureStateShard(pLocation, TriState.FALSE, false)).setTransparencyState(TRANSLUCENT_TRANSPARENCY).setCullState(NO_CULL).setOutputState(ITEM_ENTITY_TARGET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE).createCompositeState(true);
-            return create("entity_invisibility", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, true, rendertype$compositestate);
         }
     }
 }

@@ -30,7 +30,7 @@ public class FocusOnGoalAbility extends Ability {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (entity.getCommandSenderWorld().isClientSide) {
+        if (entity.level().isClientSide()) {
             float f = entity.zza;
             if (this.dataManager.get(FORWARD_IMPULSE) != f) {
                 this.dataManager.setFromClient(FORWARD_IMPULSE, Math.round(f));
@@ -40,7 +40,7 @@ public class FocusOnGoalAbility extends Ability {
         int targetId = this.dataManager.get(TARGET_ID);
         boolean bool = entity.getId() == targetId;
         if (enabled) {
-            Entity target = entity.getCommandSenderWorld().getEntity(targetId);
+            Entity target = entity.level().getEntity(targetId);
             if (bool || target == null || !target.isAlive()
                     || target.getEyePosition().y > entity.getEyePosition().y
                     || target.getEyePosition().distanceTo(entity.getEyePosition()) < 4 && !this.hasSpeedAbility()) {
@@ -58,7 +58,7 @@ public class FocusOnGoalAbility extends Ability {
                             if (vec.distanceTo(vec1) > 2) {
                                 entity.setDeltaMovement(entity.getDeltaMovement().add(vec.subtract(vec1).multiply(0.01F, 0, 0.01F)));
                             } else {
-                                for (LivingEntity e : entity.getCommandSenderWorld().getEntitiesOfClass(LivingEntity.class,
+                                for (LivingEntity e : entity.level().getEntitiesOfClass(LivingEntity.class,
                                         CommonUtil.boxWithRange(entity.position(), 0.5D))) {
                                     if (e != entity) {
                                         e.hurt(e.damageSources().inWall(), 2);

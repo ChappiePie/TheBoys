@@ -77,7 +77,7 @@ public class FlightAbility extends Ability implements IHasTimer {
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
         if (enabled) {
-            if (entity.getCommandSenderWorld().isClientSide) {
+            if (entity.level().isClientSide()) {
                 float f = entity.zza;
                 boolean sprinting = entity.isSprinting();
                 if (this.dataManager.get(SPRINTING) != sprinting) {
@@ -102,13 +102,13 @@ public class FlightAbility extends Ability implements IHasTimer {
                     if (this.conditionManager.test("boost")) {
                         this.cooldown.start(60);
                         this.dataManager.set(BOOSTING, true);
-                        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.EXPLOSION,
+                        CommonUtil.spawnParticleForAll(this.entity.level(), ParticleTypes.EXPLOSION,
                                 true, this.entity.position(), Vec3.ZERO, 1, 10);
                     }
                 }
                 if (this.dataManager.get(BOOSTING)) {
                     speed += this.cooldown.value(1) * 4F;
-                    CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), ParticleTypes.CLOUD,
+                    CommonUtil.spawnParticleForAll(this.entity.level(), ParticleTypes.CLOUD,
                             true, this.entity.position(), Vec3.ZERO, 0.05F, 10);
                     if (this.cooldown.timer == 0) {
                         this.dataManager.set(BOOSTING, false);
@@ -147,45 +147,45 @@ public class FlightAbility extends Ability implements IHasTimer {
         }
     }
 
-    public boolean causeFallDamage(ServerLevel level, LivingEntity entity, float fallDistance) {
+    public boolean causeFallDamage(ServerLevel level, LivingEntity entity, double fallDistance) {
         boolean sprinting = this.dataManager.get(SPRINTING) || entity.isSprinting();
         if (this.dataManager.get(BREAK_BLOCKS) && fallDistance > 20 && (sprinting || !this.isEnabled())) {
             for (int x = 0; x < 5; x++) {
                 for (int y = 0; y < 5; y++) {
                     for (int z = 0; z < 5; z++) {
-                        double xPos = entity.getX() - 2.5 + x + entity.getCommandSenderWorld().random.nextInt(5);
-                        double yPos = entity.getY() - 2.5 + y + entity.getCommandSenderWorld().random.nextInt(5);
-                        double zPos = entity.getZ() - 2.5 + z + entity.getCommandSenderWorld().random.nextInt(5);
+                        double xPos = entity.getX() - 2.5 + x + entity.level().random.nextInt(5);
+                        double yPos = entity.getY() - 2.5 + y + entity.level().random.nextInt(5);
+                        double zPos = entity.getZ() - 2.5 + z + entity.level().random.nextInt(5);
                         BlockPos pos = new BlockPos((int) xPos, (int) yPos, (int) zPos);
-                        Block block = entity.getCommandSenderWorld().getBlockState(pos).getBlock();
+                        Block block = entity.level().getBlockState(pos).getBlock();
 
                         if (block == Blocks.STONE) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.COBBLESTONE.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.COBBLESTONE.defaultBlockState());
                         } else if (block == Blocks.STONE_BRICKS) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
                         } else if (block == Blocks.COBBLESTONE) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
                         } else if (block == Blocks.GRASS_BLOCK) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
                         } else if (block == Blocks.DIRT) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.COARSE_DIRT.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.COARSE_DIRT.defaultBlockState());
                         } else if (block == Blocks.OAK_LOG) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_OAK_LOG.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_OAK_LOG.defaultBlockState());
                         } else if (block == Blocks.BIRCH_LOG) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_BIRCH_LOG.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_BIRCH_LOG.defaultBlockState());
                         } else if (block == Blocks.SPRUCE_LOG) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_SPRUCE_LOG.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_SPRUCE_LOG.defaultBlockState());
                         } else if (block == Blocks.JUNGLE_LOG) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_JUNGLE_LOG.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_JUNGLE_LOG.defaultBlockState());
                         } else if (block == Blocks.DARK_OAK_LOG) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_DARK_OAK_LOG.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_DARK_OAK_LOG.defaultBlockState());
                         } else if (block == Blocks.ACACIA_LOG) {
-                            entity.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.STRIPPED_ACACIA_LOG.defaultBlockState());
+                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_ACACIA_LOG.defaultBlockState());
                         } else if (block == Blocks.GLASS) {
-                            entity.getCommandSenderWorld().destroyBlock(pos, false);
+                            entity.level().destroyBlock(pos, false);
                         }
 
-                        level.sendParticles(ParticleTypes.EXPLOSION, false, false, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.getCommandSenderWorld().getHeight()) * 10, 0.0D, 0.0D, 1F);
+                        level.sendParticles(ParticleTypes.EXPLOSION, false, false, entity.getX(), entity.getY() + 0.25F, entity.getZ(), 0, (fallDistance / entity.level().getHeight()) * 10, 0.0D, 0.0D, 1F);
                         entity.playSound(SoundEvents.MOOSHROOM_SHEAR, 1.0F, 1.0F);
                     }
                 }

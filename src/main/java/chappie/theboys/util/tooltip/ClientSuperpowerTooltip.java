@@ -2,12 +2,11 @@ package chappie.theboys.util.tooltip;
 
 import chappie.modulus.util.ClientUtil;
 import chappie.theboys.common.ability.base.TBSuperpower;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 
@@ -44,14 +43,13 @@ public class ClientSuperpowerTooltip implements ClientTooltipComponent {
     }
 
     private void renderSlot(int pX, int pY, Font pFont, GuiGraphics guiGraphics) {
-        guiGraphics.blitSprite(RenderType::guiTextured, SLOT_SPRITE, pX, pY, 0, 18, 20);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_SPRITE, pX, pY, 0, 18, 20);
         int border = 1;
         guiGraphics.fill(pX + border, pY + border, pX + 18 + border, pY + 18 + border, ARGB.color(57, 57, 57));
         guiGraphics.fill(pX - border, pY - border, pX + 18 - border, pY + 18 - border, -1);
         guiGraphics.fill(pX, pY, pX + 18, pY + 18, ARGB.color(157, 157, 157));
 
         guiGraphics.drawString(pFont, this.superpower.getDisplayName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
-        RenderSystem.enableBlend();
         this.superpower.renderIcon(pX + 1, pY + 1, 1, Minecraft.getInstance(), guiGraphics, ClientUtil.getPartialTick());
     }
 

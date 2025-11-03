@@ -3,10 +3,11 @@ package chappie.theboys.common.capability;
 import chappie.theboys.TheBoys;
 import chappie.theboys.util.timers.SyringeAnim;
 import chappie.theboys.util.timers.SyringeVialAnim;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
@@ -76,26 +77,22 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        this.compoundV = tag.getBoolean("CompoundV");
-        CompoundTag nbt = tag.getCompound("eyeOptions");
-        this.eyesHeight = nbt.getInt("eyesHeight");
-        this.eyesLength = nbt.getInt("eyesLength");
-
-        this.syringeAnim.readFromNbt(tag.getCompound("syringeAnim"));
-        this.vialAnim.readFromNbt(tag.getCompound("vialAnim"));
+    public void readData(ValueInput input) {
+        this.compoundV = input.getBooleanOr("CompoundV", false);
+        ValueInput eyeOptions = input.childOrEmpty("eyeOptions");
+        this.eyesHeight = eyeOptions.getIntOr("eyesHeight", this.eyesHeight);
+        this.eyesLength = eyeOptions.getIntOr("eyesLength", this.eyesLength);
+        input.read("syringeAnim", CompoundTag.CODEC).ifPresent(this.syringeAnim::readFromNbt);
+        input.read("vialAnim", CompoundTag.CODEC).ifPresent(this.vialAnim::readFromNbt);
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        tag.putBoolean("CompoundV", this.compoundV);
-
-        CompoundTag eyeOptions = new CompoundTag();
+    public void writeData(ValueOutput output) {
+        output.putBoolean("CompoundV", this.compoundV);
+        ValueOutput eyeOptions = output.child("eyeOptions");
         eyeOptions.putInt("eyesHeight", this.eyesHeight);
         eyeOptions.putInt("eyesLength", this.eyesLength);
-        tag.put("eyeOptions", eyeOptions);
-
-        tag.put("syringeAnim", this.syringeAnim.writeToNbt());
-        tag.put("vialAnim", this.vialAnim.writeToNbt());
+        output.store("syringeAnim", CompoundTag.CODEC, this.syringeAnim.writeToNbt());
+        output.store("vialAnim", CompoundTag.CODEC, this.vialAnim.writeToNbt());
     }
 }

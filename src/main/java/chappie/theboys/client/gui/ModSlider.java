@@ -1,10 +1,11 @@
 package chappie.theboys.client.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
@@ -56,14 +57,8 @@ public class ModSlider extends AbstractSliderButton {
     @Override
     public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         final Minecraft mc = Minecraft.getInstance();
-        guiGraphics.blitSprite(RenderType::guiTextured, this.getSprite(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        guiGraphics.blitSprite(RenderType::guiTextured, this.getHandleSprite(), this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 8, this.getHeight());
-
-        if (isBlocked()) {
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.6F);
-            guiGraphics.blitSprite(RenderType::guiTextured, this.getHandleSprite(), this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 8, this.getHeight());
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        }
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, this.getSprite(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, this.getHandleSprite(), this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 8, this.getHeight());
 
         int i = this.getX() + 2;
         int j = this.getX() + this.getWidth() - 2;
@@ -72,24 +67,24 @@ public class ModSlider extends AbstractSliderButton {
 
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
+    public void onClick(MouseButtonEvent event, boolean isDoubleClick) {
         if (this.isBlocked()) return;
-        super.onClick(mouseX, mouseY);
+        super.onClick(event, isDoubleClick);
         this.tick = 5;
         this.click++;
     }
 
     @Override
-    protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
+    protected void onDrag(MouseButtonEvent event, double mouseX, double mouseY) {
         if (!this.isBlocked()) {
-            super.onDrag(mouseX, mouseY, dragX, dragY);
+            super.onDrag(event, mouseX, mouseY);
         }
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
         if (!this.isBlocked()) {
-            return super.keyPressed(keyCode, scanCode, modifiers);
+            return super.keyPressed(event);
         }
         return false;
     }

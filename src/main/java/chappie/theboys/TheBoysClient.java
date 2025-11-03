@@ -1,6 +1,6 @@
 package chappie.theboys;
 
-import chappie.modulus.Modulus;
+import chappie.modulus.client.ModulusClient;
 import chappie.modulus.client.gui.ChappModListWidget;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
@@ -45,7 +45,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class TheBoysClient implements ClientModInitializer {
 
-    public static final ToggleKeyMapping OVERLAY = new ToggleKeyMapping("key.%s.overlay".formatted(TheBoys.MODID), GLFW.GLFW_KEY_LEFT_ALT, "key.categories.%s".formatted(Modulus.MODID), () -> TBConfig.CLIENT.abilitiesOverlayToggle.get());
+    public static final ToggleKeyMapping OVERLAY = new ToggleKeyMapping("key.%s.overlay".formatted(TheBoys.MODID), GLFW.GLFW_KEY_LEFT_ALT, ModulusClient.MODULUS_CATEGORY, () -> TBConfig.CLIENT.abilitiesOverlayToggle.get(), false);
 
     static {
         ChappModListWidget.MOD_CLICKED.put(TheBoys.MODID, (e) ->
@@ -75,7 +75,7 @@ public class TheBoysClient implements ClientModInitializer {
 
         MenuScreens.register(TBMenus.SYNTHESIZER, SynthesizerScreen::new);
         BlockEntityRenderers.register(TBBlockEntities.SYNTHESIZER,
-                context -> new SynthesizerRenderer());
+                (context) -> new SynthesizerRenderer());
 
         TooltipComponentCallback.EVENT.register(tooltip -> {
             if (tooltip instanceof ArmorTooltip) {

@@ -7,8 +7,8 @@ import chappie.theboys.common.item.suit.SuitItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
@@ -46,12 +46,14 @@ public class ClientSuitProperties {
         return TheBoys.id("textures/suits/%s/layer_%s.png".formatted(this.type(), slot == EquipmentSlot.LEGS ? 1 : 0));
     }
 
-    public void render(PoseStack pPoseStack, MultiBufferSource pBuffer, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {
+    public void render(PoseStack pPoseStack, SubmitNodeCollector submitNodeCollector, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {
     }
 
-    public void renderSuitModel(PlayerModel suitModel, PoseStack poseStack, MultiBufferSource buffer, HumanoidRenderState renderState, EquipmentSlot slot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> pModel, float alpha) {
+    public void renderSuitModel(PlayerModel suitModel, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, HumanoidRenderState renderState, EquipmentSlot slot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> pModel, float alpha) {
         RenderType type = RenderType.entityTranslucent(this.suitTexture(slot, armorStack, ""));
-        suitModel.renderToBuffer(poseStack, buffer.getBuffer(type), pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
+        submitNodeCollector.submitCustomGeometry(poseStack, type, (pose, vertexConsumer) -> {
+            suitModel.renderToBuffer(poseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
+        });
     }
 
     public <S extends HumanoidRenderState> void setupSuitScale(PlayerModel model, Entity entity, EquipmentSlot slot, ItemStack armorItem) {

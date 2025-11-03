@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(SoundEngine.class)
 public class SoundEngineMixin {
 
-    @ModifyVariable(method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "play", at = @At("HEAD"), argsOnly = true)
     public SoundInstance theBoys$changeSound(SoundInstance soundInstance) {
         return ClientEvents.playSound(soundInstance);
     }

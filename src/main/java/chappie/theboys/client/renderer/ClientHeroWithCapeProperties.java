@@ -13,8 +13,8 @@ import com.mojang.math.Axis;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ARGB;
@@ -29,8 +29,8 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
     }
 
     @Override
-    public void render(PoseStack pPoseStack, MultiBufferSource pBuffer, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {
-        super.render(pPoseStack, pBuffer, renderState, pSlot, pPackedLight, armorStack, suitStack, model, alpha);
+    public void render(PoseStack pPoseStack, SubmitNodeCollector submitNodeCollector, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {
+        super.render(pPoseStack, submitNodeCollector, renderState, pSlot, pPackedLight, armorStack, suitStack, model, alpha);
         if (renderState instanceof IRenderStateEntity<?> state && state.modulus$entity() instanceof AbstractClientPlayer player && pSlot == EquipmentSlot.CHEST) {
             this.model.setupAnim(renderState);
 
@@ -48,7 +48,8 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
                 cape.xRot -= (float) ((cape.xRot - Math.toRadians(170)) * t);
             }
             pPoseStack.scale(0.85F, 0.85F, 0.85F);
-            this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(this.renderType()), pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.color((int) (alpha * 255), 255, 255, 255));
+            submitNodeCollector.submitCustomGeometry(pPoseStack, this.renderType(), ((pose, vertexConsumer) ->
+                    this.model.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.color((int) (alpha * 255), 255, 255, 255))));
             pPoseStack.popPose();
         }
     }

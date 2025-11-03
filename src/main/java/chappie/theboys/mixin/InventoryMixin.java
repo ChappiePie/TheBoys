@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Inventory.class)
 public class InventoryMixin {
 
-    @Inject(method = "setSelectedHotbarSlot", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setSelectedSlot", at = @At("HEAD"), cancellable = true)
     public void cancelSwapSlots$setSelectedHotbarSlot(int index, CallbackInfo ci) {
         Inventory inv = (Inventory) (Object) this;
         TheBoysCap cap = TheBoysCap.getCap(inv.player);

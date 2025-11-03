@@ -5,6 +5,7 @@ import chappie.theboys.client.renderer.ClientHeroWithCapeProperties;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.ClientSuitProperties;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.dispenser.EquipmentDispenseItemBehavior;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -13,14 +14,15 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 
-import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class SuitItem extends Item {
@@ -58,7 +60,8 @@ public class SuitItem extends Item {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.isArmor()) {
                 ItemStack pStack = player.getItemBySlot(slot);
-                if (!pStack.isEmpty() && pStack.getItem() instanceof ArmorItem && suitStack.getItem() instanceof SuitItem item) {
+                Equippable equippable = pStack.get(DataComponents.EQUIPPABLE);
+                if (!pStack.isEmpty() && equippable != null && equippable.slot().isArmor() && suitStack.getItem() instanceof SuitItem item) {
                     EquipmentSlot suitSlot = item.equipmentSlot(pStack, suitStack, player);
                     if (suitSlot == null || slot.equals(suitSlot)) {
                         ItemStack suitItem = pStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
@@ -84,8 +87,8 @@ public class SuitItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-        tooltipComponents.add(Component.translatable("item.theboys.suit.equip").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, tooltipDisplay, tooltipAdder, tooltipFlag);
+        tooltipAdder.accept(Component.translatable("item.theboys.suit.equip").withStyle(ChatFormatting.GRAY));
     }
 }

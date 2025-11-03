@@ -69,11 +69,11 @@ public class FishSwarmAbility extends Ability implements IHasTimer {
 
             entity.setDeltaMovement(Vec3.directionFromRotation(0, entity.getYRot()).multiply(0.75, 0, 0.75)
                     .add(0, verticalMotion, 0));
-            CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
+            CommonUtil.spawnParticleForAll(this.entity.level(),
                     TBParticleTypes.WATER_SPLASH,
                     true, entity.position().add(0, 0.4F, 0), new Vec3(1, 0.2, 1), 1F, 2);
 
-            CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
+            CommonUtil.spawnParticleForAll(this.entity.level(),
                     TBParticleTypes.WATER_SPLASH,
                     true, entity.position().add(0, 0.4F, 0), new Vec3(0, 0, 0), 1F, 5);
         }

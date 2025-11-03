@@ -4,11 +4,13 @@ import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ExplosionDamageCalculator;
@@ -34,13 +36,14 @@ public class ServerLevelMixin {
     List<ServerPlayer> players;
 
     @Inject(method = "explode", at = @At("TAIL"))
-    public void getDistance(@Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, Holder<SoundEvent> explosionSound, CallbackInfo ci, @Local ServerExplosion serverExplosion) {
+    public void getDistance(@Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, WeightedList<ExplosionParticleInfo> blockParticles, Holder<SoundEvent> explosionSound, CallbackInfo ci, @Local ServerExplosion serverExplosion) {
         for (ServerPlayer player : this.players) {
             if (player.distanceToSqr(x, y, z) > 4096.0D) {
                 for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(player))) {
                     if (a.isEnabled()) {
                         ParticleOptions particleOptions = serverExplosion.isSmall() ? smallExplosionParticles : largeExplosionParticles;
-                        player.connection.send(new ClientboundExplodePacket(new Vec3(x, y, z), Optional.ofNullable(serverExplosion.getHitPlayers().get(player)), particleOptions, explosionSound));
+                        Optional<Vec3> optional = Optional.ofNullable((Vec3)serverExplosion.getHitPlayers().get(player));
+                        player.connection.send(new ClientboundExplodePacket(new Vec3(x, y, z), radius, serverExplosion.explode(), optional, particleOptions, explosionSound, blockParticles));
                     }
                 }
             }

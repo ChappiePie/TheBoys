@@ -64,7 +64,7 @@ public class SpeedAbility extends Ability implements IHasTimer {
                 }
             }
         }
-        if (entity.getCommandSenderWorld().isClientSide) return;
+        if (entity.level().isClientSide()) return;
         for (Timer timer : this.timers()) {
             timer.update();
         }
@@ -103,10 +103,10 @@ public class SpeedAbility extends Ability implements IHasTimer {
                 }*/
 
                 if (speedLevel > 5 && isMoving) {
-                    for (LivingEntity e : entity.getCommandSenderWorld().getEntitiesOfClass(LivingEntity.class,
+                    for (LivingEntity e : entity.level().getEntitiesOfClass(LivingEntity.class,
                             CommonUtil.boxWithRange(entity.position(), 0.5D))) {
                         if (e != entity) {
-                            if (entity.getCommandSenderWorld() instanceof ServerLevel level) {
+                            if (entity.level() instanceof ServerLevel level) {
                                 e.hurtServer(level, e.damageSources().inWall(), speedLevel);
                             }
                         }
@@ -131,7 +131,7 @@ public class SpeedAbility extends Ability implements IHasTimer {
         if (Math.abs(entity.getX() - this.xOld) >= distanceForTrail || Math.abs(entity.getZ() - this.zOld) >= distanceForTrail) {
             this.xOld = ex.theBoys$oldPos().x;
             this.zOld = ex.theBoys$oldPos().z;
-            entity.getCommandSenderWorld().addFreshEntity(new TrailEntity(entity.getCommandSenderWorld(), entity, Color.WHITE, this.dataManager.get(TRAIL_DURATION)));
+            entity.level().addFreshEntity(new TrailEntity(entity.level(), entity, Color.WHITE, this.dataManager.get(TRAIL_DURATION)));
         }
     }
 

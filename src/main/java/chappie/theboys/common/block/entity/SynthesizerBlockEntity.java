@@ -28,10 +28,12 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
@@ -118,17 +120,17 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
 
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        this.waterMb = tag.getInt("waterMb");
-        this.work = tag.getBoolean("work");
-        this.opened = tag.getBoolean("opened");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.waterMb = input.getIntOr("waterMb", 0);
+        this.work = input.getBooleanOr("work", false);
+        this.opened = input.getBooleanOr("opened", true);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(tag, this.getItems(), registries);
+        ContainerHelper.loadAllItems(input, this.getItems());
 
-        this.litTime = tag.getShort("burnTime");
-        this.cookingProgress = tag.getShort("time");
-        this.cookingTotalTime = tag.getShort("timeTotal");
+        this.litTime = input.getShortOr("burnTime", (short) 0);
+        this.cookingProgress = input.getShortOr("time", (short) 0);
+        this.cookingTotalTime = input.getShortOr("timeTotal", (short) 200);
         this.litDuration = this.getBurnDuration(this.items.get(1));
     }
 
@@ -141,16 +143,16 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("waterMb", this.waterMb);
-        tag.putBoolean("work", this.work);
-        tag.putBoolean("opened", this.opened);
-        ContainerHelper.saveAllItems(tag, this.getItems(), registries);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("waterMb", this.waterMb);
+        output.putBoolean("work", this.work);
+        output.putBoolean("opened", this.opened);
+        ContainerHelper.saveAllItems(output, this.getItems());
 
-        tag.putShort("burnTime", (short) this.litTime);
-        tag.putShort("time", (short) this.cookingProgress);
-        tag.putShort("timeTotal", (short) this.cookingTotalTime);
+        output.putShort("burnTime", (short) this.litTime);
+        output.putShort("time", (short) this.cookingProgress);
+        output.putShort("timeTotal", (short) this.cookingTotalTime);
     }
 
     @Override

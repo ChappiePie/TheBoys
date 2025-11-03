@@ -15,15 +15,18 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.PlayerModelType;
 
 import java.awt.*;
 import java.util.Map;
@@ -77,6 +80,13 @@ public class ClientSpawnTrail implements CustomPacketPayload {
         buf.writeInt(this.color.getBlue());
     }
 
+    static Map<PlayerModelType, EntityRendererProvider<AbstractClientPlayer>> playerProviders() {
+        return Map.of(
+                PlayerModelType.WIDE, context -> new AvatarRenderer<>(context, false),
+                PlayerModelType.SLIM, context -> new AvatarRenderer<>(context, true)
+        );
+    }
+
     @SuppressWarnings("unchecked")
     public void handle(LocalPlayer localPlayer, PacketSender packetSender) {
         Minecraft mc = Minecraft.getInstance();
@@ -84,7 +94,7 @@ public class ClientSpawnTrail implements CustomPacketPayload {
             Entity entity = mc.level.getEntity(this.entityId);
             if (entity instanceof TrailEntity e) {
                 e.lifeTime = this.lifeTime;
-                e.attached = (LivingEntity) entity.getCommandSenderWorld().getEntity(this.ownerId);
+                e.attached = (LivingEntity) entity.level().getEntity(this.ownerId);
                 e.color = this.color;
 
                 if (e.attached == null) return;
@@ -104,7 +114,7 @@ public class ClientSpawnTrail implements CustomPacketPayload {
                 LivingEntityRenderState state = null;
                 var r = EntityRenderersAccessor.providers().get(e.attached.getType());
                 if (r == null && e.attached instanceof AbstractClientPlayer player) {
-                    r = EntityRenderersAccessor.playerProviders().get(player.getSkin().model());
+                    r = playerProviders().get(player.getSkin().model());
                 }
                 if (r.create(IHasContext.getContext()) instanceof LivingEntityRenderer renderer) {
                     if (renderer.createRenderState(e.attached, ClientUtil.getPartialTick()) instanceof LivingEntityRenderState livingState) {
@@ -119,8 +129,12 @@ public class ClientSpawnTrail implements CustomPacketPayload {
                         playerModel.leftPants.visible = false;
                         playerModel.rightPants.visible = false;
                         playerModel.jacket.visible = false;
-                        playerModel.setupAnim((PlayerRenderState) state);
-                        e.trail = new TrailRenderState.TrailResources(playerModel, player.getSkin().texture());
+                        if (state instanceof AvatarRenderState avatarRenderState) {
+                            playerModel.setupAnim(avatarRenderState);
+                            e.trail = new TrailRenderState.TrailResources(playerModel, player.getSkin().body().texturePath());
+                        } else {
+                            e.trail = new TrailRenderState.TrailResources(playerModel, player.getSkin().body().texturePath());
+                        }
                     } else {
                         var model1 = (EntityModel<LivingEntityRenderState>) renderer.getModel();
                         model1.setupAnim(state);

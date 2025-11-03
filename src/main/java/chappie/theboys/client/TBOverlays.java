@@ -16,20 +16,15 @@ import chappie.theboys.common.ability.HeatVisionAbility;
 import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.base.TBSuperpower;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
-import chappie.theboys.mixin.client.GameRendererAccessor;
 import chappie.theboys.util.TBClientUtil;
 import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.TBConfig;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.client.renderer.LevelTargetBundle;
-import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -37,6 +32,7 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import org.joml.Matrix3x2fStack;
 
 import java.awt.*;
 import java.util.List;
@@ -69,7 +65,7 @@ public class TBOverlays {
         float f = ANIM_TICK.value(partialTick);
         float f1 = (float) (Math.pow(Math.cos(f * Math.PI / 2), 10) * Math.cos(f * Math.PI));
         f1 = Math.max(0, Math.min(f1, 1));
-        PoseStack poseStack = guiGraphics.pose();
+        Matrix3x2fStack matrix = guiGraphics.pose();
 
         boolean tab = f1 < 0.25F;
         //InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_TAB);
@@ -97,13 +93,12 @@ public class TBOverlays {
         x += 7;
         y += 19;
         if (f != 1) {
-            RenderSystem.enableBlend();
             guiGraphics.fill(x, y, x + 22, y + 22, ARGB.color((int) (f1 * 255 / 2), color));
             power.renderIcon(x + 3, y + 3, f1, mc, guiGraphics, partialTick);
             //guiGraphics.blit(TEXTURE, x + 3, y + 3, 0, 128, 16, 16, 256, 256);
 
-            poseStack.pushPose();
-            poseStack.scale(0.5F, 0.5F, 1F);
+            matrix.pushMatrix();
+            matrix.scale(0.5F, 0.5F);
             int newX = x * 4;
             int newY = y * 2 + 30;
             MutableComponent overlayKey = TheBoysClient.OVERLAY.getTranslatedKeyMessage().copy().withStyle(ClientUtil.BOLD_MINECRAFT);
@@ -111,11 +106,11 @@ public class TBOverlays {
                 guiGraphics.fill(newX, newY, newX + mc.font.width(overlayKey) + 8, newY + 16, ARGB.colorFromFloat(f1 * 0.5F, 0, 0, 0));
                 guiGraphics.drawString(mc.font, overlayKey, newX + 5, newY + 5, ARGB.color((int) (f1 * 255), textColor), true);
             }
-            poseStack.popPose();
+            matrix.popMatrix();
         }
         // Abilities icons and text
         if (f1 != 1 && size != 0) {
-            poseStack.pushPose();
+            matrix.pushMatrix();
 
             int type = Minecraft.getInstance().screen instanceof ChatScreen ? 0 : 2;
             int maxX = 94;
@@ -134,7 +129,7 @@ public class TBOverlays {
             }
 
             float f2 = Math.min(1.0f - f1, 0.5F) * 2F;
-            poseStack.translate(f1 * -(maxX + (type == 2 ? 30 : 0)), 0, 0);
+            matrix.translate((float) (f1 * -(maxX + (type == 2 ? 30 : 0))), 0.0F);
             //RenderSystem.setShaderColor(1, 1, 1, f2);
             guiGraphics.fill(x - 5, y + 2, x - 4, y + (type == 1 ? 20 : size * 20), ARGB.color((int) (f2 * 255), textColor));
 
@@ -162,11 +157,10 @@ public class TBOverlays {
                     float b = ARGB.blue(cBack) / 255F;
 
                     float alpha = !ability.isEnabled() ? 0.25F : 0.75F;
-                    RenderSystem.enableBlend();
-                    guiGraphics.blit(RenderType::guiTextured, TEXTURE, texX + 3, texY + 3, 0, 0, 16, 16, 256, 256, ARGB.colorFromFloat(alpha, r, g, b));
+                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, texX + 3, texY + 3, 0, 0, 16, 16, 256, 256, ARGB.colorFromFloat(alpha, r, g, b));
 
                     if (ability.isEnabled()) {
-                        guiGraphics.blit(RenderType::guiTextured, TEXTURE, texX + 2, texY + 2, 0, 16, 18, 18, 256, 256, ARGB.colorFromFloat(alpha, r, g, b));
+                        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, texX + 2, texY + 2, 0, 16, 18, 18, 256, 256, ARGB.colorFromFloat(alpha, r, g, b));
                     }
                 }
 
@@ -184,21 +178,19 @@ public class TBOverlays {
                         key = Component.literal(keyType == KeyMap.KeyType.MOUSE_RIGHT ? "RMB" : "LMB");
                     }
                     key = key.withStyle(ClientUtil.BOLD_MINECRAFT);
-                    poseStack.pushPose();
-                    poseStack.translate(0, 0, 10);
-                    poseStack.scale(0.5F, 0.5F, 1F);
+                    matrix.pushMatrix();
+                    matrix.scale(0.5F, 0.5F);
                     int newX = texX * 2 + 30;
                     int newY = texY * 2 + 30;
                     if (type == 1) {
                         newX = texX * 2 + 10 + 6 - mc.font.width(key) / 2;
                     }
                     guiGraphics.fill(newX, newY, newX + mc.font.width(key.getString().toUpperCase()) + 11, newY + 16, ARGB.colorFromFloat(127 * ((f2 == 0.25F ? 0.5F : 1F) * f2), 0, 0, 0));
-                    poseStack.translate(0, 0, 0);
                     guiGraphics.drawString(mc.font, key.getString().toUpperCase(), newX + 6, newY + 5, ARGB.color((int) (((f2 == 0.25F ? 0.5F : 1F) * f2) * 255), textColor), true);
-                    poseStack.popPose();
+                    matrix.popMatrix();
                 }
             }
-            poseStack.popPose();
+            matrix.popMatrix();
         }
     }
 
@@ -240,23 +232,8 @@ public class TBOverlays {
                     float timer = a.eyesTimer.value(partialTick);
                     int red = color.getRed(), green = color.getGreen(), blue = color.getBlue(), alpha = (int) (timer * 255);
 
-                    if (a.isEnabled() && TBConfig.CLIENT.heatVisionHardcored.get()) {
-                        float t = timer * 20;
-                        if (!(t < 1.0F)) {
-                            PostChain postChain = client.getShaderManager().getPostChain(ResourceLocation.withDefaultNamespace("blur"), LevelTargetBundle.MAIN_TARGETS);
-                            if (postChain != null) {
-                                postChain.setUniform("Radius", t);
-                                postChain.process(client.getMainRenderTarget(), ((GameRendererAccessor) client.gameRenderer).resourcePool());
-                            }
-                        }
-                        client.getMainRenderTarget().bindWrite(false);
-                    }
-                    RenderSystem.enableBlend();
-                    RenderSystem.defaultBlendFunc();
-                    RenderSystem.disableDepthTest();
-
                     int i = ARGB.color(alpha, red, green, blue);
-                    guiGraphics.blit(RenderType::guiTexturedOverlay, TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
+                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA, TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
                             guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight(), i);
                 }
             }
@@ -267,14 +244,14 @@ public class TBOverlays {
         Entity entity = Minecraft.getInstance().getCameraEntity();
         int left = width - 96;
         int top = height - 24;
-        PoseStack poseStack = guiGraphics.pose();
+        Matrix3x2fStack matrix = guiGraphics.pose();
         if (entity != null && entity.isAlive()) {
             for (SpeedAbility ability : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
                 float f = APPEAR_ANIM_TICK.value(partialTick);
                 float f1 = (float) (Math.pow(Math.cos(f * Math.PI / 2), 3) * Math.cos(f * Math.PI));
-                poseStack.pushPose();
-                poseStack.translate(f1 * 140.0F, 0, 0);
-                guiGraphics.blit(RenderType::guiTextured, A_TRAIN, left, top, 0, 0, 96, 24, 96, 48);
+                matrix.pushMatrix();
+                matrix.translate(f1 * 140.0F, 0.0F);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, A_TRAIN, left, top, 0, 0, 96, 24, 96, 48);
                 if (ability.isEnabled()) {
                     float u = 47.5F;
                     for (float multiplier : new float[]{0.25F, 0.375F, 0.5F, 0.625F, 0.75F, 0.875F, 1.0F}) {
@@ -284,7 +261,7 @@ public class TBOverlays {
                     }
                     ClientUtil.blit(guiGraphics, A_TRAIN, left, top, 0, 24, u * 0.75F, 24, u * 0.75F, 24, 96, 48, -1);
                 }
-                poseStack.popPose();
+                matrix.popMatrix();
                 break;
             }
 

@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -49,20 +50,17 @@ public class SynthesizerBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock())) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
+        if (!state.is(neighborBlock)) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof SynthesizerBlockEntity be) {
                 if (level instanceof ServerLevel) {
                     Containers.dropContents(level, pos, be);
                 }
-
-                super.onRemove(state, level, pos, newState, movedByPiston);
                 level.updateNeighbourForOutputSignal(pos, this);
-            } else {
-                super.onRemove(state, level, pos, newState, movedByPiston);
             }
         }
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
     }
 
     @Override
@@ -82,7 +80,7 @@ public class SynthesizerBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         } else {
             if (level.getBlockEntity(pos) instanceof SynthesizerBlockEntity e) {

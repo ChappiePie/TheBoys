@@ -3,5 +3,4 @@ accessible method net/minecraft/client/gui/components/AbstractSliderButton getSp
 accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleSprite ()Lnet/minecraft/resources/ResourceLocation;
 
 accessible method net/minecraft/world/level/block/LiquidBlock getFluidState (Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/material/FluidState;
-accessible field net/minecraft/world/item/component/ItemAttributeModifiers showInTooltip Z
 accessible method net/minecraft/client/renderer/LevelRenderer compileSections (Lnet/minecraft/client/Camera;)V

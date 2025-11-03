@@ -1,8 +1,5 @@
 package chappie.theboys.common.particle;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -10,11 +7,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.RisingParticle;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.state.QuadParticleRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -22,19 +20,19 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 public class LaserParticle extends RisingParticle {
 
     private final float rot, rotO;
     private final float pitch, pitchO;
 
-    public LaserParticle(int color, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, float pitch, float rot) {
-        super(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
+    public LaserParticle(int color, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, float pitch, float rot, TextureAtlasSprite sprite) {
+        super(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, sprite);
         this.lifetime = 20;
         this.pitchO = this.pitch = pitch;
         this.rotO = this.rot = rot;
@@ -49,10 +47,6 @@ public class LaserParticle extends RisingParticle {
         super.tick();
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.CUSTOM;
-    }
-
     public void move(double pX, double pY, double pZ) {
         this.setBoundingBox(this.getBoundingBox().move(pX, pY, pZ));
         this.setLocationFromBoundingbox();
@@ -61,6 +55,11 @@ public class LaserParticle extends RisingParticle {
     public float getQuadSize(float pScaleFactor) {
         float f = ((float) this.age + pScaleFactor) / (float) this.lifetime;
         return this.quadSize * (1.0F - f * f * 0.5F);
+    }
+
+    @Override
+    protected Layer getLayer() {
+        return Layer.TRANSLUCENT;
     }
 
     @Override
@@ -79,57 +78,49 @@ public class LaserParticle extends RisingParticle {
     }
 
     @Override
-    public void renderCustom(PoseStack poseStack, MultiBufferSource bufferSource, Camera pRenderInfo, float pPartialTicks) {
-        Vec3 vec3 = pRenderInfo.getPosition();
-        float rot = -Mth.lerp(pPartialTicks, this.rotO, this.rot) * ((float) Math.PI / 180F);
-        float pitch = (float) (Mth.lerp(pPartialTicks, this.pitchO, this.pitch) + Math.PI / 2F) * ((float) Math.PI / 180F);
-        float x = (float) (Mth.lerp(pPartialTicks, this.xo, this.x) - vec3.x());
-        float y = (float) (Mth.lerp(pPartialTicks, this.yo, this.y) - vec3.y());
-        float z = (float) (Mth.lerp(pPartialTicks, this.zo, this.z) - vec3.z());
-        Vector3f vec3f = (new Vector3f(0.5F, 0.5F, 0.5F)).normalize();
-        Quaternionf quaternionf = (new Quaternionf()).setAngleAxis(0.0F, vec3f.x(), vec3f.y(), vec3f.z());
-        quaternionf.rotationYXZ(rot, pitch, 0.0F);
+    public void extract(QuadParticleRenderState renderState, Camera camera, float partialTick) {
+        Vec3 cameraPos = camera.getPosition();
+        float interpRot = -Mth.lerp(partialTick, this.rotO, this.rot) * ((float) Math.PI / 180F);
+        float interpPitch = (float) (Mth.lerp(partialTick, this.pitchO, this.pitch) + Math.PI / 2F) * ((float) Math.PI / 180F);
+        float x = (float) (Mth.lerp(partialTick, this.xo, this.x) - cameraPos.x());
+        float y = (float) (Mth.lerp(partialTick, this.yo, this.y) - cameraPos.y());
+        float z = (float) (Mth.lerp(partialTick, this.zo, this.z) - cameraPos.z());
 
-        quaternionf.transform(new Vector3f(-1.0F, -1.0F, 0.0F));
-        Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
-        float f3 = this.getQuadSize(pPartialTicks);
+        Vec3 offset = new Vec3(x, y - 0.25F, z).add(new Vec3(0.0, 0.3, 0.0).yRot(interpRot));
+        float quadSize = this.getQuadSize(partialTick);
+        Quaternionf orientation = new Quaternionf().rotationYXZ(interpRot, interpPitch, 0.0F);
 
-        vec3 = new Vec3(x, y - 0.25F, z).add(new Vec3(0, 0.3, 0).yRot(rot));
-        for (Vector3f vector3f : avector3f) {
-            vector3f.rotate(quaternionf);
-            vector3f.mul(f3);
-            vector3f.add((float) vec3.x, (float) vec3.y, (float) vec3.z);
-        }
-        int j = this.getLightColor(pPartialTicks);
-
-        RenderType renderType = RenderType.entityTranslucentEmissive(TextureAtlas.LOCATION_PARTICLES);
-        VertexConsumer pBuffer = bufferSource.getBuffer(renderType);
-        RenderSystem.depthMask(true);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        this.makeCornerVertex(pBuffer, avector3f[0], this.getU1(), this.getV1(), j);
-        this.makeCornerVertex(pBuffer, avector3f[1], this.getU1(), this.getV0(), j);
-        this.makeCornerVertex(pBuffer, avector3f[2], this.getU0(), this.getV0(), j);
-        this.makeCornerVertex(pBuffer, avector3f[3], this.getU0(), this.getV1(), j);
-    }
-
-    private void makeCornerVertex(VertexConsumer pConsumer, Vector3f pVertex, float pU, float pV, int pPackedLight) {
-        pConsumer.addVertex(pVertex.x(), pVertex.y(), pVertex.z()).setColor(this.rCol, this.gCol, this.bCol, this.alpha * 0.5F).setUv(pU, pV)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(pPackedLight).setNormal(0, 1, 0);
+        renderState.add(
+                this.getLayer(),
+                (float) offset.x,
+                (float) offset.y,
+                (float) offset.z,
+                orientation.x,
+                orientation.y,
+                orientation.z,
+                orientation.w,
+                quadSize,
+                this.getU0(),
+                this.getU1(),
+                this.getV0(),
+                this.getV1(),
+                ARGB.colorFromFloat(this.alpha * 0.5F, this.rCol, this.gCol, this.bCol),
+                this.getLightColor(partialTick)
+        );
     }
 
     @Environment(EnvType.CLIENT)
     public record LaserParticleFactory(SpriteSet sprite) implements ParticleProvider<LaserParticleOptions> {
 
         @Override
-        public Particle createParticle(LaserParticleOptions pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        public Particle createParticle(LaserParticleOptions pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             float rot = 0, pitch = 0;
             if (pLevel.getEntity(pType.entityId()) instanceof LivingEntity e) {
                 rot = e.getYRot();
                 pitch = Math.min(e.getXRot(), 45);
             }
-            LaserParticle particle = new LaserParticle(pType.color(), pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, pitch, rot);
-            particle.pickSprite(this.sprite);
+            TextureAtlasSprite sprite = this.sprite.get(pLevel.random);
+            LaserParticle particle = new LaserParticle(pType.color(), pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, pitch, rot, sprite);
             particle.scale(2F);
 
             return particle;

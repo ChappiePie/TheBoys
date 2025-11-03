@@ -1,14 +1,19 @@
 package chappie.theboys.common.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
+import org.jetbrains.annotations.Nullable;
 
-public class WaterSplashParticle extends TextureSheetParticle {
+public class WaterSplashParticle extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     public WaterSplashParticle(ClientLevel clientLevel, double d, double e, double f, SpriteSet sprites) {
-        super(clientLevel, d, e, f);
+        super(clientLevel, d, e, f, sprites.get(0, 1));
         this.lifetime = 11;
         this.hasPhysics = false;
         this.gravity = -0.1F;
@@ -33,9 +38,9 @@ public class WaterSplashParticle extends TextureSheetParticle {
                 this.zd *= 1.1;
             }
 
-            this.xd = this.xd * (double)this.friction;
-            this.yd = this.yd * (double)this.friction;
-            this.zd = this.zd * (double)this.friction;
+            this.xd *= (double)this.friction;
+            this.yd *= (double)this.friction;
+            this.zd *= (double)this.friction;
             if (this.onGround) {
                 this.xd *= 0.7F;
                 this.zd *= 0.7F;
@@ -43,16 +48,16 @@ public class WaterSplashParticle extends TextureSheetParticle {
         }
     }
 
-
     @Override
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    protected SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
     public record Provider(SpriteSet sprite) implements ParticleProvider<SimpleParticleType> {
 
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-                return new WaterSplashParticle(level, x, y, z, this.sprite);
-            }
+        @Override
+        public @Nullable Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
+            return new WaterSplashParticle(level, x, y, z, this.sprite);
         }
+    }
 }

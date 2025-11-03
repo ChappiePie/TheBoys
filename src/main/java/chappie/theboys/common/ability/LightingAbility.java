@@ -13,8 +13,8 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -92,13 +92,15 @@ public class LightingAbility extends Ability implements IHasTimer {
             }
 
             @Override
-            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, MultiBufferSource bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
+            public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!(renderer.getModel() instanceof HumanoidModel model)) return;
                 for (int k = 0; k < 2; k++) {
                     poseStack.pushPose();
 
                     //VertexConsumer consumer = bufferSource.getBuffer(RenderType.lightning());
-                    model.translateToHand(k == 0 ? HumanoidArm.RIGHT : HumanoidArm.LEFT, poseStack);
+                    HumanoidArm arm = k == 0 ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
+                    model.root().translateAndRotate(poseStack);
+                    (arm == HumanoidArm.RIGHT ? model.rightArm : model.leftArm).translateAndRotate(poseStack);
                     if (k == 0) {
                         poseStack.mulPose(Axis.YP.rotationDegrees(180F));
                     }
@@ -115,15 +117,30 @@ public class LightingAbility extends Ability implements IHasTimer {
                     float f = timer.value(modelProperties.partialTicks());
                     float width = 0.05f;
                     float height = width;
-                    for (int i = 0; i < segments.size() - 1; i += 2) {
-                        var from = segments.get(i);
-                        var to = segments.get(i + 1);
-                        Color c = new Color(0, 156, 255);
-                        Color c1 = new Color(0, 226, 255);
-                        renderPart(from, to, width, height, poseStack, bufferIn.getBuffer(ClientUtil.ModRenderTypes.glow(WHITE)), 1, 1, 1, f);
-                        VertexConsumer consumer = bufferIn.getBuffer(RenderType.entityTranslucentEmissive(WHITE));
-                        renderPart(from, to, width + 0.1F, height + 0.1F, poseStack, consumer, c1.getRed() / 255F, c1.getGreen() / 255F, c1.getBlue() / 255F, 0.1F * f);
-                        renderPart(from, to, width + 0.2F, height + 0.2F, poseStack, consumer, c.getRed() / 255F, c.getGreen() / 255F, c.getBlue() / 255F, 0.1F * f);
+                    if (!segments.isEmpty()) {
+                        nodeCollector.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.glow(WHITE), (pose, consumer) -> {
+                            PoseStack renderStack = new PoseStack();
+                            renderStack.last().pose().set(pose.pose());
+                            renderStack.last().normal().set(pose.normal());
+                            for (int i = 0; i < segments.size() - 1; i += 2) {
+                                Vec3 from = segments.get(i);
+                                Vec3 to = segments.get(i + 1);
+                                renderPart(from, to, width, height, renderStack, consumer, 1, 1, 1, f);
+                            }
+                        });
+                        nodeCollector.submitCustomGeometry(poseStack, RenderType.entityTranslucentEmissive(WHITE), (pose, consumer) -> {
+                            PoseStack renderStack = new PoseStack();
+                            renderStack.last().pose().set(pose.pose());
+                            renderStack.last().normal().set(pose.normal());
+                            for (int i = 0; i < segments.size() - 1; i += 2) {
+                                Vec3 from = segments.get(i);
+                                Vec3 to = segments.get(i + 1);
+                                Color c = new Color(0, 156, 255);
+                                Color c1 = new Color(0, 226, 255);
+                                renderPart(from, to, width + 0.1F, height + 0.1F, renderStack, consumer, c1.getRed() / 255F, c1.getGreen() / 255F, c1.getBlue() / 255F, 0.1F * f);
+                                renderPart(from, to, width + 0.2F, height + 0.2F, renderStack, consumer, c.getRed() / 255F, c.getGreen() / 255F, c.getBlue() / 255F, 0.1F * f);
+                            }
+                        });
                     }
                     poseStack.popPose();
                 }

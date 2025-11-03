@@ -27,7 +27,7 @@ import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.manager.AnimatableManager;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -103,7 +103,7 @@ public class SyringeItem extends Item implements GeoItem {
                         b = true;
                     } else {
                         if (this.vialSuperpower(pStack).equals("compoundV")) {
-                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 3, false, true, true));
+                            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, 3, false, true, true));
                             if (!player.getAbilities().instabuild) {
                                 vial.remove(TBDataComponents.SUPERPOWER);
                             }

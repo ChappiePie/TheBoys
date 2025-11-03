@@ -39,7 +39,7 @@ public class SyringeAnim implements IHasTimer {
     }
 
     public void readFromNbt(CompoundTag tag) {
-        this.triggerAnim = tag.getBoolean("triggerAnim");
+        this.triggerAnim = tag.getBooleanOr("triggerAnim", false);
     }
 
     public CompoundTag writeToNbt() {

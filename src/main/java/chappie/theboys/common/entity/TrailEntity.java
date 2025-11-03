@@ -5,7 +5,6 @@ import chappie.theboys.client.renderer.TrailRenderState;
 import chappie.theboys.networking.client.ClientSpawnTrail;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,6 +12,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.awt.*;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class TrailEntity extends Entity {
         this.color = color;
         this.setYRot(attached.getYRot());
         this.setXRot(attached.getXRot());
-        this.moveTo(attached.position().add(Mth.sin(-attached.getYRot() * ((float) Math.PI / 180F)) * -0.25F, 0.0D, Mth.cos(attached.getYRot() * ((float) Math.PI / 180F)) * -0.25F));
+        this.setPos(attached.position().add(Mth.sin(-attached.getYRot() * ((float) Math.PI / 180F)) * -0.25F, 0.0D, Mth.cos(attached.getYRot() * ((float) Math.PI / 180F)) * -0.25F));
     }
 
     @Override
@@ -74,10 +75,12 @@ public class TrailEntity extends Entity {
         return true;
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
+    @Override
+    protected void readAdditionalSaveData(ValueInput input) {
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
     }
 
     public static void startTracking(Entity entity, ServerPlayer serverPlayer) {

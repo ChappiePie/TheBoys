@@ -27,9 +27,9 @@ public class EnergyChargingAbility extends Ability {
             int r = 15;
             for (BlockPos pos1 : BlockPos.betweenClosed(-r, -r, -r, r, r, r)) {
                 BlockPos pos = player.getOnPos().offset(pos1);
-                BlockState state = player.getCommandSenderWorld().getBlockState(pos);
+                BlockState state = player.level().getBlockState(pos);
                 if (state.getOptionalValue(BlockStateProperties.LIT).isPresent() && entity.tickCount % 8 == 0) {
-                    player.getCommandSenderWorld().setBlock(pos, state.cycle(BlockStateProperties.LIT), 2);
+                    player.level().setBlock(pos, state.cycle(BlockStateProperties.LIT), 2);
                 }
             }
         }

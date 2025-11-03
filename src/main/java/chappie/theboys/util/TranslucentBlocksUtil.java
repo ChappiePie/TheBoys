@@ -6,10 +6,12 @@ import chappie.theboys.common.ability.XRayAbility;
 import chappie.theboys.util.interfaces.IWithAlpha;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -17,6 +19,8 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
 
 public class TranslucentBlocksUtil {
 
@@ -54,8 +58,11 @@ public class TranslucentBlocksUtil {
                             RandomSource random = RandomSource.create();
                             if (pos instanceof IWithAlpha i) {
                                 i.theBoys$setAlpha(alpha);
+                                List<BlockModelPart> list = new ObjectArrayList<>();
+                                instance.getBlockModel(state).collectParts(random, list);
                                 Minecraft.getInstance().getBlockRenderer().getModelRenderer()
-                                        .tesselateBlock(level, instance.getBlockModel(state), state, pos, poseStack, consumer, true, random, state.getSeed(pos), OverlayTexture.NO_OVERLAY);
+                                        .tesselateBlock(level, list, state, pos, poseStack, consumer, true, OverlayTexture.NO_OVERLAY);
+                                list.clear();
                                 i.theBoys$setAlpha(-1.0F);
                                 return false;
                             }

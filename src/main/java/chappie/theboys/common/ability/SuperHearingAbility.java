@@ -91,9 +91,9 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
     @Override
     public void deserializeNBT(CompoundTag tag) {
         super.deserializeNBT(tag);
-        if (tag.contains("listener", 10)) {
+        if (tag.contains("listener")) {
             VibrationSystem.Data.CODEC
-                    .parse(new Dynamic<>(NbtOps.INSTANCE, tag.getCompound("listener")))
+                    .parse(new Dynamic<>(NbtOps.INSTANCE, tag.getCompound("listener").get()))
                     .resultOrPartial(TheBoys.LOGGER::error)
                     .ifPresent(data -> this.vibrationData = data);
         }

@@ -2,7 +2,7 @@ package chappie.theboys.mixin.client;
 
 import chappie.theboys.util.interfaces.IItemRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,10 +31,10 @@ public class LayerRenderStateMixin implements IItemRenderState {
         }
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V"))
-    private void renderStack(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, CallbackInfo ci) {
+    @Inject(method = "submit", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V"))
+    private void renderStack(PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLight, int packedOverlay, int outlineColor, CallbackInfo ci) {
         if (this.itemStackRenderState != null) {
-            this.itemStackRenderState.render(poseStack, bufferSource, packedLight, packedOverlay);
+            this.itemStackRenderState.submit(poseStack, nodeCollector, packedLight, packedOverlay, 0);
         }
     }
 }

@@ -37,7 +37,7 @@ public class SyringeVialAnim implements IHasTimer {
                 && mainHandItem.getItem() instanceof SyringeItem
                 && (offHandItem.getItem() instanceof VialItem || (this.reverse && !mainHandItem.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY).isEmpty() && offHandItem.isEmpty()));
         float timeline = this.timeline.value(1);
-        if (timeline == 1 && !entity.getCommandSenderWorld().isClientSide()) {
+        if (timeline == 1 && !entity.level().isClientSide()) {
             if (this.reverse) {
                 ItemStack itemStack = mainHandItem.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
                 entity.setItemInHand(InteractionHand.OFF_HAND, itemStack);
@@ -65,8 +65,8 @@ public class SyringeVialAnim implements IHasTimer {
     }
 
     public void readFromNbt(CompoundTag tag) {
-        this.triggerAnim = tag.getBoolean("triggerAnim");
-        this.reverse = tag.getBoolean("reverse");
+        this.triggerAnim = tag.getBooleanOr("triggerAnim", false);
+        this.reverse = tag.getBooleanOr("reverse", false);
     }
 
     public CompoundTag writeToNbt() {

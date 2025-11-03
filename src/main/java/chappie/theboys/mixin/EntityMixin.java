@@ -35,7 +35,7 @@ public abstract class EntityMixin implements EntitySavingFields {
     @Inject(method = "updateDynamicGameEventListener(Ljava/util/function/BiConsumer;)V", at = @At("TAIL"))
     public void mixin$updateDynamicGameEventListener(BiConsumer<DynamicGameEventListener<?>, ServerLevel> listenerConsumer, CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
-        if (entity.getCommandSenderWorld() instanceof ServerLevel serverLevel) {
+        if (entity.level() instanceof ServerLevel serverLevel) {
             for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(entity))) {
                 listenerConsumer.accept(a.dynamicGameEventListener, serverLevel);
             }

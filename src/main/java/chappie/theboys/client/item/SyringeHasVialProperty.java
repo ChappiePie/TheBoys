@@ -25,4 +25,9 @@ public record SyringeHasVialProperty() implements SelectItemModelProperty<Boolea
 	public SelectItemModelProperty.Type<SyringeHasVialProperty, Boolean> type() {
 		return TYPE;
 	}
+
+	@Override
+	public Codec<Boolean> valueCodec() {
+		return Codec.BOOL;
+	}
 }

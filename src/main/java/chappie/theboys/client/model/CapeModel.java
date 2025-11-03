@@ -8,11 +8,11 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import org.joml.Quaternionf;
 
-public class CapeModel extends Model {
+public class CapeModel extends Model<HumanoidRenderState> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Modulus.id("cape"), "main");
 
 	private final ModelPart cape = this.root.getChild("cape");
@@ -32,8 +32,9 @@ public class CapeModel extends Model {
 		return LayerDefinition.create(meshdefinition, 64, 32);
 	}
 
+	@Override
 	public void setupAnim(HumanoidRenderState renderState) {
-		if (renderState instanceof PlayerRenderState playerRenderState) {
+		if (renderState instanceof AvatarRenderState playerRenderState) {
 			this.cape.rotateBy(
 					new Quaternionf()
 							.rotateX((6.0F + playerRenderState.capeLean / 2.0F + playerRenderState.capeFlap) * (float) (Math.PI / 180.0))

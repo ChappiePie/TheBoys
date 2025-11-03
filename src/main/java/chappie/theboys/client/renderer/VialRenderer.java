@@ -1,65 +1,46 @@
 package chappie.theboys.client.renderer;
 
-import chappie.modulus.util.ClientUtil;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.item.VialItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
-import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
+import net.minecraft.world.item.ItemStack;
 import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.cache.object.GeoCube;
 import software.bernie.geckolib.model.DefaultedItemGeoModel;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
-import software.bernie.geckolib.util.RenderUtil;
-
-import java.util.Optional;
+import software.bernie.geckolib.renderer.base.GeoRenderState;
 
 public class VialRenderer extends GeoItemRenderer<VialItem> {
+
+    private ItemStack currentStack = ItemStack.EMPTY;
+    private int fluidColor = -1;
 
     public VialRenderer() {
         super(new DefaultedItemGeoModel<VialItem>(TheBoys.id("vial")).withAltTexture(TheBoys.id("syringe/3d")));
     }
 
     @Override
-    public RenderType getRenderType(VialItem animatable, ResourceLocation texture, @Nullable MultiBufferSource bufferSource, float partialTick) {
+    public RenderType getRenderType(GeoRenderState renderState, ResourceLocation texture) {
         return RenderType.entityTranslucent(texture);
     }
 
     @Override
-    public void renderRecursively(PoseStack poseStack, VialItem animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int renderColor) {
-        if (!bone.getName().equals("bone3")) {
-            super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
-        }
+    public void addRenderData(VialItem animatable, RenderData renderData, GeoRenderState renderState, float partialTick) {
+        this.currentStack = renderData.itemStack();
+        this.fluidColor = this.currentStack.getItem() instanceof VialItem ? VialItem.getColor(this.currentStack) : -1;
     }
 
     @Override
-    public void preRender(PoseStack poseStack, VialItem animatable, BakedGeoModel model, @Nullable MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int renderColor) {
-        super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, renderColor);
-        Optional<GeoBone> boneOptional = model.getBone("bone3");
-        int color = -1;
-        if (this.currentItemStack.getItem() instanceof VialItem) {
-            color = VialItem.getColor(this.currentItemStack);
+    public void renderBone(GeoRenderState renderState, PoseStack poseStack, GeoBone bone, VertexConsumer buffer, CameraRenderState cameraState, int packedLight, int packedOverlay, int renderColor) {
+        if ("bone3".equals(bone.getName())) {
+            int color = this.fluidColor != -1 ? ARGB.color(ARGB.alpha(renderColor), this.fluidColor) : renderColor;
+            super.renderBone(renderState, poseStack, bone, buffer, cameraState, packedLight, packedOverlay, color);
+            return;
         }
-        if (boneOptional.isPresent() && color != -1) {
-            GeoBone bone = boneOptional.get();
-            VertexConsumer vertexConsumer = ModelBakery.WATER_FLOW.buffer(bufferSource, ClientUtil.ModRenderTypes::glow);
-            poseStack.pushPose();
-            RenderUtil.prepMatrixForBone(poseStack, bone.getParent().getParent());
-            RenderUtil.prepMatrixForBone(poseStack, bone.getParent());
-            RenderUtil.prepMatrixForBone(poseStack, bone);
-            for (GeoCube cube : bone.getCubes()) {
-                poseStack.pushPose();
-                renderCube(poseStack, cube, vertexConsumer, packedLight, packedOverlay, ARGB.color(ARGB.alpha(renderColor), color));
-                poseStack.popPose();
-            }
-            bufferSource.getBuffer(this.getRenderType(animatable, this.getTextureLocation(animatable), bufferSource, partialTick));
-            poseStack.popPose();
-        }
+        super.renderBone(renderState, poseStack, bone, buffer, cameraState, packedLight, packedOverlay, renderColor);
     }
 }

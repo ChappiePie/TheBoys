@@ -1,9 +1,9 @@
 package chappie.theboys.common.capability;
 
 import chappie.theboys.TheBoys;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.component.ComponentV3;
@@ -42,12 +42,12 @@ public class TBEntityCap implements AutoSyncedComponent, CommonTickingComponent,
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        this.glowingTick = tag.getInt("glowingTick");
+    public void readData(ValueInput input) {
+        this.glowingTick = input.getIntOr("glowingTick", 0);
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        tag.putInt("glowingTick", this.glowingTick);
+    public void writeData(ValueOutput output) {
+        output.putInt("glowingTick", this.glowingTick);
     }
 }
