@@ -75,6 +75,7 @@ public class TrailEntity extends Entity {
         return new ClientSpawnTrail(this);
     }
 
+    @Environment(EnvType.CLIENT)
     @SuppressWarnings("unchecked")
     public void readSpawnData(int lifeTime, LivingEntity entity, Color color) {
         this.lifeTime = lifeTime;

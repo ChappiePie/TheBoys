@@ -1,5 +1,6 @@
 package chappie.theboys.networking.client;
 
+import chappie.modulus.networking.ModPacket;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.entity.TrailEntity;
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
@@ -20,7 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import java.awt.*;
 import java.util.UUID;
 
-public class ClientSpawnTrail implements FabricPacket, Packet<ClientGamePacketListener> {
+public class ClientSpawnTrail extends ModPacket implements Packet<ClientGamePacketListener> {
 
     public static final PacketType<ClientSpawnTrail> PACKET = PacketType.create(TheBoys.id("spawn_trail"), ClientSpawnTrail::new);
     public final TrailEntity entity;

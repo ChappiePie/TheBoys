@@ -21,15 +21,16 @@ import chappie.theboys.common.particle.LaserParticle;
 import chappie.theboys.common.particle.TBParticleTypes;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.util.TBConfig;
+import chappie.theboys.util.tooltip.ArmorTooltip;
+import chappie.theboys.util.tooltip.ClientArmorTooltip;
+import chappie.theboys.util.tooltip.ClientSuperpowerTooltip;
+import chappie.theboys.util.tooltip.SuperpowerTooltip;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -77,5 +78,15 @@ public class TheBoysClient implements ClientModInitializer {
         MenuScreens.register(TBMenus.SYNTHESIZER, SynthesizerScreen::new);
         BlockEntityRenderers.register(TBBlockEntities.SYNTHESIZER,
                 context -> new SynthesizerRenderer());
+
+        TooltipComponentCallback.EVENT.register(tooltip -> {
+            if (tooltip instanceof ArmorTooltip) {
+                return new ClientArmorTooltip((ArmorTooltip) tooltip);
+            }
+            if (tooltip instanceof SuperpowerTooltip) {
+                return new ClientSuperpowerTooltip((SuperpowerTooltip) tooltip);
+            }
+            return null;
+        });
     }
 }

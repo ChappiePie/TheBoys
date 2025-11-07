@@ -1,14 +1,14 @@
 package chappie.theboys.networking.server;
 
+import chappie.modulus.networking.ModPacket;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
-public class ServerSetEyeOptions implements FabricPacket {
+public class ServerSetEyeOptions extends ModPacket {
 
     public static final PacketType<ServerSetEyeOptions> PACKET = PacketType.create(TheBoys.id("server_set_eye_options"), ServerSetEyeOptions::new);
     public int eyesHeight;
@@ -29,7 +29,8 @@ public class ServerSetEyeOptions implements FabricPacket {
         return PACKET;
     }
 
-    public void write(FriendlyByteBuf buf) {
+    @Override
+    public void writeCopy(FriendlyByteBuf buf) {
         buf.writeInt(this.eyesHeight);
         buf.writeInt(this.eyesLength);
     }

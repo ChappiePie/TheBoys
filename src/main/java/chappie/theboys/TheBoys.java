@@ -47,14 +47,6 @@ public class TheBoys implements ModInitializer {
         ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, TBConfig.COMMON_SPEC);
 
         TBNetworking.registerMessages();
-        TooltipComponentCallback.EVENT.register(tooltip -> {
-            if (tooltip instanceof ArmorTooltip) {
-                return new ClientArmorTooltip((ArmorTooltip) tooltip);
-            }
-            if (tooltip instanceof SuperpowerTooltip) {
-                return new ClientSuperpowerTooltip((SuperpowerTooltip) tooltip);
-            }
-            return null;
-        });
+
     }
 }

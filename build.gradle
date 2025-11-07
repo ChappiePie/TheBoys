@@ -12,6 +12,12 @@ base {
 
 loom {
 	accessWidenerPath = file("src/main/resources/${project.archives_base_name}.accesswidener")
+	afterEvaluate {
+		def remapJarTask = tasks.named("remapJar")
+		remapJarTask.configure {
+			exclude "chappie/theboys/networking/server/ServerSetEyeOptions.class"
+		}
+	}
 }
 
 repositories {
