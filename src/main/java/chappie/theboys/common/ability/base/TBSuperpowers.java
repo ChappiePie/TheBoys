@@ -6,6 +6,7 @@ import chappie.modulus.common.ability.DamageResistanceAbility;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.AbilityType;
 import chappie.modulus.common.ability.base.Superpower;
+import chappie.modulus.common.ability.base.condition.Condition;
 import chappie.modulus.common.ability.base.condition.DoubleKeyCondition;
 import chappie.modulus.common.ability.base.condition.KeyCondition;
 import chappie.modulus.util.CommonUtil;
@@ -115,6 +116,7 @@ public class TBSuperpowers {
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
             AbilityBuilder.of("fish_swarm", TBAbilityTypes.FISH_SWARM)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(144)))
+                    .condition(a -> new Condition(a, (c) -> a.entity.isInWater()), "enabling")
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.HELD), "enabling"),
 
             AbilityBuilder.of("water_breathing", TBAbilityTypes.WATER_BREATHING).hide(),

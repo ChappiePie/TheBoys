@@ -53,8 +53,13 @@ public class TBOverlays {
 
     public static void renderHud(Minecraft mc, Gui gui, GuiGraphics guiGraphics, float partialTick, int width, int height) {
         Entity entity = mc.getCameraEntity();
-        if (!(entity instanceof LivingEntity e) || PowerCap.getCap(e) == null || !(PowerCap.getCap(e).getSuperpower() instanceof TBSuperpower power))
+        if (!(entity instanceof LivingEntity e)) {
             return;
+        }
+        PowerCap cap = PowerCap.getCap(e);
+        if (cap == null || !(cap.getSuperpower() instanceof TBSuperpower power)) {
+            return;
+        }
         // color of background
         int color = ARGB.color(127, 0x282828);
         int textColor = ARGB.color(200, 0xFFFFFF);
@@ -231,9 +236,16 @@ public class TBOverlays {
                     Color color = a.dataManager.get(TBCommonUtil.COLOR);
                     float timer = a.eyesTimer.value(partialTick);
                     int red = color.getRed(), green = color.getGreen(), blue = color.getBlue(), alpha = (int) (timer * 255);
+                    if (a.isEnabled() && TBConfig.CLIENT.heatVisionHardcored.get()) {
+                        float t = timer * 20;
+                        if (!(t < 1.0F)) {
+                            guiGraphics.blurBeforeThisStratum();
+                        }
+                    }
 
                     int i = ARGB.color(alpha, red, green, blue);
-                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA, TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
+                    guiGraphics.blit(RenderPipelines.GUI_TEXTURED
+                            , TBClientUtil.GLOW_EYES_OVERLAY, 0, 0, 0.0F, 0.0F,
                             guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight(), i);
                 }
             }

@@ -132,10 +132,10 @@ public class HeatVisionAbility extends GlowEyesAbility {
                         poseStack.scale(0.5F, 0.75F, 1);
                         poseStack.translate(x, -0.05, 0);
                         bufferIn.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.MAIN_LASER, (pose, vertexConsumer) ->
-                                ClientUtil.renderFilledBox(poseStack, vertexConsumer, box, 1F, 1F, 1F, f, packedLightIn));
+                                ClientUtil.renderFilledBox(pose.pose(), vertexConsumer, box, 1F, 1F, 1F, f, packedLightIn));
                         bufferIn.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.LASER, (PoseStack.Pose pose, VertexConsumer vertexConsumer) -> {
-                            ClientUtil.renderFilledBox(poseStack, vertexConsumer, box.inflate(0.015D), red, green, blue, f * 0.2F, packedLightIn);
-                            ClientUtil.renderFilledBox(poseStack, vertexConsumer, box.inflate(0.03D), red, green, blue, f * 0.2F, packedLightIn);
+                            ClientUtil.renderFilledBox(pose.pose(), vertexConsumer, box.inflate(0.015D), red, green, blue, f * 0.2F, packedLightIn);
+                            ClientUtil.renderFilledBox(pose.pose(), vertexConsumer, box.inflate(0.03D), red, green, blue, f * 0.2F, packedLightIn);
                         });
                         poseStack.popPose();
                     }

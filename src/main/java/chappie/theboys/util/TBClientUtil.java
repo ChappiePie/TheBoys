@@ -13,10 +13,15 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.component.DataComponents;
@@ -30,112 +35,58 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.Equippable;
 import org.joml.Vector3f;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 public class TBClientUtil {
 
     public static final ResourceLocation GLOW_EYES_OVERLAY = TheBoys.id("textures/gui/glow_eyes_overlay.png");
 
-    public static void copyHumanoidModelProperties(HumanoidModel<?> source, HumanoidModel<?> target) {
-        copyPartPose(source.root(), target.root());
-        copyPartPose(source.head, target.head);
-        copyPartPose(source.hat, target.hat);
-        copyPartPose(source.body, target.body);
-        copyPartPose(source.rightArm, target.rightArm);
-        copyPartPose(source.leftArm, target.leftArm);
-        copyPartPose(source.rightLeg, target.rightLeg);
-        copyPartPose(source.leftLeg, target.leftLeg);
-        if (source instanceof PlayerModel sourcePlayer && target instanceof PlayerModel targetPlayer) {
-            copyPartPose(sourcePlayer.leftSleeve, targetPlayer.leftSleeve);
-            copyPartPose(sourcePlayer.rightSleeve, targetPlayer.rightSleeve);
-            copyPartPose(sourcePlayer.leftPants, targetPlayer.leftPants);
-            copyPartPose(sourcePlayer.rightPants, targetPlayer.rightPants);
-            copyPartPose(sourcePlayer.jacket, targetPlayer.jacket);
-        }
+    public static final ArmorModelSet<ModelLayerLocation> SUIT = new ArmorModelSet<>(register("helmet"),
+            register("chestplate"),
+            register("leggings"),
+            register("boots"));
+
+    private static ModelLayerLocation register(String model) {
+        return new ModelLayerLocation(TheBoys.id("suit"), model);
     }
 
-    private static void copyPartPose(ModelPart source, ModelPart target) {
-        target.x = source.x;
-        target.y = source.y;
-        target.z = source.z;
-        target.xRot = source.xRot;
-        target.yRot = source.yRot;
-        target.zRot = source.zRot;
-        target.xScale = source.xScale;
-        target.yScale = source.yScale;
-        target.zScale = source.zScale;
-        target.visible = source.visible;
-        target.skipDraw = source.skipDraw;
+    public static ArmorModelSet<LayerDefinition> createArmorMeshSet() {
+        Supplier<MeshDefinition> meshCreator = () -> PlayerModel.createMesh(CubeDeformation.NONE, false);
+        MeshDefinition head = createMeshForParts(meshCreator, "head");
+        MeshDefinition body = createMeshForParts(meshCreator, "body", "left_arm", "right_arm");
+        MeshDefinition leggings = createMeshForParts(meshCreator, "left_leg", "right_leg", "body");
+        MeshDefinition boots = createMeshForParts(meshCreator, "left_leg", "right_leg");
+        return new ArmorModelSet<>(head, body, leggings, boots).map(md -> LayerDefinition.create(md, 64, 64));
+    }
+
+    private static MeshDefinition createMeshForParts(Supplier<MeshDefinition> meshCreator, String... partNames) {
+        MeshDefinition meshDefinition = meshCreator.get();
+        meshDefinition.getRoot().retainPartsAndChildren(Set.of(partNames));
+        return meshDefinition;
     }
 
     public static void setupArms(PlayerModel model, HumanoidArm side, PoseStack pPoseStack, SubmitNodeCollector renderTasks, int pCombinedLight, Player pPlayer, ModelPart pRendererArm, float partialTicks) {
         TheBoysCap cap = TheBoysCap.getCap(pPlayer);
         if (cap == null) return;
         float timeline = cap.vialAnim.timeline.value(partialTicks);
-        float t = Math.min(timeline, 0.5F) * 2F;
+        float injectionProgress = Math.min(timeline, 0.5F) * 2F;
 
-        boolean flag1 = side == HumanoidArm.RIGHT;
-        int i = flag1 ? 1 : -1;
+        boolean rightArm = side == HumanoidArm.RIGHT;
+        int armSign = rightArm ? 1 : -1;
         ItemStack stack = pPlayer.getMainArm() == side ? pPlayer.getMainHandItem() : pPlayer.getOffhandItem();
 
-        boolean vial = stack.getItem() == TBItems.VIAL || pPlayer.getMainArm() != side && timeline > 0;
+        boolean vial = isVialPose(pPlayer, side, stack, timeline);
         if (stack.getItem() == TBItems.SYRINGE || vial) {
-            pRendererArm.xRot = (float) Math.toRadians(-12.5F);
-            pRendererArm.yRot = (float) Math.toRadians(50F * i);
-            pRendererArm.zRot = (float) Math.toRadians(-30.5F * i);
-            pPoseStack.translate(-0.25 * i, 0.1, -0.1);
-
-
-            float t1 = Mth.sin(pPlayer.tickCount + partialTicks) * cap.vialAnim.rollVial.value(partialTicks);
-            float t2 = cap.vialAnim.insertVial.value(partialTicks) * 0.2F;
-            if (vial) {
-                t *= -i;
-                pRendererArm.xRot -= (float) (Math.toRadians(30F) * t) * -i;
-                pRendererArm.yRot += (float) (Math.toRadians(75.5F + t1) * t);
-                pRendererArm.zRot -= (float) (Math.toRadians(22.5F) * t);
-                pRendererArm.x += 0.6F * t;
-                pRendererArm.y -= (1.2F + t2) * t * -i;
-                pRendererArm.z -= (5.2F + t2) * t * -i;
-                t /= -i;
-            } else {
-                pRendererArm.yRot -= (float) (Math.toRadians(70F) * t * i);
-                pRendererArm.zRot += (float) (Math.toRadians(45F) * t * i);
-            }
-
-            if (!stack.isEmpty()) {
-                pPoseStack.pushPose();
-                pRendererArm.translateAndRotate(pPoseStack);
-                pPoseStack.mulPose(Axis.XN.rotationDegrees(90F + (vial ? -20 : 0)));
-                pPoseStack.mulPose(Axis.YN.rotationDegrees(180F + 11.25F * i));
-                pPoseStack.translate(-0.15 * i, 0, -0.4);
-                if (vial) {
-                    float f = 1.0F - 0.4F * t;
-                    pPoseStack.scale(f, f, f);
-                    pPoseStack.translate(0, 0.155 * t + t1 * 0.01F, 0);
-
-                    pPoseStack.mulPose(Axis.YN.rotationDegrees(t1 * 20));
-                }
-                Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(pPlayer, stack, flag1 ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, pPoseStack, renderTasks, pCombinedLight);
-                pPoseStack.popPose();
-            }
+            float vialRoll = Mth.sin(pPlayer.tickCount + partialTicks) * cap.vialAnim.rollVial.value(partialTicks);
+            float vialInsert = cap.vialAnim.insertVial.value(partialTicks) * 0.2F;
+            applyInjectionPose(pRendererArm, pPoseStack, armSign, vial, injectionProgress, vialRoll, vialInsert);
+            renderHeldInjectionItem(pPoseStack, renderTasks, pCombinedLight, pPlayer, pRendererArm, stack, rightArm, vial, injectionProgress, vialRoll, armSign);
         }
 
-        {
-            ItemStack chestStack = pPlayer.getItemBySlot(EquipmentSlot.CHEST);
-            if (!chestStack.isEmpty()) {
-                if (chestStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).getItem() instanceof SuitItem item) {
-                    PlayerModel playerModel = new PlayerModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER), CommonUtil.smallArms(pPlayer));
-                    copyHumanoidModelProperties(model, playerModel);
-                    item.getClientSuitProperties().setupSuitScale(playerModel, pPlayer, EquipmentSlot.CHEST, chestStack);
-                    ResourceLocation texture = item.getClientSuitProperties().suitTexture(EquipmentSlot.CHEST, chestStack, "");
-                    Vector3f vec3f = item.getClientSuitProperties().entityWearScale(EquipmentSlot.CHEST, stack);
-                    ClientUtil.modified(model.rightSleeve).modulus$setSize(vec3f);
-                    ClientUtil.modified(model.leftSleeve).modulus$setSize(vec3f);
-                    if (pRendererArm == model.rightArm) {
-                        renderTasks.submitModelPart(playerModel.rightArm, pPoseStack, RenderType.entityTranslucent(texture), pCombinedLight, OverlayTexture.NO_OVERLAY, null);
-                    } else {
-                        renderTasks.submitModelPart(playerModel.leftArm, pPoseStack, RenderType.entityTranslucent(texture), pCombinedLight, OverlayTexture.NO_OVERLAY, null);
-                    }
-                }
-            }
+        ItemStack chestStack = pPlayer.getItemBySlot(EquipmentSlot.CHEST);
+        if (!chestStack.isEmpty()) {
+            renderSuitSleeveIfPresent(model, pPoseStack, renderTasks, pCombinedLight, pPlayer, pRendererArm, chestStack);
         }
     }
 
@@ -167,6 +118,71 @@ public class TBClientUtil {
                     ClientUtil.modified(model.leftLeg).modulus$setSize(vec3f);
                 }
             }
+        }
+    }
+
+    private static boolean isVialPose(Player player, HumanoidArm side, ItemStack stack, float timeline) {
+        return stack.getItem() == TBItems.VIAL || player.getMainArm() != side && timeline > 0;
+    }
+
+    private static void applyInjectionPose(ModelPart arm, PoseStack poseStack, int armSign, boolean vial, float progress, float vialRoll, float vialInsert) {
+        arm.xRot = (float) Math.toRadians(-12.5F);
+        arm.yRot = (float) Math.toRadians(50F * armSign);
+        arm.zRot = (float) Math.toRadians(-30.5F * armSign);
+        poseStack.translate(-0.25 * armSign, 0.1, -0.1);
+
+        if (vial) {
+            arm.xRot -= (float) Math.toRadians(30F) * progress;
+            arm.yRot -= (float) Math.toRadians(75.5F + vialRoll) * progress * armSign;
+            arm.zRot += (float) Math.toRadians(22.5F) * progress * armSign;
+            arm.x -= 0.6F * progress * armSign;
+            arm.y -= (1.2F + vialInsert) * progress;
+            arm.z -= (5.2F + vialInsert) * progress;
+        } else {
+            arm.yRot -= (float) Math.toRadians(70F) * progress * armSign;
+            arm.zRot += (float) Math.toRadians(45F) * progress * armSign;
+        }
+    }
+
+    private static void renderHeldInjectionItem(PoseStack poseStack, SubmitNodeCollector renderTasks, int combinedLight, Player player, ModelPart arm, ItemStack stack, boolean rightArm, boolean vial, float progress, float vialRoll, int armSign) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        poseStack.pushPose();
+        arm.translateAndRotate(poseStack);
+        poseStack.mulPose(Axis.XN.rotationDegrees(90F + (vial ? -20 : 0)));
+        poseStack.mulPose(Axis.YN.rotationDegrees(180F + 11.25F * armSign));
+        poseStack.translate(-0.15 * armSign, 0, -0.4);
+        if (vial) {
+            float scale = 1.0F - 0.4F * progress;
+            poseStack.scale(scale, scale, scale);
+            poseStack.translate(0, 0.155 * progress + vialRoll * 0.01F, 0);
+            poseStack.mulPose(Axis.YN.rotationDegrees(vialRoll * 20));
+        }
+        Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(player, stack, rightArm ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, renderTasks, combinedLight);
+        poseStack.popPose();
+    }
+
+    private static void renderSuitSleeveIfPresent(PlayerModel model, PoseStack poseStack, SubmitNodeCollector renderTasks, int combinedLight, Player player, ModelPart rendererArm, ItemStack chestStack) {
+        ItemStack suitItemStack = chestStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
+        if (!(suitItemStack.getItem() instanceof SuitItem suitItem)) {
+            return;
+        }
+
+        HumanoidModel<HumanoidRenderState> suitModel = new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER));
+        suitModel.leftArm.loadPose(model.leftArm.storePose());
+        suitModel.rightArm.loadPose(model.rightArm.storePose());
+
+        suitItem.getClientSuitProperties().setupSuitScale(suitModel, player, EquipmentSlot.CHEST, chestStack);
+        Vector3f sleeveScale = suitItem.getClientSuitProperties().entityWearScale(EquipmentSlot.CHEST, chestStack);
+        RenderType renderType = RenderType.entityTranslucent(suitItem.getClientSuitProperties().suitTexture(EquipmentSlot.CHEST, chestStack, ""));
+
+        ClientUtil.modified(model.rightSleeve).modulus$setSize(sleeveScale);
+        ClientUtil.modified(model.leftSleeve).modulus$setSize(sleeveScale);
+        if (rendererArm == model.rightArm) {
+            renderTasks.submitModelPart(suitModel.rightArm, poseStack, renderType, combinedLight, OverlayTexture.NO_OVERLAY, null);
+        } else {
+            renderTasks.submitModelPart(suitModel.leftArm, poseStack, renderType, combinedLight, OverlayTexture.NO_OVERLAY, null);
         }
     }
 }

@@ -19,6 +19,7 @@ import chappie.theboys.util.timers.SyringeVialAnim;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.ClientAvatarState;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -234,9 +235,9 @@ public class ClientEvents {
 
             if (entity instanceof AbstractClientPlayer clientPlayer && !clientPlayer.isSprinting()) {
                 var avatarState = clientPlayer.avatarState();
-                d0 += avatarState.getInterpolatedCloakX(partialTicks) - clientPlayer.getX();
-                d1 += avatarState.getInterpolatedCloakY(partialTicks) - clientPlayer.getY();
-                d2 += avatarState.getInterpolatedCloakZ(partialTicks) - clientPlayer.getZ();
+                d0 += avatarState.getInterpolatedCloakX(partialTicks);
+                d1 += avatarState.getInterpolatedCloakY(partialTicks);
+                d2 += avatarState.getInterpolatedCloakZ(partialTicks);
             }
 
             float f = ability.timer.value(partialTicks);
@@ -272,7 +273,7 @@ public class ClientEvents {
 
     public static void renderHeatVisionFP(InteractionHand hand, float partialTicks, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight) {
         Minecraft mc = Minecraft.getInstance();
-        AbstractClientPlayer player = mc.player;
+        LocalPlayer player = mc.player;
         TheBoysCap cap = TheBoysCap.getCap(player);
         if (player == null || cap == null || !mc.options.getCameraType().isFirstPerson() || hand == InteractionHand.OFF_HAND)
             return;
@@ -283,14 +284,12 @@ public class ClientEvents {
             if (f == 0) continue;
             // remove bob
             {
-                var avatarState = player.avatarState();
-                float walkForward = avatarState.getInterpolatedWalkDistance(partialTicks);
-                float walkBackward = avatarState.getBackwardsInterpolatedWalkDistance(partialTicks);
-                float f1 = -(walkForward + (walkForward - walkBackward));
-                float f2 = avatarState.getInterpolatedBob(partialTicks);
-                poseStack.mulPose(Axis.XN.rotationDegrees(Math.abs(Mth.cos(f1 * (float) Math.PI - 0.2F) * f2) * 5.0F));
-                poseStack.mulPose(Axis.ZN.rotationDegrees(Mth.sin(f1 * (float) Math.PI) * f2 * 3.0F));
-                poseStack.translate(-(Mth.sin(f1 * (float) Math.PI) * f2 * 0.5F), Math.abs(Mth.cos(f1 * (float) Math.PI) * f2), 0.0F);
+                ClientAvatarState clientAvatarState = player.avatarState();
+                float f1 = clientAvatarState.getBackwardsInterpolatedWalkDistance(partialTicks);
+                float g = clientAvatarState.getInterpolatedBob(partialTicks);
+                poseStack.mulPose(Axis.XN.rotationDegrees(Math.abs(Mth.cos(f1 * (float) Math.PI - 0.2F) * g) * 5.0F));
+                poseStack.mulPose(Axis.ZN.rotationDegrees(Mth.sin(f1 * (float) Math.PI) * g * 3.0F));
+                poseStack.translate(-Mth.sin(f1 * (float) Math.PI) * g * 0.5F, Math.abs(Mth.cos(f1 * (float) Math.PI) * g), 0.0F);
             }
             Color color = a.dataManager.get(TBCommonUtil.COLOR);
             HitResult hitResult = CommonUtil.pick(player, a.dataManager.get(HeatVisionAbility.DISTANCE));
@@ -303,12 +302,11 @@ public class ClientEvents {
                 AABB box = new AABB(f1, -0.25, -0.15F, 0, -0.25, -0.15F + -distance * f).inflate(0.03D);
                 poseStack.pushPose();
                 poseStack.translate(f1 + (TBConfig.CLIENT.heatVisionHardcored.get() ? 0 : f1), 0.25, 0);
-                submitNodeCollector.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.MAIN_LASER, (pose, buffer) -> {
-                    ClientUtil.renderFilledBox(poseStack, buffer, box, 1F, 1F, 1F, f, packedLight);
-                });
+                submitNodeCollector.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.MAIN_LASER, (pose, buffer) ->
+                        ClientUtil.renderFilledBox(pose.pose(), buffer, box, 1F, 1F, 1F, f, packedLight));
                 submitNodeCollector.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.LASER, (pose, buffer) -> {
-                    ClientUtil.renderFilledBox(poseStack, buffer, box.inflate(0.015D), red, green, blue, f * 0.2F, packedLight);
-                    ClientUtil.renderFilledBox(poseStack, buffer, box.inflate(0.03D), red, green, blue, f * 0.2F, packedLight);
+                    ClientUtil.renderFilledBox(pose.pose(), buffer, box.inflate(0.015D), red, green, blue, f * 0.2F, packedLight);
+                    ClientUtil.renderFilledBox(pose.pose(), buffer, box.inflate(0.03D), red, green, blue, f * 0.2F, packedLight);
                 });
                 poseStack.popPose();
             }

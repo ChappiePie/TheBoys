@@ -6,7 +6,7 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.item.suit.SuitItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
@@ -16,6 +16,7 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 public class ClientSuitProperties {
@@ -49,52 +50,34 @@ public class ClientSuitProperties {
     public void render(PoseStack pPoseStack, SubmitNodeCollector submitNodeCollector, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {
     }
 
-    public void renderSuitModel(PlayerModel suitModel, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, HumanoidRenderState renderState, EquipmentSlot slot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> pModel, float alpha) {
-        RenderType type = RenderType.entityTranslucent(this.suitTexture(slot, armorStack, ""));
-        submitNodeCollector.submitCustomGeometry(poseStack, type, (pose, vertexConsumer) -> {
-            suitModel.renderToBuffer(poseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F));
-        });
+    public void renderSuitModel(HumanoidModel<HumanoidRenderState> suitModel, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, HumanoidRenderState renderState, EquipmentSlot slot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> pModel, float alpha) {
+        submitNodeCollector.submitModel(
+                suitModel,
+                renderState,
+                poseStack,
+                RenderType.entityTranslucent(this.suitTexture(slot, armorStack, "")),
+                pPackedLight,
+                OverlayTexture.NO_OVERLAY,
+                ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F),
+                null,
+                renderState.outlineColor,
+                null
+        );
     }
 
-    public <S extends HumanoidRenderState> void setupSuitScale(PlayerModel model, Entity entity, EquipmentSlot slot, ItemStack armorItem) {
+    public void setupSuitScale(HumanoidModel<?> model, @Nullable Entity entity, EquipmentSlot slot, ItemStack armorItem) {
         ClientUtil.modifyAllParts(model, (part, iPart) -> {
             Vector3f vec = this.suitScale(slot, armorItem);
             iPart.modulus$setSize(vec);
             if (CommonUtil.smallArms(entity)) {
-                if (part == model.rightArm || part == model.rightSleeve) {
+                ModelPart rightSleeve = model.rightArm.hasChild("right_sleeve") ? model.rightArm.getChild("right_sleeve") : null;
+                ModelPart leftSleeve = model.leftArm.hasChild("left_sleeve") ? model.leftArm.getChild("left_sleeve") : null;
+                if (part == model.rightArm || part == rightSleeve) {
                     iPart.modulus$setSizeAndPos(vec.add(-0.5F, 0, 0), new Vector3f(0.5F, 0, 0));
-                } else if (part == model.leftArm || part == model.leftSleeve) {
+                } else if (part == model.leftArm || part == leftSleeve) {
                     iPart.modulus$setSizeAndPos(vec.add(-0.5F, 0, 0), new Vector3f(-0.5F, 0, 0));
                 }
             }
         });
-        model.setAllVisible(false);
-        switch (slot) {
-            case HEAD:
-                model.head.visible = true;
-                model.hat.visible = true;
-                break;
-            case CHEST:
-                model.body.visible = true;
-                model.jacket.visible = true;
-                model.rightArm.visible = true;
-                model.rightSleeve.visible = true;
-                model.leftArm.visible = true;
-                model.leftSleeve.visible = true;
-                break;
-            case LEGS:
-                model.body.visible = true;
-                model.jacket.visible = true;
-                model.rightLeg.visible = true;
-                model.rightPants.visible = true;
-                model.leftLeg.visible = true;
-                model.leftPants.visible = true;
-                break;
-            case FEET:
-                model.rightLeg.visible = true;
-                model.rightPants.visible = true;
-                model.leftLeg.visible = true;
-                model.leftPants.visible = true;
-        }
     }
 }

@@ -50,6 +50,11 @@ public class SynthesizerBlock extends BaseEntityBlock {
     }
 
     @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
+    }
+
+    @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
         if (!state.is(neighborBlock)) {
             BlockEntity blockEntity = level.getBlockEntity(pos);

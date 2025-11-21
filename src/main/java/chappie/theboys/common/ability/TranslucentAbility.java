@@ -6,9 +6,7 @@ import chappie.modulus.common.ability.base.AbilityClientProperties;
 import chappie.modulus.util.IHasTimer;
 import chappie.modulus.util.events.RendererChangeCallback;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.List;
@@ -36,23 +34,12 @@ public class TranslucentAbility extends Ability implements IHasTimer {
                 return this.alphaChange(event);
             }
 
-            @SuppressWarnings("unchecked")
             public <T extends LivingEntityRenderState> boolean alphaChange(RendererChangeCallback.RendererChangeEvent<? extends LivingEntity, T, ? extends EntityModel<? super LivingEntityRenderState>> event) {
                 AbilityClientProperties.super.rendererChange(event);
                 float alpha = getAlpha(event.modelProperties().partialTicks());
 
                 if (alpha < 1) {
-                    RenderType renderType = RenderType.entityTranslucentEmissive(event.renderer().getTextureLocation((T) event.modelProperties().renderstate()));
-                    event.submitNodeCollector().submitModel(
-                            event.renderer().getModel(),
-                            (T) event.modelProperties().renderstate(),
-                            event.poseStack(),
-                            renderType,
-                            event.packedLight(),
-                            event.packedOverlay(),
-                            ARGB.colorFromFloat((event.alpha() / 255F) * alpha, event.red() / 255F, event.green() / 255F, event.blue() / 255F),
-                            null
-                    );
+                    event.submitTranslucent((int) (alpha * 255));
                     return true;
                 }
                 return false;

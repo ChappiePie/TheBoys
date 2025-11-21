@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Minecraft.class)
@@ -43,8 +44,20 @@ public class MinecraftMixin implements ISetupGameProfiles {
         }
     }
 
-    @WrapOperation(method = "handleKeybinds()V", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 2))
+    @WrapOperation(
+            method = "handleKeybinds()V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z"),
+            slice = @Slice(
+                    from = @At(
+                            value = "FIELD",
+                            target = "Lnet/minecraft/client/Options;keySwapOffhand:Lnet/minecraft/client/KeyMapping;"
+                    ),
+                    to = @At(
+                            value = "FIELD",
+                            target = "Lnet/minecraft/client/Options;keyDrop:Lnet/minecraft/client/KeyMapping;"
+                    )
+            )
+    )
     private boolean cancelSwapSlots(KeyMapping instance, Operation<Boolean> original) {
         TheBoysCap cap = TheBoysCap.getCap(Minecraft.getInstance().player);
         if (cap != null && cap.vialAnim.timeline.value(ClientUtil.getPartialTick()) > 0) {

@@ -48,8 +48,19 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
                 cape.xRot -= (float) ((cape.xRot - Math.toRadians(170)) * t);
             }
             pPoseStack.scale(0.85F, 0.85F, 0.85F);
-            submitNodeCollector.submitCustomGeometry(pPoseStack, this.renderType(), ((pose, vertexConsumer) ->
-                    this.model.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, ARGB.color((int) (alpha * 255), 255, 255, 255))));
+
+            submitNodeCollector.submitModel(
+                    this.model,
+                    renderState,
+                    pPoseStack,
+                    this.renderType(),
+                    pPackedLight,
+                    OverlayTexture.NO_OVERLAY,
+                    ARGB.color((int) (alpha * 255), 255, 255, 255),
+                    null,
+                    renderState.outlineColor,
+                    null
+            );
             pPoseStack.popPose();
         }
     }

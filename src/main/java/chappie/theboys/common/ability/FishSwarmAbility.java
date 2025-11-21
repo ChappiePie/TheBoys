@@ -47,35 +47,32 @@ public class FishSwarmAbility extends Ability implements IHasTimer {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (enabled && entity.isInWater()) {
+        if (enabled) {
             Level level = entity.level();
             BlockPos playerPos = entity.blockPosition();
             double waterSurfaceY = entity.getY();
-
+            BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
             for (int y = 0; y <= 10; y++) {
-                BlockPos checkPos = playerPos.above(y);
-                if (level.getFluidState(checkPos).is(FluidTags.WATER) &&
-                        !level.getFluidState(checkPos.above()).is(FluidTags.WATER)) {
-                    waterSurfaceY = checkPos.getY() + 1.0;
+                mutableBlockPos.set(playerPos.getX(), playerPos.getY() + y, playerPos.getZ());
+                if (level.getFluidState(mutableBlockPos).is(FluidTags.WATER) && !level.getFluidState(mutableBlockPos.above()).is(FluidTags.WATER)) {
+                    waterSurfaceY = mutableBlockPos.getY() + 1.0D;
                     break;
                 }
             }
 
-            double distanceToSurface = waterSurfaceY - Math.ceil(entity.getY() + (entity.isCrouching() ? -0.75F : 0));
-            double verticalMotion = distanceToSurface > 2.0 ? 0.2 :
-                    distanceToSurface > 0.5 ? 0.12 :
-                            distanceToSurface > 0 ? 0.08 :
-                                    distanceToSurface < -0.7 ? -0.05 : 0.02;
+            double immersionDepth = entity.isCrouching() ? 0.15D : 0.35D;
+            double time = entity.tickCount;
+            double bob = Math.sin(time * 0.25D) * 0.08D;
+            double targetY = waterSurfaceY - immersionDepth + bob;
+            double verticalMotion = Mth.clamp((targetY - entity.getY()) * 0.5D, -0.25D, 0.18D);
 
-            entity.setDeltaMovement(Vec3.directionFromRotation(0, entity.getYRot()).multiply(0.75, 0, 0.75)
-                    .add(0, verticalMotion, 0));
-            CommonUtil.spawnParticleForAll(this.entity.level(),
-                    TBParticleTypes.WATER_SPLASH,
-                    true, entity.position().add(0, 0.4F, 0), new Vec3(1, 0.2, 1), 1F, 2);
+            Vec3 forward = Vec3.directionFromRotation(0, entity.getYRot()).scale(0.75D);
+            Vec3 strafe = Vec3.directionFromRotation(0, entity.getYRot() + 90.0F).scale(Math.sin(time * 0.35D) * 0.08D);
+            entity.setDeltaMovement(forward.add(strafe).add(0, verticalMotion, 0));
 
-            CommonUtil.spawnParticleForAll(this.entity.level(),
-                    TBParticleTypes.WATER_SPLASH,
-                    true, entity.position().add(0, 0.4F, 0), new Vec3(0, 0, 0), 1F, 5);
+            Vec3 splashPos = entity.position().add(0, 0.4F, 0);
+            CommonUtil.spawnParticleForAll(level, TBParticleTypes.WATER_SPLASH, true, splashPos, new Vec3(1, 0.2, 1), 1F, 2);
+            CommonUtil.spawnParticleForAll(level, TBParticleTypes.WATER_SPLASH, true, splashPos, Vec3.ZERO, 1F, 5);
         }
     }
 

@@ -32,15 +32,17 @@ public class CapeModel extends Model<HumanoidRenderState> {
 		return LayerDefinition.create(meshdefinition, 64, 32);
 	}
 
-	@Override
-	public void setupAnim(HumanoidRenderState renderState) {
-		if (renderState instanceof AvatarRenderState playerRenderState) {
-			this.cape.rotateBy(
-					new Quaternionf()
-							.rotateX((6.0F + playerRenderState.capeLean / 2.0F + playerRenderState.capeFlap) * (float) (Math.PI / 180.0))
-							.rotateZ(playerRenderState.capeLean2 / 2.0F * (float) (Math.PI / 180.0))
-							.rotateY((180.0F - playerRenderState.capeLean2 / 2.0F) * (float) (Math.PI / 180.0))
-			);
-		}
-	}
+    @Override
+    public void setupAnim(HumanoidRenderState renderState) {
+        super.setupAnim(renderState);
+        if (renderState instanceof AvatarRenderState playerRenderState) {
+            this.cape.rotateBy(
+                    new Quaternionf()
+                            .rotateX((6.0F + playerRenderState.capeLean / 2.0F + playerRenderState.capeFlap) * (float) (Math.PI / 180.0))
+                            .rotateZ(playerRenderState.capeLean2 / 2.0F * (float) (Math.PI / 180.0))
+                            .rotateY((180.0F - playerRenderState.capeLean2 / 2.0F) * (float) (Math.PI / 180.0))
+            );
+        }
+    }
+
 }

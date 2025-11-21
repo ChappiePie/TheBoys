@@ -39,8 +39,8 @@ public class FlightAbility extends Ability implements IHasTimer {
 
     public final Timer timer = new Timer(() -> 5, this::isEnabled);
     public final Timer sprintingTimer = new Timer(() -> 10, () -> this.isEnabled() && this.dataManager.get(SPRINTING));
-    public final Timer forwardTimer = new Timer(() -> 5, () -> this.isEnabled() && this.dataManager.get(FORWARD_IMPULSE) > 0);
-    public final Timer backwardTimer = new Timer(() -> 5, () -> this.isEnabled() && this.dataManager.get(FORWARD_IMPULSE) < 0);
+    public final Timer forwardTimer = new Timer(() -> 7, () -> this.isEnabled() && this.dataManager.get(FORWARD_IMPULSE) > 0);
+    public final Timer backwardTimer = new Timer(() -> 7, () -> this.isEnabled() && this.dataManager.get(FORWARD_IMPULSE) < 0);
 
     public final Cooldown cooldown = new Cooldown();
 
@@ -213,46 +213,53 @@ public class FlightAbility extends Ability implements IHasTimer {
             LivingEntity entity = event.entity();
             var properties = event.modelProperties();
             HumanoidModel<?> model = event.model();
-            float f = this.ability.timer.value(properties.partialTicks());
-            float f1 = this.ability.forwardTimer.value(properties.partialTicks());
-            float f2 = this.ability.backwardTimer.value(properties.partialTicks());
-            float f3 = this.ability.sprintingTimer.value(properties.partialTicks()) * f;
-            float f4 = 1.0F - (f1 + f2) / 2.0F;
-            float toRad = (float) Math.toRadians(f);
-            if (!(event.state() instanceof ArmedEntityRenderState state)) return;
-            float bob = Mth.sin(state.ageInTicks * 0.067F) * 0.05F;
+            float partialTicks = properties.partialTicks();
+            float flight = this.ease(this.ability.timer.value(partialTicks));
+            if (flight <= 0.001F) return;
 
+            float forward = this.ease(this.ability.forwardTimer.value(partialTicks));
+            float backward = this.ease(this.ability.backwardTimer.value(partialTicks));
+            float sprint = this.ease(this.ability.sprintingTimer.value(partialTicks)) * flight;
+            float baseBlend = this.ease(Mth.clamp(1.0F - (forward + backward) / 2.0F, 0.0F, 1.0F));
+            float toRad = Mth.DEG_TO_RAD * flight;
+            if (!(event.state() instanceof ArmedEntityRenderState state)) return;
+            float bob = Mth.sin(state.ageInTicks * 0.067F) * 0.05F * flight;
 
             boolean right = !entity.isUsingItem() && state.rightArmPose == HumanoidModel.ArmPose.EMPTY && !state.leftArmPose.isTwoHanded();
             boolean left = !entity.isUsingItem() && state.leftArmPose == HumanoidModel.ArmPose.EMPTY && !state.rightArmPose.isTwoHanded();
 
-            model.head.xRot /= 1 + f;
-            model.head.xRot += bob * f;
-            model.body.y -= bob * 4F * f;
-            float f5 = (1.0F - this.ability.sprintingTimer.value(properties.partialTicks())) * f;
+            model.head.xRot /= 1 + flight;
+            model.head.xRot += bob;
+            model.body.y -= bob * 4F;
+            float relax = (1.0F - sprint / Math.max(flight, 0.001F)) * flight;
             if (right) {
-                model.rightArm.xRot += bob * 3.0F * f5;
+                model.rightArm.xRot += bob * 3.0F * relax;
             }
             if (left) {
-                model.leftArm.xRot += bob * 3.0F * f5;
+                model.leftArm.xRot += bob * 3.0F * relax;
             }
-            model.rightLeg.xRot -= model.rightLeg.xRot * f;
-            model.rightLeg.xRot += bob * f;
-            model.leftLeg.xRot -= model.leftLeg.xRot * f;
-            model.leftLeg.xRot -= bob * f;
+            model.rightLeg.xRot -= model.rightLeg.xRot * flight;
+            model.rightLeg.xRot += bob;
+            model.leftLeg.xRot -= model.leftLeg.xRot * flight;
+            model.leftLeg.xRot -= bob;
 
-            if (f4 != 0) {
-                this.setupBaseAnim(model, toRad * f4, right, left);
+            if (baseBlend > 0.001F) {
+                this.setupBaseAnim(model, toRad * baseBlend, right, left);
             }
-            if (f1 != 0) {
-                this.setupForwardAnim(model, f1, f4, toRad * f1, right, left);
+            if (forward > 0.001F) {
+                this.setupForwardAnim(model, forward, baseBlend, toRad * forward, right, left);
             }
-            if (f2 != 0) {
-                this.setupBackwardAnim(model, toRad * f2, right, left);
+            if (backward > 0.001F) {
+                this.setupBackwardAnim(model, toRad * backward, right, left);
             }
-            if (f3 != 0) {
-                this.setupSprintingAnim(model, properties.partialTicks(), f3, toRad * f3, right, left);
+            if (sprint > 0.001F) {
+                this.setupSprintingAnim(model, partialTicks, sprint, toRad * sprint, right, left);
             }
+        }
+
+        private float ease(float value) {
+            value = Mth.clamp(value, 0.0F, 1.0F);
+            return value * value * (3.0F - 2.0F * value);
         }
 
         public void setupBaseAnim(HumanoidModel<?> model, float toRad, boolean right, boolean left) {

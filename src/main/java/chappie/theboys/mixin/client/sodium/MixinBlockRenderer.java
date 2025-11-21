@@ -4,7 +4,6 @@ import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.XRayAbility;
 import chappie.theboys.util.TranslucentBlocksUtil;
-import chappie.theboys.util.interfaces.IWithAlpha;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.caffeinemc.mods.sodium.client.render.chunk.terrain.material.DefaultMaterials;
@@ -59,7 +58,7 @@ public abstract class MixinBlockRenderer extends AbstractBlockRenderContext {
                             float alpha = (float) (vec.distanceTo(Vec3.atCenterOf(pos)) / (distantMul + 1));
                             alpha = (1f - Math.max(0.5F, Math.min(alpha, 1F))) * t;
                             alpha = 1.0F - alpha;
-                            if (alpha != 1 && pos instanceof IWithAlpha i) {
+                            if (alpha != 1) {
                                 a = (int) (alpha * 255);
                                 break;
                             }

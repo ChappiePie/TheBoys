@@ -19,29 +19,35 @@ import chappie.theboys.common.particle.LaserParticle;
 import chappie.theboys.common.particle.TBParticleTypes;
 import chappie.theboys.common.particle.WaterSplashParticle;
 import chappie.theboys.networking.TBNetworking;
+import chappie.theboys.util.TBClientUtil;
 import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.conditional.HasVialDataProperty;
 import chappie.theboys.util.tooltip.ArmorTooltip;
 import chappie.theboys.util.tooltip.ClientArmorTooltip;
 import chappie.theboys.util.tooltip.ClientSuperpowerTooltip;
 import chappie.theboys.util.tooltip.SuperpowerTooltip;
+import com.google.common.collect.ImmutableMap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.client.color.item.ItemTintSources;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.item.properties.conditional.ConditionalItemModelProperties;
 import net.minecraft.world.entity.player.Player;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Map;
 
 public class TheBoysClient implements ClientModInitializer {
 
@@ -55,6 +61,11 @@ public class TheBoysClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ItemTintSources.ID_MAPPER.put(TheBoys.id("vial"), VialTintSource.MAP_CODEC);
+        ImmutableMap.Builder<ModelLayerLocation, LayerDefinition> builder = ImmutableMap.builder();
+        TBClientUtil.SUIT.putFrom(TBClientUtil.createArmorMeshSet(), builder);
+        for (Map.Entry<ModelLayerLocation, LayerDefinition> value : builder.build().entrySet()) {
+            EntityModelLayerRegistry.registerModelLayer(value.getKey(), value::getValue);
+        }
         EntityModelLayerRegistry.registerModelLayer(CapeModel.LAYER_LOCATION, CapeModel::createBodyLayer);
         TBNetworking.registerClientMessages();
         KeyBindingHelper.registerKeyBinding(OVERLAY);
@@ -69,7 +80,7 @@ public class TheBoysClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(TBOverlays::clientTick);
         ParticleFactoryRegistry.getInstance().register(TBParticleTypes.LASER, LaserParticle.LaserParticleFactory::new);
         ParticleFactoryRegistry.getInstance().register(TBParticleTypes.WATER_SPLASH, WaterSplashParticle.Provider::new);
-        EntityRendererRegistry.register(TBEntities.TRAIL, TrailRenderer::new);
+        EntityRenderers.register(TBEntities.TRAIL, TrailRenderer::new);
 
         ConditionalItemModelProperties.ID_MAPPER.put(TheBoys.id("has_vial"), HasVialDataProperty.MAP_CODEC);
 
@@ -77,14 +88,8 @@ public class TheBoysClient implements ClientModInitializer {
         BlockEntityRenderers.register(TBBlockEntities.SYNTHESIZER,
                 (context) -> new SynthesizerRenderer());
 
-        TooltipComponentCallback.EVENT.register(tooltip -> {
-            if (tooltip instanceof ArmorTooltip) {
-                return new ClientArmorTooltip((ArmorTooltip) tooltip);
-            }
-            if (tooltip instanceof SuperpowerTooltip) {
-                return new ClientSuperpowerTooltip((SuperpowerTooltip) tooltip);
-            }
-            return null;
-        });
+        TooltipComponentCallback.EVENT.register(tooltip ->
+                tooltip instanceof ArmorTooltip armorTooltip ? new ClientArmorTooltip(armorTooltip) :
+                        tooltip instanceof SuperpowerTooltip superpowerTooltip ? new ClientSuperpowerTooltip(superpowerTooltip) : null);
     }
 }
