@@ -4,13 +4,17 @@ import chappie.modulus.networking.ModNetworking;
 import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.IOneScaleScreen;
 import chappie.theboys.TheBoys;
+import chappie.theboys.client.gui.render.state.LaserPreviewRenderState;
 import chappie.theboys.mixin.client.ScreenAccessor;
 import chappie.theboys.networking.server.ServerSetEyeOptions;
 import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.interfaces.ISetupGameProfiles;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.yggdrasil.ProfileResult;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
@@ -26,17 +30,21 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.Services;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.entity.player.PlayerModelType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
@@ -54,6 +62,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     private PlayerModelType skinModel;
     private ModSlider eyesLengthSlider, eyesHeightSlider, rotationSlider;
     private EditBox name;
+    private final AtomicInteger profileRequestCounter = new AtomicInteger();
 
     public EyeOptionsScreen(Screen screen) {
         super(Component.translatable("gui.theboys.eyeOptions"));
@@ -84,6 +93,22 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         };
     }
 
+    private static UUID generateOfflineUuid(String playerName) {
+        return UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {
+        ModSlider eyesLengthSlider = this.eyesLengthSlider, eyesHeightSlider = this.eyesHeightSlider, rotationSlider = this.rotationSlider;
+        String s = this.name != null ? this.name.getValue() : "";
+        super.resize(pMinecraft, pWidth, pHeight);
+        this.addLaserOptions();
+        this.eyesLengthSlider.copy(eyesLengthSlider);
+        this.eyesHeightSlider.copy(eyesHeightSlider);
+        this.rotationSlider.copy(rotationSlider);
+        this.name.setValue(s);
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -111,15 +136,14 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
                 }
 
                 @Override
-                public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
-                    boolean flag = event.x() >= (double) this.getX() && event.x() < (double) (this.getX() + this.width) && event.y() >= (double) this.getY() && event.y() < (double) (this.getY() + this.height);
-                    if (this.isVisible() && event.button() == 0 && !flag) {
+                public void setFocused(boolean focused) {
+                    boolean wasFocused = this.isFocused();
+                    super.setFocused(focused);
+                    if (wasFocused && !focused) {
                         EyeOptionsScreen.this.changeProfile(this.getValue());
                     }
-                    return super.mouseClicked(event, isDoubleClick);
                 }
             };
-            this.name.setCanLoseFocus(true);
             this.name.setTextColor(-1);
             this.name.setTextColorUneditable(-12632257);
             this.name.setMaxLength(50);
@@ -127,21 +151,9 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             this.addRenderableWidget(this.name);
         }
 
-        this.changeYPos.put(this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (p_96257_) -> {
-            this.minecraft.setScreen(this.parent);
-        }).bounds(this.width / 2 - 166, this.height / 2 + 75, 128, 20).build()), y -> y + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0) + 5);
-    }
-
-    @Override
-    public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {
-        ModSlider eyesLengthSlider = this.eyesLengthSlider, eyesHeightSlider = this.eyesHeightSlider, rotationSlider = this.rotationSlider;
-        String s = this.name != null ? this.name.getValue() : "";
-        super.resize(pMinecraft, pWidth, pHeight);
-        this.addLaserOptions();
-        this.eyesLengthSlider.copy(eyesLengthSlider);
-        this.eyesHeightSlider.copy(eyesHeightSlider);
-        this.rotationSlider.copy(rotationSlider);
-        this.name.setValue(s);
+        this.changeYPos.put(this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) ->
+                        this.minecraft.setScreen(this.parent)).bounds(this.width / 2 - 166, this.height / 2 + 75, 128, 20).build()),
+                y -> y + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0) + 5);
     }
 
     @Override
@@ -162,7 +174,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         this.setModelProperties(this.model, pPartialTick);
         Matrix3x2fStack matrix = guiGraphics.pose();
 
-        if (this.minecraft.level == null) {
+        if (this.minecraft != null && this.minecraft.level == null) {
             this.renderPanorama(guiGraphics, pPartialTick);
         }
 
@@ -222,6 +234,18 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         AnimationUtils.bobModelPart(model.leftArm, this.tickCount + pPartialTick, -1.0F);
     }
 
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+        if (event.button() == 0 && this.name != null) {
+            boolean insideName = event.x() >= (double) this.name.getX() && event.x() < (double) (this.name.getX() + this.name.getWidth())
+                    && event.y() >= (double) this.name.getY() && event.y() < (double) (this.name.getY() + this.name.getHeight());
+            if (this.name.isFocused() != insideName) {
+                this.name.setFocused(insideName);
+            }
+        }
+        return super.mouseClicked(event, isDoubleClick);
+    }
+
     public void renderEntityInInventory(GuiGraphics guiGraphics, int x, int y, int scale, float angleXComponent, float angleYComponent) {
         if (this.playerInfo == null) {
             return;
@@ -234,33 +258,40 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             this.skinModel = modelType;
         }
 
-        float yaw = (float) (Math.atan(angleXComponent / 40.0F) * 40.0F) + (float) this.rotationSlider.getValue();
-        float pitch = -(float) Math.atan(angleYComponent / 40.0F) * 20.0F;
-        this.model.head.yRot = yaw * ((float) Math.PI / 180F);
+        float pointerYaw = (float) (Math.atan(angleXComponent / 40.0F) * 40.0F);
+        float rotationYaw = this.rotationSlider == null ? 0.0F : (float) this.rotationSlider.getValue();
+        float pitch = 10F -(float) Math.atan(angleYComponent / 40.0F) * 20.0F;
+        this.model.head.yRot = pointerYaw * ((float) Math.PI / 180F);
         this.model.head.xRot = pitch * ((float) Math.PI / 180F);
 
         ResourceLocation texture = this.playerInfo.getSkin().body().texturePath();
         int width = 100;
-        int height = 140;
-        guiGraphics.submitSkinRenderState(
+        int height = 160;
+        submitLaserOverlay(guiGraphics, texture, x, y + 10, width, height, scale, -pitch, rotationYaw);
+    }
+
+    private void submitLaserOverlay(GuiGraphics guiGraphics, ResourceLocation texture, int x, int y, int width, int height, int scale, float rotationX, float rotationY) {
+        if (this.model == null) return;
+        int eyesHeight = this.isCustomEyesType() && this.eyesHeightSlider != null ? (int) this.eyesHeightSlider.getValue() : getEyesHeight();
+        int eyesLength = this.isCustomEyesType() && this.eyesLengthSlider != null ? (int) this.eyesLengthSlider.getValue() : getEyesLength();
+        LaserPreviewRenderState laserState = new LaserPreviewRenderState(
                 this.model,
                 texture,
-                (float) scale,
-                pitch,
-                yaw,
+                rotationX,
+                rotationY,
                 -1.5F,
+                eyesHeight,
+                eyesLength,
+                LASERS_LENGTH,
+                this.tickCount,
                 x - width / 2,
                 y - height,
                 x + width / 2,
-                y
+                y,
+                scale,
+                guiGraphics.scissorStack.peek()
         );
-
-        this.model.head.yRot = 0.0F;
-        this.model.head.xRot = 0.0F;
-    }
-
-    public void renderEyesAndLasers() {
-        // TODO: Re-implement custom eye rendering for 1.21.10 render pipeline.
+        guiGraphics.guiRenderState.submitPicturesInPictureState(laserState);
     }
 
     private void addSkinPresets() {
@@ -397,16 +428,79 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
     }
 
-    private void changeProfile(String name) {
-        if (minecraft == null || name.isBlank() || name.isEmpty()
-                || this.playerInfo != null && this.playerInfo.getProfile().name().equals(name)) return;
-        ((ISetupGameProfiles) minecraft).theBoys$setup();
+    private boolean isCustomEyesType() {
+        int type = TBConfig.CLIENT.eyesType.get();
+        return type == 4 || type == 5;
+    }
 
-        GameProfile profile = new GameProfile(UUID.randomUUID(), name);
+    private void changeProfile(String input) {
+        if (this.minecraft == null) return;
+        String trimmed = input.trim();
+        if (StringUtil.isNullOrEmpty(trimmed)) {
+            return;
+        }
+        if (this.playerInfo != null && trimmed.equalsIgnoreCase(this.playerInfo.getProfile().name())) {
+            return;
+        }
+        ((ISetupGameProfiles) this.minecraft).theBoys$setup();
+
+        final int requestId = this.profileRequestCounter.incrementAndGet();
+        final String requestName = trimmed;
+        Util.backgroundExecutor().execute(() -> {
+            GameProfile profile = this.lookupProfileBlocking(requestName);
+            this.minecraft.execute(() -> this.applyResolvedProfile(requestId, profile));
+        });
+    }
+
+    private GameProfile lookupProfileBlocking(String playerName) {
+        Minecraft minecraft = this.minecraft;
+        if (minecraft == null) {
+            return new GameProfile(generateOfflineUuid(playerName), playerName);
+        }
+        Services services = minecraft.services();
+        GameProfile profile = null;
+        try {
+            profile = services.profileResolver().fetchByName(playerName).orElse(null);
+        } catch (Exception exception) {
+            TheBoys.LOGGER.warn("Profile lookup threw for {}", playerName, exception);
+        }
+        if (profile == null) {
+            profile = new GameProfile(generateOfflineUuid(playerName), playerName);
+        }
+        return this.enrichProfile(services.sessionService(), profile, playerName);
+    }
+
+    private GameProfile enrichProfile(@Nullable MinecraftSessionService sessionService, GameProfile profile, String fallbackName) {
+        GameProfile resolved = profile;
+        if (sessionService != null && profile.id() != null) {
+            try {
+                ProfileResult result = sessionService.fetchProfile(profile.id(), true);
+                if (result != null && result.profile() != null) {
+                    resolved = result.profile();
+                }
+            } catch (Exception e) {
+                TheBoys.LOGGER.warn("Failed to fetch profile data for {}", profile.name(), e);
+            }
+        }
+        if (resolved.name() == null || resolved.name().isBlank()) {
+            UUID id = resolved.id() != null ? resolved.id() : generateOfflineUuid(fallbackName);
+            resolved = new GameProfile(id, fallbackName);
+            resolved.properties().putAll(profile.properties());
+        }
+        return resolved;
+    }
+
+    private void applyResolvedProfile(int requestId, GameProfile profile) {
+        if (this.minecraft == null || requestId != this.profileRequestCounter.get()) {
+            return;
+        }
         PlayerInfo playerinfo = new PlayerInfo(profile, false);
         playerinfo.getSkin(); // update textures and model
-        EyeOptionsScreen.this.minecraft.getPlayerSocialManager().addPlayer(playerinfo);
-        EyeOptionsScreen.this.playerInfo = playerinfo;
+        this.minecraft.getPlayerSocialManager().addPlayer(playerinfo);
+        this.playerInfo = playerinfo;
+        if (this.name != null && profile.name() != null) {
+            this.name.setHint(Component.literal(profile.name()));
+        }
     }
 
     @Override
