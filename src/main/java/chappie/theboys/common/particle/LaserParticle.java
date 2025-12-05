@@ -1,29 +1,12 @@
 package chappie.theboys.common.particle;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.RisingParticle;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.state.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 
 public class LaserParticle extends RisingParticle {
@@ -78,68 +61,12 @@ public class LaserParticle extends RisingParticle {
     }
 
     @Override
-    public void extract(QuadParticleRenderState renderState, Camera camera, float partialTick) {
-        Vec3 cameraPos = camera.getPosition();
+    public void extract(QuadParticleRenderState reusedState, Camera camera, float partialTick) {
         float interpRot = -Mth.lerp(partialTick, this.rotO, this.rot) * ((float) Math.PI / 180F);
-        float interpPitch = (float) (Mth.lerp(partialTick, this.pitchO, this.pitch) + Math.PI / 2F) * ((float) Math.PI / 180F);
-        float x = (float) (Mth.lerp(partialTick, this.xo, this.x) - cameraPos.x());
-        float y = (float) (Mth.lerp(partialTick, this.yo, this.y) - cameraPos.y());
-        float z = (float) (Mth.lerp(partialTick, this.zo, this.z) - cameraPos.z());
-
-        Vec3 offset = new Vec3(x, y - 0.25F, z).add(new Vec3(0.0, 0.3, 0.0).yRot(interpRot));
-        float quadSize = this.getQuadSize(partialTick);
-        Quaternionf orientation = new Quaternionf().rotationYXZ(interpRot, interpPitch, 0.0F);
-
-        renderState.add(
-                this.getLayer(),
-                (float) offset.x,
-                (float) offset.y,
-                (float) offset.z,
-                orientation.x,
-                orientation.y,
-                orientation.z,
-                orientation.w,
-                quadSize,
-                this.getU0(),
-                this.getU1(),
-                this.getV0(),
-                this.getV1(),
-                ARGB.colorFromFloat(this.alpha * 0.5F, this.rCol, this.gCol, this.bCol),
-                this.getLightColor(partialTick)
-        );
-    }
-
-    @Environment(EnvType.CLIENT)
-    public record LaserParticleFactory(SpriteSet sprite) implements ParticleProvider<LaserParticleOptions> {
-
-        @Override
-        public Particle createParticle(LaserParticleOptions pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
-            float rot = 0, pitch = 0;
-            if (pLevel.getEntity(pType.entityId()) instanceof LivingEntity e) {
-                rot = e.getYRot();
-                pitch = Math.min(e.getXRot(), 45);
-            }
-            TextureAtlasSprite sprite = this.sprite.get(pLevel.random);
-            LaserParticle particle = new LaserParticle(pType.color(), pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, pitch, rot, sprite);
-            particle.scale(2F);
-
-            return particle;
-        }
-    }
-
-    public record LaserParticleOptions(int entityId, int color) implements ParticleOptions {
-        public static final MapCodec<LaserParticleOptions> CODEC = RecordCodecBuilder.mapCodec(
-                instance -> instance.group(Codec.INT.fieldOf("entityId").forGetter(optionsBase -> optionsBase.entityId),
-                                Codec.INT.fieldOf("color").forGetter(optionsBase -> optionsBase.color))
-                        .apply(instance, LaserParticleOptions::new)
-        );
-        public static final StreamCodec<RegistryFriendlyByteBuf, LaserParticleOptions> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.VAR_INT, (opt) -> opt.entityId, ByteBufCodecs.VAR_INT, (opt) -> opt.color, LaserParticleOptions::new
-        );
-
-        @Override
-        public @NotNull ParticleType<?> getType() {
-            return TBParticleTypes.LASER;
-        }
+        float interpPitch = Mth.lerp(partialTick, this.pitchO, this.pitch) * ((float) Math.PI / 180F);
+        Quaternionf facing = new Quaternionf().rotationY(interpRot).rotateX(interpPitch);
+        this.extractRotatedQuad(reusedState, camera, facing, partialTick);
+        Quaternionf mirrored = new Quaternionf(facing).rotateY((float) Math.PI);
+        this.extractRotatedQuad(reusedState, camera, mirrored, partialTick);
     }
 }

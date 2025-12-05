@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,6 +21,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements ILivingEntityEx {
+
+    @Shadow
+    public abstract float getScale();
 
     @Unique
     private Vec3 oldPos = Vec3.ZERO;
@@ -54,13 +58,13 @@ public abstract class LivingEntityMixin extends Entity implements ILivingEntityE
         }
     }
 
-    @Inject(method = "getDefaultDimensions", at = @At("TAIL"), cancellable = true)
+    @Inject(method = "getDimensions", at = @At("TAIL"), cancellable = true)
     public void mixin$getFallFlying(Pose pPose, CallbackInfoReturnable<EntityDimensions> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity != null && entity.isAlive() && entity instanceof Player) {
             for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(entity))) {
                 if (entity.isSprinting() && ability.isEnabled()) {
-                    cir.setReturnValue(FlightAbility.FLIGHT_DIMENSIONS);
+                    cir.setReturnValue(FlightAbility.FLIGHT_DIMENSIONS.scale(this.getScale()));
                 }
             }
         }

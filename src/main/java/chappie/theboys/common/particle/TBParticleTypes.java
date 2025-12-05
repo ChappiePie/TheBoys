@@ -12,18 +12,18 @@ import net.minecraft.network.codec.StreamCodec;
 
 public class TBParticleTypes {
 
-    public static final ParticleType<LaserParticle.LaserParticleOptions> LASER = Registry.register(BuiltInRegistries.PARTICLE_TYPE, TheBoys.id("laser"), complex(false));
+    public static final ParticleType<LaserParticleOptions> LASER = Registry.register(BuiltInRegistries.PARTICLE_TYPE, TheBoys.id("laser"), complex(false));
 
-    public static ParticleType<LaserParticle.LaserParticleOptions> complex(boolean alwaysSpawn) {
+    public static ParticleType<LaserParticleOptions> complex(boolean alwaysSpawn) {
         return new ParticleType<>(alwaysSpawn) {
             @Override
-            public MapCodec<LaserParticle.LaserParticleOptions> codec() {
-                return LaserParticle.LaserParticleOptions.CODEC;
+            public MapCodec<LaserParticleOptions> codec() {
+                return LaserParticleOptions.CODEC;
             }
 
             @Override
-            public StreamCodec<? super RegistryFriendlyByteBuf, LaserParticle.LaserParticleOptions> streamCodec() {
-                return LaserParticle.LaserParticleOptions.STREAM_CODEC;
+            public StreamCodec<? super RegistryFriendlyByteBuf, LaserParticleOptions> streamCodec() {
+                return LaserParticleOptions.STREAM_CODEC;
             }
         };
     }

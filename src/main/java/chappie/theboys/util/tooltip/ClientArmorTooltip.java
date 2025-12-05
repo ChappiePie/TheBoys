@@ -6,12 +6,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 
-public class ClientArmorTooltip implements ClientTooltipComponent {
-    private final ItemStack itemStack;
-
-    public ClientArmorTooltip(ArmorTooltip tooltip) {
-        this.itemStack = tooltip.itemStack();
-    }
+public record ClientArmorTooltip(ItemStack itemStack) implements ClientTooltipComponent {
 
     @Override
     public int getHeight(Font font) {

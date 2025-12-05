@@ -10,13 +10,8 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 
-public class ClientSuperpowerTooltip implements ClientTooltipComponent {
+public record ClientSuperpowerTooltip(TBSuperpower superpower) implements ClientTooltipComponent {
     private static final ResourceLocation SLOT_SPRITE = ResourceLocation.withDefaultNamespace("container/bundle/slot");
-    private final TBSuperpower superpower;
-
-    public ClientSuperpowerTooltip(SuperpowerTooltip tooltip) {
-        this.superpower = tooltip.superpower();
-    }
 
     @Override
     public int getHeight(Font font) {

@@ -9,7 +9,7 @@ import chappie.modulus.util.data.DataAccessor;
 import chappie.modulus.util.model.ModelProperties;
 import chappie.theboys.common.ability.base.TBAbilityTypes;
 import chappie.theboys.common.capability.TheBoysCap;
-import chappie.theboys.common.particle.LaserParticle;
+import chappie.theboys.common.particle.LaserParticleOptions;
 import chappie.theboys.util.TBCommonUtil;
 import com.google.common.collect.Iterables;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -84,10 +84,10 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 }
 
                 CommonUtil.spawnParticleForAll(this.entity.level(),
-                        new LaserParticle.LaserParticleOptions(this.entity.getId(), Color.WHITE.getRGB()),
+                        new LaserParticleOptions(this.entity.getId(), Color.WHITE.getRGB()),
                         true, hitResult.getLocation(), new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.01F, 1);
                 CommonUtil.spawnParticleForAll(this.entity.level(),
-                        new LaserParticle.LaserParticleOptions(this.entity.getId(), this.dataManager.get(TBCommonUtil.COLOR).getRGB()),
+                        new LaserParticleOptions(this.entity.getId(), this.dataManager.get(TBCommonUtil.COLOR).getRGB()),
                         true, hitResult.getLocation(), new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.04F, 4);
 
                 CommonUtil.spawnParticleForAll(this.entity.level(),

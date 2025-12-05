@@ -12,10 +12,11 @@ import chappie.theboys.client.item.VialTintSource;
 import chappie.theboys.client.model.CapeModel;
 import chappie.theboys.client.renderer.TrailRenderer;
 import chappie.theboys.client.renderer.block.SynthesizerRenderer;
+import chappie.theboys.common.ability.base.TBSuperpower;
 import chappie.theboys.common.block.entity.TBBlockEntities;
 import chappie.theboys.common.block.menu.TBMenus;
 import chappie.theboys.common.entity.TBEntities;
-import chappie.theboys.common.particle.LaserParticle;
+import chappie.theboys.common.particle.LaserParticleFactory;
 import chappie.theboys.common.particle.TBParticleTypes;
 import chappie.theboys.common.particle.WaterSplashParticle;
 import chappie.theboys.networking.TBNetworking;
@@ -45,6 +46,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.item.properties.conditional.ConditionalItemModelProperties;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Map;
@@ -78,18 +80,17 @@ public class TheBoysClient implements ClientModInitializer {
         SetupAnimCallback.EVENT.register(ClientEvents::setupAnim);
         FirstPersonAdditionalHandCallback.EVENT.register(ClientEvents::firstPersonAdditionalHand);
         ClientTickEvents.END_CLIENT_TICK.register(TBOverlays::clientTick);
-        ParticleFactoryRegistry.getInstance().register(TBParticleTypes.LASER, LaserParticle.LaserParticleFactory::new);
+        ParticleFactoryRegistry.getInstance().register(TBParticleTypes.LASER, LaserParticleFactory::new);
         ParticleFactoryRegistry.getInstance().register(TBParticleTypes.WATER_SPLASH, WaterSplashParticle.Provider::new);
         EntityRenderers.register(TBEntities.TRAIL, TrailRenderer::new);
 
         ConditionalItemModelProperties.ID_MAPPER.put(TheBoys.id("has_vial"), HasVialDataProperty.MAP_CODEC);
 
         MenuScreens.register(TBMenus.SYNTHESIZER, SynthesizerScreen::new);
-        BlockEntityRenderers.register(TBBlockEntities.SYNTHESIZER,
-                (context) -> new SynthesizerRenderer());
+        BlockEntityRenderers.register(TBBlockEntities.SYNTHESIZER, (context) -> new SynthesizerRenderer());
 
         TooltipComponentCallback.EVENT.register(tooltip ->
-                tooltip instanceof ArmorTooltip armorTooltip ? new ClientArmorTooltip(armorTooltip) :
-                        tooltip instanceof SuperpowerTooltip superpowerTooltip ? new ClientSuperpowerTooltip(superpowerTooltip) : null);
+                tooltip instanceof ArmorTooltip(ItemStack itemStack) ? new ClientArmorTooltip(itemStack) :
+                        tooltip instanceof SuperpowerTooltip(TBSuperpower superpower) ? new ClientSuperpowerTooltip(superpower) : null);
     }
 }
