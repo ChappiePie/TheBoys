@@ -42,7 +42,6 @@ public class FocusOnGoalAbility extends Ability {
         if (enabled) {
             Entity target = entity.level().getEntity(targetId);
             if (bool || target == null || !target.isAlive()
-                    || target.getEyePosition().y > entity.getEyePosition().y
                     || target.getEyePosition().distanceTo(entity.getEyePosition()) < 4 && !this.hasSpeedAbility()) {
                 this.dataManager.set(TARGET_ID, entity.getId());
             }
@@ -96,7 +95,7 @@ public class FocusOnGoalAbility extends Ability {
             if (this.dataManager.get(FocusOnGoalAbility.TARGET_ID).equals(this.entity.getId())) {
                 var hitResult = CommonUtil.pick(this.entity, 40);
                 if (hitResult instanceof EntityHitResult hr && hr.getEntity() instanceof LivingEntity target) {
-                    if (target.getEyePosition().distanceTo(this.entity.getEyePosition()) < 4 && !this.hasSpeedAbility()) {
+                    if (target.getEyePosition().distanceTo(this.entity.getEyePosition()) < 2 && !this.hasSpeedAbility()) {
                         return false;
                     }
                     this.dataManager.set(FocusOnGoalAbility.TARGET_ID, target.getId());

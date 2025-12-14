@@ -74,7 +74,7 @@ public class TBSuperpowers {
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(96).backgroundColor(() -> {
                         if (a instanceof FocusOnGoalAbility a1 && !a1.hasSpeedAbility()) {
                             if (CommonUtil.pick(a.entity, 40) instanceof EntityHitResult hr && hr.getEntity() instanceof LivingEntity target) {
-                                if (target.getEyePosition().distanceTo(a.entity.getEyePosition()) < 4) {
+                                if (target.getEyePosition().distanceTo(a.entity.getEyePosition()) < 2) {
                                     return 8553091;
                                 }
                             }

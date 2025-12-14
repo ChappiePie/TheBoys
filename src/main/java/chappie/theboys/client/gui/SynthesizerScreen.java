@@ -19,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
+import java.util.List;
+
 public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> {
     private static final ResourceLocation SYNTHESIZER_LOCATION = TheBoys.id("textures/gui/synthesizer.png");
     public static IHasTimer.Timer timer = new IHasTimer.Timer(() -> 10, () -> false);
@@ -34,11 +36,7 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
         Minecraft mc = Minecraft.getInstance();
         boolean isMouseOverObj = pMouseX >= x && pMouseY >= y && pMouseX <= x + width && pMouseY <= y + height;
         if (isMouseOverObj) {
-            int i = pMouseX + 2;
-            int j = pMouseY - 10;
-            int k = mc.font.width(toolTip);
-            guiGraphics.fillGradient(i - 3, j - 3, i + k + 3, j + 8 + 3, -1073741824, -1073741824);
-            guiGraphics.drawString(mc.font, toolTip, i, j, 16777215, true);
+            guiGraphics.setComponentTooltipForNextFrame(mc.font, List.of(toolTip), pMouseX, pMouseY);
         }
     }
 
@@ -78,7 +76,11 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
         matrix.pushMatrix();
         matrix.translate(i, j);
         matrix.pushMatrix();
-        guiGraphics.enableScissor(i + 36, j, i + 36 + 103, j + 81);
+        int scissorLeft = 36;
+        int scissorTop = 0;
+        int scissorRight = scissorLeft + 103;
+        int scissorBottom = scissorTop + 81;
+        guiGraphics.enableScissor(scissorLeft, scissorTop, scissorRight, scissorBottom);
 
         matrix.translate(87.5F, 40.5F);
         matrix.rotate((float) Math.toRadians(-360F * rollTimer.value(ClientUtil.getPartialTick())));
