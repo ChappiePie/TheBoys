@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "syringe",
+  "pattern": [
+    "  #",
+    " i ",
+    "I /"
+  ],
+  "key": {
+    "#": "minecraft:flint",
+    "i": "minecraft:iron_ingot",
+    "I": "minecraft:iron_nugget",
+    "/": "minecraft:stick"
+  },
+  "result": {
+    "id": "theboys:syringe",
+    "count": 1
+  }
+}

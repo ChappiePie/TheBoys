@@ -6,15 +6,11 @@
     "G"
   ],
   "key": {
-    "i": {
-      "item": "minecraft:iron_ingot"
-    },
-    "G": {
-      "item": "minecraft:glass"
-    }
+    "i": "minecraft:iron_ingot",
+    "G": "minecraft:glass"
   },
   "result": {
-    "item": "theboys:vial",
+    "id": "theboys:vial",
     "count": 3
   }
 }
