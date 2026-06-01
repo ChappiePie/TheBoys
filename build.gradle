@@ -12,6 +12,11 @@ base {
 
 loom {
 	accessWidenerPath = file("src/main/resources/${project.archives_base_name}.accesswidener")
+    runs {
+        server {
+            runDir "run/server"
+        }
+    }
 }
 
 repositories {

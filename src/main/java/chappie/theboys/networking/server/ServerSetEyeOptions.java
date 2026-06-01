@@ -1,6 +1,6 @@
 package chappie.theboys.networking.server;
 
-import chappie.modulus.Modulus;
+import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class ServerSetEyeOptions implements CustomPacketPayload {
 
-    public static final ResourceLocation PACKET_ID = Modulus.id("server_set_eye_options");
+    public static final ResourceLocation PACKET_ID = TheBoys.id("server_set_eye_options");
     public static final Type<ServerSetEyeOptions> PACKET = new Type<>(PACKET_ID);
     public static StreamCodec<FriendlyByteBuf, ServerSetEyeOptions> CODEC = CustomPacketPayload.codec(ServerSetEyeOptions::write, ServerSetEyeOptions::new);
 

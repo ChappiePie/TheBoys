@@ -3,6 +3,7 @@ package chappie.theboys.mixin;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
@@ -43,7 +44,7 @@ public class ServerLevelMixin {
                     if (a.isEnabled()) {
                         ParticleOptions particleOptions = serverExplosion.isSmall() ? smallExplosionParticles : largeExplosionParticles;
                         Optional<Vec3> optional = Optional.ofNullable((Vec3)serverExplosion.getHitPlayers().get(player));
-                        player.connection.send(new ClientboundExplodePacket(new Vec3(x, y, z), radius, serverExplosion.explode(), optional, particleOptions, explosionSound, blockParticles));
+                        ServerPlayNetworking.getSender(player).sendPacket(new ClientboundExplodePacket(new Vec3(x, y, z), radius, serverExplosion.explode(), optional, particleOptions, explosionSound, blockParticles));
                     }
                 }
             }

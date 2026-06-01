@@ -13,10 +13,7 @@ import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.KeyMap;
 import chappie.modulus.util.ModRegistries;
 import chappie.theboys.TheBoys;
-import chappie.theboys.common.ability.FlightAbility;
-import chappie.theboys.common.ability.FocusOnGoalAbility;
-import chappie.theboys.common.ability.HeatVisionAbility;
-import chappie.theboys.common.ability.SpeedAbility;
+import chappie.theboys.common.ability.*;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
 import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.core.Registry;
@@ -40,17 +37,15 @@ public class TBSuperpowers {
                                             KeyMap.KeyType.FIRST : KeyMap.KeyType.MOUSE_RIGHT))
                     ),
             AbilityBuilder.of("flight", TBAbilityTypes.FLIGHT)
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.TOGGLE), "enabling", "pressed")
                     .condition(a -> new DoubleKeyCondition(a).shouldStop(() -> a.entity.onGround() || a.entity.isShiftKeyDown()), "enabling")
                     .condition(a -> new DoubleKeyCondition(a).keyType(KeyMap.KeyType.SPRINT).shouldStop(() -> !(a instanceof FlightAbility f && f.cooldown.end() && a.isEnabled() && a.dataManager.get(FlightAbility.SPRINTING))), "boost")
                     .additionalData(a ->
                             new IHasOverlay(a, (b) -> b.uOffset(32)
-                                    .keyType(() -> !a.conditionManager.test("pressed") ?
-                                            KeyMap.KeyType.SECOND : KeyMap.KeyType.JUMP))
+                                    .keyType(() -> a.conditionManager.test("enabling") ? KeyMap.KeyType.SPRINT : KeyMap.KeyType.JUMP))
                     ),
             AbilityBuilder.of("super_hearing", TBAbilityTypes.SUPER_HEARING)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(64)))
-                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD).action(KeyCondition.Action.HELD), "enabling"),
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.HELD), "enabling"),
             AbilityBuilder.of("xray", TBAbilityTypes.XRAY)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(112)))
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FOURTH).action(KeyCondition.Action.HELD), "enabling"),
@@ -124,6 +119,31 @@ public class TBSuperpowers {
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
             AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE))
     ).uOffset(48));
+
+    public static final Superpower BLACK_NOIR = register("black_noir", new TBSuperpower(
+            AbilityBuilder.of("nod_head", TBAbilityTypes.NOD_HEAD)
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(160)))
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.MOUSE_LEFT).action(KeyCondition.Action.ACTION), "yes")
+                    .condition(a -> new Condition(a, p -> a.isEnabled()), "yes")
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.MOUSE_RIGHT).action(KeyCondition.Action.ACTION), "no")
+                    .condition(a -> new Condition(a, p -> a.isEnabled()), "no")
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
+            AbilityBuilder.of("parkour", TBAbilityTypes.PARKOUR)
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(176)))
+                    .condition(a -> new DoubleKeyCondition(a).keyType(KeyMap.KeyType.JUMP)
+                            .shouldStop(() -> !(a instanceof ParkourAbility p && p.dodgeRollHandler.canTrigger())), "roll")
+                    .condition(a -> new DoubleKeyCondition(a).keyType(KeyMap.KeyType.CROUCH)
+                            .shouldStop(() -> !(a instanceof ParkourAbility p && p.isEnabled())), "slide"),
+
+            AbilityBuilder.of("damage_resistance", AbilityType.DAMAGE_RESISTANCE).additionalData((a) -> a.dataManager.set(DamageResistanceAbility.AMPLIFIER, 4F)),
+            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(3.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(4.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("jump_boost", b -> b.attribute(ModRegistries.JUMP_BOOST).amount(0.5D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADD_VALUE))
+//            , AbilityBuilder.of("hallucination", TBAbilityTypes.HALLUCINATION)
+//                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(192)))
+//                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.THIRD).action(KeyCondition.Action.TOGGLE), "enabling")
+    ).uOffset(64));
 
 //    public static final Superpower STARLIGHT = register("starlight", new TBSuperpower(
 //            AbilityBuilder.of("lasers", TBAbilityTypes.GLOW_EYES)

@@ -5,9 +5,8 @@ import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
 import chappie.theboys.client.renderer.ClientHeroWithCapeProperties;
-import chappie.theboys.common.ability.FlightAbility;
-import chappie.theboys.common.ability.HeatVisionAbility;
-import chappie.theboys.common.ability.SuperHearingAbility;
+import chappie.theboys.common.ability.*;
+import chappie.theboys.common.ability.parkour.DodgeRollHandler;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
@@ -225,9 +224,111 @@ public class ClientEvents {
                 break;
             }
         }
+        if (Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
+            for (NodHeadAbility ability : CommonUtil.listOfType(NodHeadAbility.class, CommonUtil.getAbilities(player))) {
+                if (!ability.isEnded()) {
+                    if (ability.isSideTurn()) {
+                        pPoseStack.mulPose(Axis.YP.rotationDegrees((float) Math.toRadians(250F) * ability.turnByShakeCurve(partialTick)));
+                    } else {
+                        pPoseStack.mulPose(Axis.XP.rotationDegrees((float) Math.toRadians(300F) * ability.nodCurve(partialTick)));
+                    }
+                }
+            }
+        }
     }
 
     public static void flightAnimation(LivingEntity entity, float partialTicks, PoseStack poseStack) {
+        float bodyRot = entity.getPreciseBodyRotation(partialTicks);
+        float xRot = entity.getViewXRot(partialTicks);
+        float yRot = entity.getViewYRot(partialTicks);
+        for (ParkourAbility ability : CommonUtil.listOfType(ParkourAbility.class, CommonUtil.getAbilities(entity))) {
+            if (ability.isEnabled()) {
+                float rollProgress = ability.dodgeRollHandler.rollTimer.value(partialTicks);
+                if (rollProgress > 0) {
+                    boolean isRolling = ability.dodgeRollHandler.isActive();
+                    float rollPhase = isRolling
+                            ? Mth.clamp(
+                                    Mth.lerp(
+                                            partialTicks,
+                                            ability.dodgeRollHandler.rollTicksO,
+                                            ability.dataManager.get(DodgeRollHandler.ROLL_TICKS)
+                                    ) / 12.0F,
+                                    0.0F,
+                                    1.0F
+                            )
+                            : 1.0F;
+                    int rollSide = ability.dataManager.get(DodgeRollHandler.ROLL_SIDE);
+
+                    poseStack.translate(0, 1.501F - 0.75F * rollProgress, 0);
+                    poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyRot));
+                    poseStack.mulPose(Axis.XP.rotationDegrees(rollPhase * 360F * (rollSide == 2 ? 1 : -1)));
+                    poseStack.mulPose(Axis.YP.rotationDegrees(bodyRot - 180.0F));
+                    poseStack.translate(0, -1.501F, 0);
+                    return;
+                }
+
+                float wallSlide = ability.wallHandler.getSlideProgress(partialTicks);
+                if (wallSlide > 0) {
+                    var wallDir = ability.wallHandler.getWallDirection();
+                    if (wallDir != null && entity instanceof Player player) {
+
+                        // Преобразуем Direction в угол
+                        float wallYaw = switch (wallDir) {
+                            case WEST -> 270f;
+                            case NORTH -> 180f;
+                            case EAST -> 90f;
+                            default -> 0f;
+                        };
+
+                        // Вычисляем относительный угол
+                        float relativeAngle = Mth.wrapDegrees(wallYaw - player.yBodyRot);
+
+                        // Определяем положение стены
+                        boolean wallInFront = Math.abs(relativeAngle) < 45f;
+                        boolean wallOnRight = relativeAngle >= 45f && relativeAngle <= 135f;
+                        boolean wallOnLeft = relativeAngle <= -45f && relativeAngle >= -135f;
+
+                        // Смещаем от стены в зависимости от её положения
+                        float offsetAmount = 0.15F * wallSlide;
+
+                        poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
+
+                        if (wallInFront) {
+                            // Стена спереди - смещаем назад
+                            poseStack.translate(0.0F, 0.0F, -offsetAmount);
+                        } else if (wallOnRight) {
+                            // Стена справа - смещаем влево
+                            poseStack.translate(offsetAmount, 0.0F, 0.0F);
+                        } else if (wallOnLeft) {
+                            // Стена слева - смещаем вправо
+                            poseStack.translate(-offsetAmount, 0.0F, 0.0F);
+                        }
+
+                        poseStack.mulPose(Axis.XP.rotationDegrees(-6.0F * wallSlide));
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(2.0F * wallSlide));
+                        poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
+                        poseStack.translate(0.0F, -0.18F * wallSlide, 0.03F * wallSlide);
+                    } else {
+                        poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
+                        poseStack.mulPose(Axis.XP.rotationDegrees(-6.0F * wallSlide));
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(2.0F * wallSlide));
+                        poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
+                        poseStack.translate(0.0F, -0.18F * wallSlide, 0.03F * wallSlide);
+                    }
+                    return;
+                }
+
+                float slide = ability.slideHandler.slideProgress(partialTicks);
+                if (slide > 0) {
+                    poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
+                    poseStack.mulPose(Axis.XP.rotationDegrees(-12.25F * slide));
+                    poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
+                    poseStack.translate(0, -slide, 0);
+                    return;
+                }
+            }
+        }
+
         for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(entity))) {
             double d0 = -Mth.lerp(partialTicks, entity.xo, entity.getX());
             double d1 = -Mth.lerp(partialTicks, entity.yo, entity.getY());
@@ -246,9 +347,6 @@ public class ClientEvents {
             float f4 = ability.sprintingTimer.value(partialTicks);
             float distance = Mth.sqrt((float) (d0 * d0 + d1 * d1 + d2 * d2)) * (-f2 + f1);
             float defaultRotation = Mth.clamp(distance, -1.0F, 1.0F) * 12.25F;
-            float xRot = entity.getViewXRot(partialTicks);
-            float yRot = entity.getViewYRot(partialTicks);
-
             poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
 
             boolean b = !entity.isFallFlying() && !entity.isAutoSpinAttack();

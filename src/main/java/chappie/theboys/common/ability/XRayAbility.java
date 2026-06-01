@@ -21,6 +21,7 @@ public class XRayAbility extends Ability {
     public IHasTimer.Timer translucentTimer = new IHasTimer.Timer(() -> 5, this::isEnabled);
     public Vec3 hitPos = null;
     public BlockPos blockHitPos = null;
+    private AABB lastAABB = null;
 
     public XRayAbility(LivingEntity entity, AbilityBuilder builder) {
         super(entity, builder);
@@ -37,9 +38,29 @@ public class XRayAbility extends Ability {
         super.update(entity, enabled);
         this.translucentTimer.update();
         float distantMul = this.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER);
-        if (this.entity.level().isClientSide() && FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && this.hitPos != null) {
-            AABB aabb = new AABB(hitPos, hitPos).inflate(distantMul);
-            Minecraft.getInstance().levelRenderer.setBlocksDirty((int) aabb.minX, (int) aabb.minY, (int) aabb.minZ, (int) aabb.maxX, (int) aabb.maxY, (int) aabb.maxZ);
+        if (this.entity.level().isClientSide() && FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            if (this.hitPos != null) {
+                AABB aabb = new AABB(hitPos, hitPos).inflate(distantMul);
+                int minX = (int) Math.floor(aabb.minX);
+                int minY = (int) Math.floor(aabb.minY);
+                int minZ = (int) Math.floor(aabb.minZ);
+                int maxX = (int) Math.floor(aabb.maxX);
+                int maxY = (int) Math.floor(aabb.maxY);
+                int maxZ = (int) Math.floor(aabb.maxZ);
+
+                if (lastAABB == null || (int) lastAABB.minX != minX || (int) lastAABB.minY != minY || (int) lastAABB.minZ != minZ ||
+                        (int) lastAABB.maxX != maxX || (int) lastAABB.maxY != maxY || (int) lastAABB.maxZ != maxZ) {
+
+                    if (lastAABB != null) {
+                        Minecraft.getInstance().levelRenderer.setBlocksDirty((int) lastAABB.minX, (int) lastAABB.minY, (int) lastAABB.minZ, (int) lastAABB.maxX, (int) lastAABB.maxY, (int) lastAABB.maxZ);
+                    }
+                    Minecraft.getInstance().levelRenderer.setBlocksDirty(minX, minY, minZ, maxX, maxY, maxZ);
+                    lastAABB = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
+                }
+            } else if (lastAABB != null) {
+                Minecraft.getInstance().levelRenderer.setBlocksDirty((int) lastAABB.minX, (int) lastAABB.minY, (int) lastAABB.minZ, (int) lastAABB.maxX, (int) lastAABB.maxY, (int) lastAABB.maxZ);
+                lastAABB = null;
+            }
         }
         double distance = 10;
         try {

@@ -11,6 +11,7 @@ import chappie.theboys.common.ability.base.TBAbilityTypes;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.particle.LaserParticleOptions;
 import chappie.theboys.util.TBCommonUtil;
+import chappie.theboys.util.TBConfig;
 import com.google.common.collect.Iterables;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -74,6 +75,16 @@ public class HeatVisionAbility extends GlowEyesAbility {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
+        if (!entity.level().isClientSide()) {
+            float configDistance = TBConfig.COMMON.heatVisionRange.get().floatValue();
+            if (this.dataManager.get(DISTANCE) != configDistance) {
+                this.dataManager.set(DISTANCE, configDistance);
+            }
+            float configDamage = TBConfig.COMMON.heatVisionDamage.get().floatValue();
+            if (this.dataManager.get(STRENGTH) != configDamage / 2F) {
+                this.dataManager.set(STRENGTH, configDamage / 2F);
+            }
+        }
         if (!entity.level().isClientSide() && this.enabledTicks >= this.dataManager.get(MAX_TIMER)) {
             HitResult hitResult = CommonUtil.pick(entity, this.dataManager.get(DISTANCE));
             if (hitResult.getType() != HitResult.Type.MISS) {

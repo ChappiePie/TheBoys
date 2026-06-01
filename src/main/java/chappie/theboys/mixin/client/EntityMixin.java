@@ -3,8 +3,10 @@ package chappie.theboys.mixin.client;
 import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.FocusOnGoalAbility;
+import chappie.theboys.common.ability.ParkourAbility;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,6 +30,15 @@ public abstract class EntityMixin {
 
     @Inject(method = "turn(DD)V", at = @At("HEAD"), cancellable = true)
     public void mixin$turn(double yRot, double xRot, CallbackInfo ci) {
+        Entity entity = (Entity) (Object) this;
+        for (ParkourAbility ability : CommonUtil.listOfType(ParkourAbility.class, CommonUtil.getAbilities(entity))) {
+            if (ability.ledgeHandler.isHanging() && entity instanceof Player player) {
+                ability.ledgeHandler.applyTurn(player, yRot, xRot);
+                ci.cancel();
+                return;
+            }
+        }
+
         if (this.theBoys$focusOnGoal()) {
             ci.cancel();
         }

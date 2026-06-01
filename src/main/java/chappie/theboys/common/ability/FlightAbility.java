@@ -35,6 +35,7 @@ public class FlightAbility extends Ability implements IHasTimer {
 
     public static final DataAccessor<Boolean> SPRINTING = new DataAccessor<>("sprinting", DataAccessor.DataSerializer.BOOLEAN);
     public static final DataAccessor<Boolean> ARM_AHEAD = new DataAccessor<>("arm_ahead", DataAccessor.DataSerializer.BOOLEAN);
+    public static final DataAccessor<Integer> STRAFE_IMPULSE = new DataAccessor<>("strafe_impulse", DataAccessor.DataSerializer.INT);
     public static final DataAccessor<Integer> FORWARD_IMPULSE = new DataAccessor<>("forward_impulse", DataAccessor.DataSerializer.INT);
 
     public final Timer timer = new Timer(() -> 5, this::isEnabled);
@@ -58,6 +59,7 @@ public class FlightAbility extends Ability implements IHasTimer {
 
         this.dataManager.define(SPRINTING, false, false);
         this.dataManager.define(ARM_AHEAD, false, false);
+        this.dataManager.define(STRAFE_IMPULSE, 0, false);
         this.dataManager.define(FORWARD_IMPULSE, 0, false);
     }
 

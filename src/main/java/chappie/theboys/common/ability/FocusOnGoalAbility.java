@@ -55,7 +55,7 @@ public class FocusOnGoalAbility extends Ability {
                         if (this.dataManager.get(FORWARD_IMPULSE) > 0 && (Math.abs(entity.getX() - xOld) != 0 || Math.abs(entity.getZ() - zOld) != 0)) {
                             // сделай проверку смотрит ли на моба,если нет то пусть уезжает
                             if (vec.distanceTo(vec1) > 2) {
-                                entity.setDeltaMovement(entity.getDeltaMovement().add(vec.subtract(vec1).multiply(0.01F, 0, 0.01F)));
+                                entity.setDeltaMovement(serverVelocity(entity).add(vec.subtract(vec1).multiply(0.01F, 0, 0.01F)));
                             } else {
                                 for (LivingEntity e : entity.level().getEntitiesOfClass(LivingEntity.class,
                                         CommonUtil.boxWithRange(entity.position(), 0.5D))) {
@@ -82,6 +82,16 @@ public class FocusOnGoalAbility extends Ability {
             }
         }
         return false;
+    }
+
+    private Vec3 serverVelocity(LivingEntity entity) {
+        if (entity.level().isClientSide()) {
+            return entity.getDeltaMovement();
+        }
+        if (entity instanceof ILivingEntityEx ex) {
+            return entity.position().subtract(ex.theBoys$oldPos());
+        }
+        return Vec3.ZERO;
     }
 
     public boolean condition(Condition c, boolean key) {

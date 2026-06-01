@@ -20,6 +20,10 @@ public class TBAbilityTypes {
     public static final AbilityType FISH_SWARM = register("fish_swarm", new AbilityType(FishSwarmAbility::new));
     public static final AbilityType WATER_BREATHING = register("water_breathing", new AbilityType(WaterBreathingAbility::new));
 
+    public static final AbilityType NOD_HEAD = register("nod_head", new AbilityType(NodHeadAbility::new));
+    public static final AbilityType PARKOUR = register("parkour", new AbilityType(ParkourAbility::new));
+    public static final AbilityType HALLUCINATION = register("hallucination", new AbilityType(HallucinationAbility::new));
+
     public static final AbilityType BRUH = register("bruh", new AbilityType(LightingAbility::new));
 
     public static <T extends AbilityType> T register(String id, T item) {
