@@ -40,6 +40,7 @@
     "LivingEntityRendererAccessor",
     "MobEffectUtilMixin",
     "MobMixin",
+    "PlayerMixin",
     "ServerLevelMixin",
     "client.BlockRenderInfoMixin",
     "client.EntityMixin",

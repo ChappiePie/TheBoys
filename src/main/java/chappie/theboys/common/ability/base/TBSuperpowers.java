@@ -115,6 +115,7 @@ public class TBSuperpowers {
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.HELD), "enabling"),
 
             AbilityBuilder.of("water_breathing", TBAbilityTypes.WATER_BREATHING).hide(),
+            AbilityBuilder.of("water_mining", TBAbilityTypes.WATER_MINING).hide(),
 
             AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
             AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE))
