@@ -28,7 +28,7 @@ public class TBConfig {
         public final ForgeConfigSpec.IntValue eyesType;
         public final ForgeConfigSpec.IntValue eyesHeight, eyesHeight2;
         public final ForgeConfigSpec.IntValue eyesLength, eyesLength2;
-        
+
         Client(ForgeConfigSpec.Builder builder) {
 
             builder.comment("Client Settings").push("client");
@@ -61,11 +61,19 @@ public class TBConfig {
 
         public final ForgeConfigSpec.DoubleValue suitOpacity;
         public final ForgeConfigSpec.BooleanValue storeAbilities;
+        public final ForgeConfigSpec.BooleanValue chatForMuted;
+
+        public final ForgeConfigSpec.DoubleValue heatVisionDamage;
+        public final ForgeConfigSpec.DoubleValue heatVisionRange;
 
         Common(ForgeConfigSpec.Builder builder) {
             builder.comment("Common Settings").push("common");
             this.suitOpacity = builder.comment("Change suit opacity on armor").translation("config.theboys.suitOpacity").defineInRange("suitOpacity", 1.0D, 0.0D, 1.0D);
             this.storeAbilities = builder.comment("Store abilities").translation("config.theboys.storeAbilities").define("storeAbilities", false);
+            this.chatForMuted = builder.comment("Chat for muted").translation("config.theboys.chatForMuted").define("chatForMuted", true);
+
+            this.heatVisionDamage = builder.comment("Heat vision damage against entities").translation("config.theboys.heatVisionDamage").defineInRange("heatVisionDamage", 2.0D, 0.0D, 100.0D);
+            this.heatVisionRange = builder.comment("Heat vision maximum range").translation("config.theboys.heatVisionRange").defineInRange("heatVisionRange", 20.0D, 0.0D, 256.0D);
             builder.pop();
         }
 

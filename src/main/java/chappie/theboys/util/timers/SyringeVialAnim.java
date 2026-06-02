@@ -37,7 +37,7 @@ public class SyringeVialAnim implements IHasTimer {
                 && mainHandItem.getItem() instanceof SyringeItem
                 && (offHandItem.getItem() instanceof VialItem || (this.reverse && !mainHandItem.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY).isEmpty() && offHandItem.isEmpty()));
         float timeline = this.timeline.value(1);
-        if (timeline == 1 && !entity.getCommandSenderWorld().isClientSide()) {
+        if (timeline >= 1.0f && !entity.level().isClientSide()) {
             if (this.reverse) {
                 ItemStack itemStack = mainHandItem.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
                 entity.setItemInHand(InteractionHand.OFF_HAND, itemStack);
@@ -56,7 +56,7 @@ public class SyringeVialAnim implements IHasTimer {
         this.rollVial.predicate = () -> a && timeline < 0.7F;
         this.insertVial.predicate = () -> a && timeline > 0.8F;
 
-        if (this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem) || timeline == 1) {
+        if (this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem) || timeline >= 1.0f) {
             this.triggerAnim = false;
             this.boysCap.syncToAll();
         }

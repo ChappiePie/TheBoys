@@ -48,24 +48,28 @@ public abstract class MixinBlockRenderer extends AbstractBlockRenderContext {
         int a = (abgr >>> 24) & 0xFF;
         BlockPos pos = this.pos;
         if (Minecraft.getInstance().getCameraEntity() != null) {
-            for (XRayAbility xRayAbility : CommonUtil.listOfType(XRayAbility.class, CommonUtil.getAbilities(Minecraft.getInstance().getCameraEntity()))) {
-                float t = xRayAbility.translucentTimer.value(ClientUtil.getPartialTick());
-                if (t != 0) {
-                    Vec3 vec = xRayAbility.hitPos;
-                    if (vec != null) {
-                        float distantMul = xRayAbility.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER);
-                        AABB aabb = new AABB(xRayAbility.blockHitPos).inflate(distantMul);
-                        if (aabb.intersects(new AABB(pos))) {
-                            float alpha = (float) (vec.distanceTo(Vec3.atCenterOf(pos)) / (distantMul + 1));
-                            alpha = (1f - Math.max(0.5F, Math.min(alpha, 1F))) * t;
-                            alpha = 1.0F - alpha;
-                            if (alpha != 1 && pos instanceof IWithAlpha i) {
-                                a = (int) (alpha * 255);
-                                break;
+            try {
+                for (XRayAbility xRayAbility : CommonUtil.listOfType(XRayAbility.class, CommonUtil.getAbilities(Minecraft.getInstance().getCameraEntity()))) {
+                    float t = xRayAbility.translucentTimer.value(ClientUtil.getPartialTick());
+                    if (t != 0) {
+                        Vec3 vec = xRayAbility.hitPos;
+                        if (vec != null) {
+                            float distantMul = xRayAbility.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER);
+                            AABB aabb = new AABB(xRayAbility.blockHitPos).inflate(distantMul);
+                            if (aabb.intersects(new AABB(pos))) {
+                                float alpha = (float) (vec.distanceTo(Vec3.atCenterOf(pos)) / (distantMul + 1));
+                                alpha = (1f - Math.max(0.5F, Math.min(alpha, 1F))) * t;
+                                alpha = 1.0F - alpha;
+                                if (alpha != 1 && pos instanceof IWithAlpha i) {
+                                    a = (int) (alpha * 255);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
+            } catch (ArrayIndexOutOfBoundsException | NullPointerException ignored) {
+                // Race condition in concurrent chunk rendering - abilities may be modified while iterating
             }
         }
         if (a < 0) a = 0; else if (a > 255) a = 255;
