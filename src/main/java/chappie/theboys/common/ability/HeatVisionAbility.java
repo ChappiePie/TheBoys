@@ -11,6 +11,7 @@ import chappie.theboys.common.ability.base.TBAbilityTypes;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.particle.LaserParticle;
 import chappie.theboys.util.TBCommonUtil;
+import chappie.theboys.util.TBConfig;
 import com.google.common.collect.Iterables;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -72,7 +73,17 @@ public class HeatVisionAbility extends GlowEyesAbility {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (!entity.getCommandSenderWorld().isClientSide && this.enabledTicks >= this.dataManager.get(MAX_TIMER)) {
+        if (!entity.level().isClientSide()) {
+            float configDistance = TBConfig.COMMON.heatVisionRange.get().floatValue();
+            if (this.dataManager.get(DISTANCE) != configDistance) {
+                this.dataManager.set(DISTANCE, configDistance);
+            }
+            float configDamage = TBConfig.COMMON.heatVisionDamage.get().floatValue();
+            if (this.dataManager.get(STRENGTH) != configDamage / 2F) {
+                this.dataManager.set(STRENGTH, configDamage / 2F);
+            }
+        }
+        if (!entity.level().isClientSide() && this.enabledTicks >= this.dataManager.get(MAX_TIMER)) {
             HitResult hitResult = CommonUtil.pick(entity, this.dataManager.get(DISTANCE));
             if (hitResult.getType() != HitResult.Type.MISS) {
                 if (hitResult instanceof EntityHitResult rtr && rtr.getEntity() != entity) {
@@ -135,7 +146,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
         hitResult.getEntity().setRemainingFireTicks((int) (strength * 5));
         hitResult.getEntity().hurt(this.entity.damageSources().mobAttack(entity), strength * 2F);
 
-        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
+        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId(), this.dataManager.get(TBCommonUtil.COLOR).getRGB()),
                 true, hitResult.getLocation(), Vec3.ZERO, 0.05F, 4);
 
         CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
@@ -145,19 +156,19 @@ public class HeatVisionAbility extends GlowEyesAbility {
 
     protected void onHitBlock(BlockHitResult hitResult) {
         BlockPos blockPos = hitResult.getBlockPos();
-        if (this.entity.getCommandSenderWorld().getBlockState(blockPos).getBlock() == Blocks.SAND) {
+        if (this.entity.level().getBlockState(blockPos).getBlock() == Blocks.SAND) {
             if (this.blocksInFire == null || !this.blocksInFire.getKey().equals(blockPos)) {
                 this.blocksInFire = new AbstractMap.SimpleEntry<>(blockPos, 0);
             }
             this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
 
             if (this.blocksInFire.getValue() > 60) {
-                this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.GLASS.defaultBlockState(), 11);
+                this.entity.level().setBlock(blockPos, Blocks.GLASS.defaultBlockState(), 11);
                 this.blocksInFire = null;
             }
         } else {
             blockPos = blockPos.relative(hitResult.getDirection());
-            if (this.entity.getCommandSenderWorld().isEmptyBlock(blockPos)) {
+            if (this.entity.level().isEmptyBlock(blockPos)) {
 
                 if (this.blocksInFire == null || !this.blocksInFire.getKey().equals(blockPos)) {
                     this.blocksInFire = new AbstractMap.SimpleEntry<>(blockPos, 0);
@@ -165,12 +176,13 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
 
                 if (this.blocksInFire.getValue() > 3) {
-                    this.entity.getCommandSenderWorld().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
+                    this.entity.level().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
                     this.blocksInFire = null;
                 }
             }
         }
-        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId()),
+
+        CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(), new LaserParticle.LaserParticleOptions(this.entity.getId(), this.dataManager.get(TBCommonUtil.COLOR).getRGB()),
                 true, hitResult.getLocation(), this.entity.getViewVector(0).multiply(0.25, 0, 0.25), 0.001F, 4);
 
         CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),

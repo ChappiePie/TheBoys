@@ -30,11 +30,14 @@ public class TBItems {
     public static final ArrayList<Item> ITEMS = new ArrayList<>();
     public static final ArrayList<ItemStack> ITEMS_TAB = new ArrayList<>();
 
-    public static final ImmutableMap<ArmorItem.Type, SuitItem> HOMELANDER_SUIT = registerSuitParts(SuitItem::new, "homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
-    public static final ImmutableMap<ArmorItem.Type, SuitItem> ATRAIN_SUIT = registerSuitParts(SuitItem::new, "atrain", (p) -> p.armorScale((stack) ->
+    public static final ImmutableMap<ArmorItem.Type, SuitItem> HOMELANDER_SUIT = registerSuitParts("homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
+    public static final ImmutableMap<ArmorItem.Type, SuitItem> ATRAIN_SUIT = registerSuitParts("atrain", (p) -> p.armorScale((stack) ->
             p.getSlot() != EquipmentSlot.HEAD ? SuitProperties.BASIC_ARMOR_SCALE.apply(p.getSlot()) : new Vector3f(-Integer.MAX_VALUE)), HELMET, CHESTPLATE, LEGGINGS, BOOTS);
-    //public static final ImmutableMap<ArmorItem.Type, SuitItem> STARLIGHT_SUIT = registerSuitParts(SuitItem::new, "starlight", (p) -> p.armorScale((e, stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, BOOTS);
-    public static final ImmutableMap<ArmorItem.Type, SuitItem> TRANSLUCENT_SUIT = registerSuitParts(SuitItem::new, "translucent", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
+    //public static final ImmutableMap<ArmorItem.Type, SuitItem> STARLIGHT_SUIT = registerSuitParts(SuitItem::new, "starlight", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, BOOTS);
+    public static final ImmutableMap<ArmorItem.Type, SuitItem> BLACK_NOIR_SUIT = registerSuitParts("black_noir", (p) -> {}, HELMET, CHESTPLATE, LEGGINGS, BOOTS);
+    //public static final ImmutableMap<ArmorItem.Type, SuitItem> STORMFRONT_SUIT = registerSuitParts(SuitItem::new, "stormfront", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
+    public static final ImmutableMap<ArmorItem.Type, SuitItem> THE_DEEP_SUIT = registerSuitParts("the_deep", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
+    public static final ImmutableMap<ArmorItem.Type, SuitItem> TRANSLUCENT_SUIT = registerSuitParts("translucent", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
 
     public static final SyringeItem SYRINGE = register("syringe", SyringeItem::new, new Properties(), false);
     public static final VialItem VIAL = register("vial", VialItem::new, new Properties(), false);
@@ -56,17 +59,17 @@ public class TBItems {
                 }
             }).build());
 
-    private static ImmutableMap<ArmorItem.Type, SuitItem> registerSuitParts(Function<SuitProperties, SuitItem> item, String type, Consumer<SuitProperties> consumer, ArmorItem.Type... slots) {
-        return TBItems.registerSuitParts(item, type, consumer, ArmorMaterials.LEATHER.value().defense(), 0.0F, slots);
+    private static ImmutableMap<ArmorItem.Type, SuitItem> registerSuitParts(String type, Consumer<SuitProperties> consumer, ArmorItem.Type... slots) {
+        return TBItems.registerSuitParts(type, consumer, ArmorMaterials.LEATHER.value().defense(), 0.0F, slots);
     }
 
-    private static ImmutableMap<ArmorItem.Type, SuitItem> registerSuitParts(Function<SuitProperties, SuitItem> item, String type, Consumer<SuitProperties> consumer, Map<ArmorItem.Type, Integer> defense, double toughness, ArmorItem.Type... slots) {
+    private static ImmutableMap<ArmorItem.Type, SuitItem> registerSuitParts(String type, Consumer<SuitProperties> consumer, Map<ArmorItem.Type, Integer> defense, double toughness, ArmorItem.Type... slots) {
         ImmutableMap.Builder<ArmorItem.Type, SuitItem> builder = ImmutableMap.builder();
         for (ArmorItem.Type slot : slots) {
             SuitProperties properties = new SuitProperties(type, slot);
             consumer.accept(properties);
             properties.defense(defense.get(properties.slot)).toughness(toughness).stacksTo(1);
-            builder.put(slot, register("%s_%s".formatted(type, slot.getName()), (prop) -> new SuitItem((SuitProperties) prop), properties));
+            builder.put(slot, register("%s_%s".formatted(type, type.equals("atrain") && slot == HELMET ? "glasses" : slot.getName()), (prop) -> new SuitItem((SuitProperties) prop), properties));
         }
         return builder.build();
     }

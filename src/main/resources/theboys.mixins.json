@@ -27,6 +27,7 @@
     "LiquidBlockMixin",
     "LivingEntityMixin",
     "LivingEntityRendererAccessor",
+    "MobEffectUtilMixin",
     "PlayerMixin",
     "ServerLevelMixin",
     "SkullBlockEntityAccessor"

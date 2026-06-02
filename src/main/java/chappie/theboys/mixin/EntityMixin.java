@@ -7,6 +7,7 @@ import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import chappie.theboys.common.ability.TranslucentAbility;
 import chappie.theboys.util.interfaces.EntitySavingFields;
+import chappie.theboys.util.interfaces.ILivingEntityEx;
 import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.server.level.ServerLevel;
@@ -70,7 +71,7 @@ public abstract class EntityMixin implements EntitySavingFields {
     @Inject(method = "updateDynamicGameEventListener(Ljava/util/function/BiConsumer;)V", at = @At("TAIL"))
     public void mixin$updateDynamicGameEventListener(BiConsumer<DynamicGameEventListener<?>, ServerLevel> listenerConsumer, CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
-        if (entity.getCommandSenderWorld() instanceof ServerLevel serverLevel) {
+        if (entity.level() instanceof ServerLevel serverLevel) {
             for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(entity))) {
                 listenerConsumer.accept(a.dynamicGameEventListener, serverLevel);
             }
@@ -148,7 +149,7 @@ public abstract class EntityMixin implements EntitySavingFields {
         Entity entity = (Entity) (Object) this;
         if (pSwimming) {
             for (SpeedAbility ability : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
-                boolean isMoving = entity.getKnownMovement().horizontalDistanceSqr() >= 1.0E-7D;
+                boolean isMoving = theBoys$isMoving(entity);
                 if (ability.isEnabled() && isMoving) {
                     ci.cancel();
                     break;
@@ -163,10 +164,23 @@ public abstract class EntityMixin implements EntitySavingFields {
     )
     private boolean cancelParticles(Entity entity) {
         for (SpeedAbility ability : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
-            if (ability.isEnabled() && entity.getDeltaMovement().horizontalDistanceSqr() >= 1.0E-7D) {
+            if (ability.isEnabled() && theBoys$isMoving(entity)) {
                 return false;
             }
         }
         return true;
+    }
+
+    @Unique
+    private boolean theBoys$isMoving(Entity entity) {
+        if (entity.level().isClientSide()) {
+            return entity.getDeltaMovement().horizontalDistanceSqr() >= 1.0E-7D;
+        }
+        if (entity instanceof ILivingEntityEx ex) {
+            double dx = entity.getX() - ex.theBoys$oldPos().x;
+            double dz = entity.getZ() - ex.theBoys$oldPos().z;
+            return dx * dx + dz * dz >= 1.0E-7D;
+        }
+        return false;
     }
 }

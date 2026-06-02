@@ -1,0 +1,7 @@
+{
+    "parent": "theboys:item/suit",
+    "textures":
+    {
+        "layer0": "theboys:item/homelander/feet"
+    }
+}

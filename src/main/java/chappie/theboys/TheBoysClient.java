@@ -20,6 +20,7 @@ import chappie.theboys.common.item.VialItem;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.particle.LaserParticle;
 import chappie.theboys.common.particle.TBParticleTypes;
+import chappie.theboys.common.particle.WaterSplashParticle;
 import chappie.theboys.networking.TBNetworking;
 import chappie.theboys.util.TBConfig;
 import net.fabricmc.api.ClientModInitializer;
@@ -61,6 +62,7 @@ public class TheBoysClient implements ClientModInitializer {
         FirstPersonAdditionalHandCallback.EVENT.register(ClientEvents::firstPersonAdditionalHand);
         ClientTickEvents.END_CLIENT_TICK.register(TBOverlays::clientTick);
         ParticleFactoryRegistry.getInstance().register(TBParticleTypes.LASER, LaserParticle.LaserParticleFactory::new);
+        ParticleFactoryRegistry.getInstance().register(TBParticleTypes.WATER_SPLASH, WaterSplashParticle.Provider::new);
         EntityRendererRegistry.register(TBEntities.TRAIL, TrailRenderer::new);
 
         ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : ((SyringeItem) stack.getItem()).getColor(stack), TBItems.SYRINGE);

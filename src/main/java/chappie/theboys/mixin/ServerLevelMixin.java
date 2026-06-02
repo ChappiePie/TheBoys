@@ -3,6 +3,7 @@ package chappie.theboys.mixin;
 import chappie.modulus.util.CommonUtil;
 import chappie.theboys.common.ability.SuperHearingAbility;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
@@ -37,8 +38,7 @@ public abstract class ServerLevelMixin {
             if (player.distanceToSqr(x, y, z) > 4096.0D) {
                 for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(player))) {
                     if (a.isEnabled()) {
-                        player.connection
-                                .send(
+                        ServerPlayNetworking.getSender(player).sendPacket(
                                         new ClientboundExplodePacket(
                                                 x,
                                                 y,

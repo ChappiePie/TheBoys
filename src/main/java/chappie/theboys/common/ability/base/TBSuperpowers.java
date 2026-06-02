@@ -15,6 +15,7 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.ability.FocusOnGoalAbility;
 import chappie.theboys.common.ability.HeatVisionAbility;
+import chappie.theboys.common.ability.SpeedAbility;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
 import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.core.Registry;
@@ -101,6 +102,22 @@ public class TBSuperpowers {
             AttributeModifierAbility.of("armor", b -> b.attribute(Attributes.ARMOR.value()).amount(5.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
             AttributeModifierAbility.of("fall_resistance", b -> b.attribute(ModRegistries.FALL_RESISTANCE.value()).amount(-Integer.MAX_VALUE).operation(AttributeModifier.Operation.ADD_VALUE))
     ));
+
+
+    public static final Superpower THE_DEEP = register("the_deep", new TBSuperpower(
+            AbilityBuilder.of("dolphin_companion", TBAbilityTypes.DOLPHIN_COMPANION)
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(128)))
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
+            AbilityBuilder.of("fish_swarm", TBAbilityTypes.FISH_SWARM)
+                    .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(144)))
+                    .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.HELD), "enabling"),
+
+            AbilityBuilder.of("water_breathing", TBAbilityTypes.WATER_BREATHING).hide(),
+            AbilityBuilder.of("water_mining", TBAbilityTypes.WATER_MINING).hide(),
+
+            AttributeModifierAbility.of("attack_damage", b -> b.attribute(Attributes.ATTACK_DAMAGE.value()).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE)),
+            AttributeModifierAbility.of("max_health", b -> b.attribute(Attributes.MAX_HEALTH.value()).amount(1.0D).operation(AttributeModifier.Operation.ADD_VALUE))
+    ).uOffset(48));
 
 //    public static final Superpower STARLIGHT = register("starlight", new TBSuperpower(
 //            AbilityBuilder.of("lasers", TBAbilityTypes.GLOW_EYES)
