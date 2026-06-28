@@ -1,0 +1,39 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "ARR"
+
+[[mods]]
+modId = "theboys"
+version = "${version}"
+displayName = "The Boys"
+description = '''
+"The Boys" mod, is based on the series of the same name, allows players to get into the role of superheroes.
+It includes suits, weapons and abilities inspired by the world of The Boys.
+This will enrich the gaming experience of fans of the series, allowing them to play as characters from this series.
+'''
+authors = "ChappiePie"
+logoFile = "assets/theboys/icon.png"
+
+[[mixins]]
+config = "theboys.mixins.json"
+
+[[dependencies.theboys]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.theboys]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.theboys]]
+modId = "modulus"
+type = "required"
+versionRange = "[1.21.1-1.0.0,)"
+ordering = "AFTER"
+side = "BOTH"

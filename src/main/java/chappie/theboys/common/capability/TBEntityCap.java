@@ -1,18 +1,11 @@
 package chappie.theboys.common.capability;
 
-import chappie.theboys.TheBoys;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
-import org.ladysnake.cca.api.v3.component.ComponentV3;
-import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 
-public class TBEntityCap implements AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
-
-    public static final ComponentKey<TBEntityCap> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(TheBoys.id("entity"), TBEntityCap.class);
+public class TBEntityCap implements INBTSerializable<CompoundTag> {
 
     public final Entity entity;
     private int glowingTick;
@@ -22,19 +15,23 @@ public class TBEntityCap implements AutoSyncedComponent, CommonTickingComponent,
     }
 
     public static TBEntityCap getCap(Object provider) {
-        return KEY.maybeGet(provider).orElse(null);
+        if (provider instanceof Entity entity) {
+            return entity.getData(TBAttachments.ENTITY_CAP);
+        }
+        return null;
     }
 
     public void setGlowingTick(int glowingTick) {
         this.glowingTick = glowingTick;
-        KEY.sync(this.entity);
+        if (this.entity != null) {
+            this.entity.setData(TBAttachments.ENTITY_CAP, this);
+        }
     }
 
     public boolean isGlowing() {
         return this.glowingTick > 0;
     }
 
-    @Override
     public void tick() {
         if (this.glowingTick > 0) {
             this.glowingTick--;
@@ -42,12 +39,14 @@ public class TBEntityCap implements AutoSyncedComponent, CommonTickingComponent,
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        this.glowingTick = tag.getInt("glowingTick");
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("glowingTick", this.glowingTick);
+        return tag;
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        tag.putInt("glowingTick", this.glowingTick);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        this.glowingTick = tag.getInt("glowingTick");
     }
 }

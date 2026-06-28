@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
@@ -41,7 +40,7 @@ public class SyringeRenderer extends GeoItemRenderer<SyringeItem> {
     @Override
     public void renderRecursively(PoseStack poseStack, SyringeItem animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int renderColor) {
         if (bone.getName().equals("bone2")) {
-            bone.setHidden(this.currentItemStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY).isEmpty());
+            bone.setHidden(!this.currentItemStack.has(TBDataComponents.VIAL));
         }
 
         if (!bone.getName().equals("bone3")) {

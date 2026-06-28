@@ -33,14 +33,14 @@ public abstract class HumanoidArmorLayerMixin<T extends LivingEntity, A extends 
     @Shadow
     protected abstract void setPartVisibility(A pModel, EquipmentSlot pSlot);
 
-    @Inject(method = "renderArmorPiece(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;setPartVisibility(Lnet/minecraft/client/model/HumanoidModel;Lnet/minecraft/world/entity/EquipmentSlot;)V"))
-    private void startRenderArmorPiece(PoseStack pPoseStack, MultiBufferSource pBuffer, T pLivingEntity, EquipmentSlot pSlot, int pPackedLight, A pModel, CallbackInfo ci) {
+    @Inject(method = "renderArmorPiece(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;FFFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/HumanoidArmorLayer;setPartVisibility(Lnet/minecraft/client/model/HumanoidModel;Lnet/minecraft/world/entity/EquipmentSlot;)V"))
+    private void startRenderArmorPiece(PoseStack pPoseStack, MultiBufferSource pBuffer, T pLivingEntity, EquipmentSlot pSlot, int pPackedLight, A pModel, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
         if (theBoys$model == null)
             theBoys$model = new SuitModel<>(SuitModel.SUIT);
         ItemStack stack = pLivingEntity.getItemBySlot(pSlot);
         if (stack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == pSlot) {
-            ItemStack suitStack = stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
-            if (!suitStack.isEmpty() && suitStack.getItem() instanceof SuitItem item) {
+            ItemStack suitStack = stack.has(TBDataComponents.SUIT) ? stack.get(TBDataComponents.SUIT).toStack() : ItemStack.EMPTY;
+            if (suitStack.getItem() instanceof SuitItem item) {
                 Vector3f vec3f = item.getClientSuitProperties().armorScale(pLivingEntity, stack);
                 switch (pSlot) {
                     case HEAD -> {
@@ -67,11 +67,11 @@ public abstract class HumanoidArmorLayerMixin<T extends LivingEntity, A extends 
     }
 
     @SuppressWarnings("unchecked")
-    @Inject(method = "renderArmorPiece(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;)V", at = @At("TAIL"))
-    private void stopRenderArmorPiece(PoseStack pPoseStack, MultiBufferSource pBuffer, T pLivingEntity, EquipmentSlot pSlot, int pPackedLight, A pModel, CallbackInfo ci, @Local(ordinal = 0) ItemStack stack) {
+    @Inject(method = "renderArmorPiece(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;FFFFFF)V", at = @At("TAIL"))
+    private void stopRenderArmorPiece(PoseStack pPoseStack, MultiBufferSource pBuffer, T pLivingEntity, EquipmentSlot pSlot, int pPackedLight, A pModel, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci, @Local(ordinal = 0) ItemStack stack) {
         if (stack.getItem() instanceof ArmorItem armoritem && armoritem.getEquipmentSlot() == pSlot) {
-            ItemStack suitStack = stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
-            if (!suitStack.isEmpty() && suitStack.getItem() instanceof SuitItem item) {
+            ItemStack suitStack = stack.has(TBDataComponents.SUIT) ? stack.get(TBDataComponents.SUIT).toStack() : ItemStack.EMPTY;
+            if (suitStack.getItem() instanceof SuitItem item) {
                 ClientSuitProperties properties = item.getClientSuitProperties();
                 float alpha = TBConfig.COMMON.suitOpacity.get().floatValue();
                 pModel.copyPropertiesTo(this.theBoys$model);

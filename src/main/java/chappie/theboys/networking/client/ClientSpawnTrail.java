@@ -5,7 +5,6 @@ import chappie.modulus.util.render.IHasContext;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.entity.TrailEntity;
 import chappie.theboys.mixin.client.EntityRenderersAccessor;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -77,7 +76,7 @@ public class ClientSpawnTrail implements CustomPacketPayload {
     }
 
     @SuppressWarnings("unchecked")
-    public void handle(LocalPlayer localPlayer, PacketSender packetSender) {
+    public void handle(LocalPlayer localPlayer) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null) {
             Entity entity = mc.level.getEntity(this.entityId);

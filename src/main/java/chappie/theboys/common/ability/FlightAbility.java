@@ -118,7 +118,10 @@ public class FlightAbility extends Ability implements IHasTimer {
                 vec3 = vec3.add(0, Math.sin(entity.tickCount / 10F) / 50F, 0); // hover
                 vec3 = vec3.add(inputVector(entity, speed * 2)); // unite two vectors, default and with movements.
             }
-            entity.setDeltaMovement(vec3);
+
+            if (Double.isFinite(vec3.x) && Double.isFinite(vec3.y) && Double.isFinite(vec3.z)) {
+                entity.setDeltaMovement(vec3);
+            }
         } else {
             this.dataManager.set(BOOSTING, false);
         }

@@ -94,7 +94,7 @@ public class SpeedAbility extends Ability implements IHasTimer {
                     }
                 }*/
 
-                if (speedLevel > 5 && isMoving) {
+                if (speedLevel > 3 && isMoving) {
                     for (LivingEntity e : entity.getCommandSenderWorld().getEntitiesOfClass(LivingEntity.class,
                             CommonUtil.boxWithRange(entity.position(), 0.5D))) {
                         if (e != entity) {

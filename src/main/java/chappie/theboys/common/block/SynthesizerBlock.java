@@ -112,12 +112,12 @@ public class SynthesizerBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return TBBlockEntities.SYNTHESIZER.create(pos, state);
+        return TBBlockEntities.SYNTHESIZER.get().create(pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, TBBlockEntities.SYNTHESIZER, (l, p, blockState, be) -> be.tick(l, p, blockState));
+        return createTickerHelper(blockEntityType, TBBlockEntities.SYNTHESIZER.get(), (l, p, blockState, be) -> be.tick(l, p, blockState));
     }
 }

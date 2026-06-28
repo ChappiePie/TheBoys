@@ -1,17 +1,17 @@
 package chappie.theboys.common.particle;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class WaterSplashParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
 
-    public WaterSplashParticle(ClientLevel clientLevel, double d, double e, double f, SpriteSet sprites) {
-        super(clientLevel, d, e, f);
+    public WaterSplashParticle(ClientLevel clientLevel, double x, double y, double z, SpriteSet sprites) {
+        super(clientLevel, x, y, z);
         this.lifetime = 11;
         this.hasPhysics = false;
         this.gravity = -0.1F;
@@ -36,9 +36,9 @@ public class WaterSplashParticle extends TextureSheetParticle {
                 this.zd *= 1.1;
             }
 
-            this.xd *= (double)this.friction;
-            this.yd *= (double)this.friction;
-            this.zd *= (double)this.friction;
+            this.xd *= this.friction;
+            this.yd *= this.friction;
+            this.zd *= this.friction;
             if (this.onGround) {
                 this.xd *= 0.7F;
                 this.zd *= 0.7F;
@@ -51,7 +51,7 @@ public class WaterSplashParticle extends TextureSheetParticle {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprite;
 

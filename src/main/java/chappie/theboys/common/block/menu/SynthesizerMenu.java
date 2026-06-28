@@ -28,7 +28,7 @@ public class SynthesizerMenu extends AbstractContainerMenu {
     }
 
     public SynthesizerMenu(int containerId, Inventory playerInventory, Container container, ContainerData data) {
-        super(TBMenus.SYNTHESIZER, containerId);
+        super(TBMenus.SYNTHESIZER.value(), containerId);
         this.container = container;
         checkContainerSize(container, 9);
         checkContainerDataCount(data, 7);

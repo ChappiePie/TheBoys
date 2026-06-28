@@ -22,6 +22,7 @@ import chappie.theboys.util.TBConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.CameraType;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
@@ -44,7 +45,9 @@ public class TBOverlays {
 
     private static final IHasTimer.Timer ANIM_TICK = new IHasTimer.Timer(() -> 10, TheBoysClient.OVERLAY::isDown);
 
-    public static void render(Minecraft mc, float partialTick, GuiGraphics guiGraphics) {
+    public static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        Minecraft mc = Minecraft.getInstance();
+        float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
         TBOverlays.renderHud(mc, mc.gui, guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         TBOverlays.renderATrain(guiGraphics, partialTick, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight());
         TBOverlays.renderEyes(guiGraphics, mc, partialTick);

@@ -5,11 +5,13 @@ import chappie.theboys.client.renderer.VialRenderer;
 import chappie.theboys.common.ability.base.TBSuperpower;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.tooltip.SuperpowerTooltip;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
@@ -43,7 +45,7 @@ public class VialItem extends Item implements GeoItem {
     }
 
     public static ItemStack compoundV() {
-        ItemStack pStack = TBItems.VIAL.getDefaultInstance();
+        ItemStack pStack = TBItems.VIAL.get().getDefaultInstance();
         pStack.set(TBDataComponents.SUPERPOWER, "compoundV");
         return pStack;
     }
@@ -86,6 +88,21 @@ public class VialItem extends Item implements GeoItem {
                 if (this.renderer == null)
                     this.renderer = new VialRenderer();
 
+                return this.renderer;
+            }
+        });
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            private GeoItemRenderer<?> renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (this.renderer == null) {
+                    this.renderer = new VialRenderer();
+                }
                 return this.renderer;
             }
         });

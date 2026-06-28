@@ -42,7 +42,6 @@ public class FocusOnGoalAbility extends Ability {
         if (enabled) {
             Entity target = entity.getCommandSenderWorld().getEntity(targetId);
             if (bool || target == null || !target.isAlive()
-                    || target.getEyePosition().y > entity.getEyePosition().y
                     || target.getEyePosition().distanceTo(entity.getEyePosition()) < 4 && !this.hasSpeedAbility()) {
                 this.dataManager.set(TARGET_ID, entity.getId());
             }

@@ -2,8 +2,6 @@ package chappie.theboys.common.entity;
 
 import chappie.modulus.networking.ModNetworking;
 import chappie.theboys.networking.client.ClientSpawnTrail;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -12,12 +10,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.awt.*;
 import java.util.Map;
 
 public class TrailEntity extends Entity {
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public EntityModel<LivingEntity> model;
     public ResourceLocation texture;
     public float yBodyRot;
@@ -34,7 +34,7 @@ public class TrailEntity extends Entity {
     }
 
     public TrailEntity(Level worldIn, LivingEntity attached, Color color, int lifeTime) {
-        this(TBEntities.TRAIL, worldIn);
+        this(TBEntities.TRAIL.get(), worldIn);
         this.attached = attached;
         this.yBodyRot = attached.yBodyRot;
         this.lifeTime = lifeTime;
@@ -63,7 +63,7 @@ public class TrailEntity extends Entity {
         }
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public boolean shouldRender(double x, double y, double z) {
         return true;

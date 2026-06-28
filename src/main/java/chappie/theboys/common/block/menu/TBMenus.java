@@ -1,25 +1,21 @@
 package chappie.theboys.common.block.menu;
 
 import chappie.theboys.TheBoys;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class TBMenus {
 
-    private static <T extends AbstractContainerMenu> MenuType<T> register(String name, MenuType.MenuSupplier<T> block) {
-        return Registry.register(BuiltInRegistries.MENU, TheBoys.id(name), new MenuType<>(block, FeatureFlags.DEFAULT_FLAGS));
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(BuiltInRegistries.MENU, TheBoys.MODID);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<SynthesizerMenu>> SYNTHESIZER = MENU_TYPES.register("synthesizer",
+            () -> new MenuType<>(SynthesizerMenu::new, FeatureFlags.DEFAULT_FLAGS));
+
+    public static void init(IEventBus modEventBus) {
+        MENU_TYPES.register(modEventBus);
     }
-
-    public static void init() {
-
-    }
-
-    public static final MenuType<SynthesizerMenu> SYNTHESIZER = register("synthesizer", SynthesizerMenu::new);
-
-
-
-
 }

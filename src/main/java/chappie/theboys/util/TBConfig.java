@@ -1,35 +1,35 @@
 package chappie.theboys.util;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class TBConfig {
     public static Client CLIENT;
-    public static ForgeConfigSpec CLIENT_SPEC, COMMON_SPEC;
+    public static ModConfigSpec CLIENT_SPEC, COMMON_SPEC;
 
     public static Common COMMON;
 
     static {
-        Pair<Client, ForgeConfigSpec> specClientPair = new ForgeConfigSpec.Builder().configure(Client::new);
+        Pair<Client, ModConfigSpec> specClientPair = new ModConfigSpec.Builder().configure(Client::new);
         CLIENT_SPEC = specClientPair.getRight();
         CLIENT = specClientPair.getLeft();
 
-        Pair<Common, ForgeConfigSpec> specCommonPair = new ForgeConfigSpec.Builder().configure(Common::new);
+        Pair<Common, ModConfigSpec> specCommonPair = new ModConfigSpec.Builder().configure(Common::new);
         COMMON_SPEC = specCommonPair.getRight();
         COMMON = specCommonPair.getLeft();
     }
 
     public static class Client {
 
-        public final ForgeConfigSpec.BooleanValue eyesOverlay;
-        public final ForgeConfigSpec.BooleanValue heatVisionHardcored;
-        public final ForgeConfigSpec.BooleanValue abilitiesOverlayToggle;
+        public final ModConfigSpec.BooleanValue eyesOverlay;
+        public final ModConfigSpec.BooleanValue heatVisionHardcored;
+        public final ModConfigSpec.BooleanValue abilitiesOverlayToggle;
 
-        public final ForgeConfigSpec.IntValue eyesType;
-        public final ForgeConfigSpec.IntValue eyesHeight, eyesHeight2;
-        public final ForgeConfigSpec.IntValue eyesLength, eyesLength2;
+        public final ModConfigSpec.IntValue eyesType;
+        public final ModConfigSpec.IntValue eyesHeight, eyesHeight2;
+        public final ModConfigSpec.IntValue eyesLength, eyesLength2;
 
-        Client(ForgeConfigSpec.Builder builder) {
+        Client(ModConfigSpec.Builder builder) {
 
             builder.comment("Client Settings").push("client");
             this.abilitiesOverlayToggle = builder.comment("Should abilities overlay key be toggleable").translation("config.theboys.abilitiesOverlayToggle").define("abilitiesOverlayToggle", false);
@@ -59,14 +59,14 @@ public class TBConfig {
 
     public static class Common {
 
-        public final ForgeConfigSpec.DoubleValue suitOpacity;
-        public final ForgeConfigSpec.BooleanValue storeAbilities;
-        public final ForgeConfigSpec.BooleanValue chatForMuted;
+        public final ModConfigSpec.DoubleValue suitOpacity;
+        public final ModConfigSpec.BooleanValue storeAbilities;
+        public final ModConfigSpec.BooleanValue chatForMuted;
 
-        public final ForgeConfigSpec.DoubleValue heatVisionDamage;
-        public final ForgeConfigSpec.DoubleValue heatVisionRange;
+        public final ModConfigSpec.DoubleValue heatVisionDamage;
+        public final ModConfigSpec.DoubleValue heatVisionRange;
 
-        Common(ForgeConfigSpec.Builder builder) {
+        Common(ModConfigSpec.Builder builder) {
             builder.comment("Common Settings").push("common");
             this.suitOpacity = builder.comment("Change suit opacity on armor").translation("config.theboys.suitOpacity").defineInRange("suitOpacity", 1.0D, 0.0D, 1.0D);
             this.storeAbilities = builder.comment("Store abilities").translation("config.theboys.storeAbilities").define("storeAbilities", false);

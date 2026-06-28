@@ -1,7 +1,0 @@
-{
-    "parent": "theboys:item/suit",
-    "textures":
-    {
-        "layer0": "theboys:item/the_deep/legs"
-    }
-}

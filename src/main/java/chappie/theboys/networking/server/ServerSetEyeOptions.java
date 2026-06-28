@@ -2,7 +2,6 @@ package chappie.theboys.networking.server;
 
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -33,7 +32,7 @@ public class ServerSetEyeOptions implements CustomPacketPayload {
         buf.writeInt(this.eyesLength);
     }
 
-    public void handle(ServerPlayer player, PacketSender packetSender) {
+    public void handle(ServerPlayer player) {
         if (player != null) {
             TheBoysCap.getCap(player).setEyeOptions(this.eyesHeight, this.eyesLength);
         }

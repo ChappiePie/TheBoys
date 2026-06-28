@@ -1,22 +1,17 @@
 package chappie.theboys.common.capability;
 
-import chappie.theboys.TheBoys;
+import chappie.theboys.networking.TBNetworking;
+import chappie.theboys.networking.packet.SyncTheBoysCapPacket;
 import chappie.theboys.util.timers.SyringeAnim;
 import chappie.theboys.util.timers.SyringeVialAnim;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
-import org.ladysnake.cca.api.v3.component.ComponentV3;
-import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.api.v3.component.tick.CommonTickingComponent;
 
-public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, ComponentV3 {
+public class TheBoysCap implements INBTSerializable<CompoundTag> {
 
-    public static final ComponentKey<TheBoysCap> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(TheBoys.id("cap"), TheBoysCap.class);
     public final SyringeVialAnim vialAnim = new SyringeVialAnim(this);
     public final SyringeAnim syringeAnim = new SyringeAnim(this);
     private final LivingEntity livingEntity;
@@ -29,12 +24,14 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
 
     @Nullable
     public static TheBoysCap getCap(Object provider) {
-        return KEY.maybeGet(provider).orElse(null);
+        if (provider instanceof LivingEntity entity) {
+            return entity.getData(TBAttachments.THEBOYS_CAP);
+        }
+        return null;
     }
 
-    @Override
     public void tick() {
-        if (this.livingEntity.isAlive()) {
+        if (this.livingEntity != null && this.livingEntity.isAlive()) {
             this.vialAnim.tick(this.livingEntity);
             this.syringeAnim.tick(this.livingEntity);
         }
@@ -66,28 +63,15 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
     }
 
     public void syncToAll() {
-        KEY.sync(this.livingEntity);
+        if (this.livingEntity != null && !this.livingEntity.level().isClientSide()) {
+            this.livingEntity.setData(TBAttachments.THEBOYS_CAP, this);
+            TBNetworking.sendToTrackingEntityAndSelf(new SyncTheBoysCapPacket(this.serializeNBT(this.livingEntity.level().registryAccess())), this.livingEntity);
+        }
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayer player) {
-        //return player != this.livingEntity;
-        return true;
-    }
-
-    @Override
-    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        this.compoundV = tag.getBoolean("CompoundV");
-        CompoundTag nbt = tag.getCompound("eyeOptions");
-        this.eyesHeight = nbt.getInt("eyesHeight");
-        this.eyesLength = nbt.getInt("eyesLength");
-
-        this.syringeAnim.readFromNbt(tag.getCompound("syringeAnim"));
-        this.vialAnim.readFromNbt(tag.getCompound("vialAnim"));
-    }
-
-    @Override
-    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag tag = new CompoundTag();
         tag.putBoolean("CompoundV", this.compoundV);
 
         CompoundTag eyeOptions = new CompoundTag();
@@ -97,5 +81,17 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
 
         tag.put("syringeAnim", this.syringeAnim.writeToNbt());
         tag.put("vialAnim", this.vialAnim.writeToNbt());
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        this.compoundV = tag.getBoolean("CompoundV");
+        CompoundTag nbt = tag.getCompound("eyeOptions");
+        this.eyesHeight = nbt.getInt("eyesHeight");
+        this.eyesLength = nbt.getInt("eyesLength");
+
+        this.syringeAnim.readFromNbt(tag.getCompound("syringeAnim"));
+        this.vialAnim.readFromNbt(tag.getCompound("vialAnim"));
     }
 }

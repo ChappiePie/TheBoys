@@ -51,13 +51,13 @@ public class ClientEvents {
         TheBoysCap theBoysCap = TheBoysCap.getCap(player);
         if (theBoysCap == null) return false;
         ItemStack pStack = player.getItemInHand(event.pHand());
-        if (!pStack.isEmpty() && (pStack.getItem() == TBItems.SYRINGE || pStack.getItem() == TBItems.VIAL)) {
+        if (!pStack.isEmpty() && (pStack.getItem() == TBItems.SYRINGE.get() || pStack.getItem() == TBItems.VIAL.get())) {
             event.renderArm().set(true);
         }
         boolean flag1 = player.getMainArm() == HumanoidArm.RIGHT;
         int i = flag1 ? 1 : -1;
         float timeline = theBoysCap.syringeAnim.timeline.value(event.pPartialTicks());
-        if (player.getMainHandItem().getItem() == TBItems.SYRINGE && timeline != 0) {
+        if (player.getMainHandItem().getItem() == TBItems.SYRINGE.get() && timeline != 0) {
             float t = Math.min(timeline, 0.25F) * 4F;
             float t1 = 1.0F - Math.min(timeline, 0.2F) * 5F;
             if (t1 < 1.0F) {
@@ -112,7 +112,7 @@ public class ClientEvents {
             int i = flag1 ? 1 : -1;
             ModelPart mainHand = flag1 ? event.model().rightArm : event.model().leftArm;
             ModelPart offHand = flag1 ? event.model().leftArm : event.model().rightArm;
-            if (pPlayer.getMainHandItem().getItem() == TBItems.SYRINGE) {
+            if (pPlayer.getMainHandItem().getItem() == TBItems.SYRINGE.get()) {
                 float timeline = theBoysCap.syringeAnim.timeline.value(partialTicks);
                 float t = Math.min(timeline, 0.25F) * 4F;
 
@@ -130,7 +130,7 @@ public class ClientEvents {
 
             SyringeVialAnim vialAnim = theBoysCap.vialAnim;
             float timeline = vialAnim.timeline.value(partialTicks);
-            if (pPlayer.getMainHandItem().getItem() == TBItems.SYRINGE && pPlayer.getOffhandItem().getItem() == TBItems.VIAL || timeline > 0) {
+            if (pPlayer.getMainHandItem().getItem() == TBItems.SYRINGE.get() && pPlayer.getOffhandItem().getItem() == TBItems.VIAL.get() || timeline > 0) {
                 float t = Math.min(timeline, 0.5F) * 2F;
                 float t1 = Mth.sin(pPlayer.tickCount + partialTicks) * vialAnim.rollVial.value(partialTicks);
                 float t2 = vialAnim.insertVial.value(partialTicks);
@@ -149,8 +149,8 @@ public class ClientEvents {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.isArmor()) {
                 ItemStack stack = event.entity().getItemBySlot(slot);
-                if (stack.getItem() instanceof ArmorItem && !stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).isEmpty()) {
-                    ItemStack suitStack = stack.get(TBDataComponents.SUIT);
+                if (stack.getItem() instanceof ArmorItem && stack.has(TBDataComponents.SUIT)) {
+                    ItemStack suitStack = stack.get(TBDataComponents.SUIT).toStack();
                     if (suitStack.getItem() instanceof SuitItem item) {
                         if (event.modelProperties().layers().stream().anyMatch(layer -> layer instanceof HumanoidArmorLayer)) {
                             Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.entity(), stack);
@@ -210,12 +210,13 @@ public class ClientEvents {
             for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
                 float yBodyRot = Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot);
                 float f = Mth.wrapDegrees(player.getViewYRot(partialTick) - yBodyRot);
-                if (!ability.cooldown.end() && ability.dataManager.get(FlightAbility.BOOSTING) && player.isSprinting() && !Minecraft.getInstance().isPaused()) {
-                    float f1 = ability.cooldown.value(partialTick);
-                    pPoseStack.mulPose(Axis.ZP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
-                    pPoseStack.mulPose(Axis.YP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
+                if (!ability.cooldown.end())
+                    if (ability.dataManager.get(FlightAbility.BOOSTING) && player.isSprinting() && !Minecraft.getInstance().isPaused()) {
+                        float f1 = ability.cooldown.value(partialTick);
+                        pPoseStack.mulPose(Axis.ZP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
+                        pPoseStack.mulPose(Axis.YP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
 
-                }
+                    }
 
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees((f * ability.sprintingTimer.value(partialTick)) / 2.0F));
                 break;
@@ -311,10 +312,17 @@ public class ClientEvents {
     public static boolean capeRender(AbstractClientPlayer player) {
         ItemStack stack = player.getItemBySlot(EquipmentSlot.CHEST);
         if (!stack.isEmpty() && stack.getItem() instanceof ArmorItem) {
-            if (stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).getItem() instanceof SuitItem item) {
+            if (stack.has(TBDataComponents.SUIT) && stack.get(TBDataComponents.SUIT).toStack().getItem() instanceof SuitItem item) {
                 return !(item.getClientSuitProperties() instanceof ClientHeroWithCapeProperties);
             }
         }
         return true;
+    }
+
+    public static void capeRender(LivingEntity entity, Object renderer) {
+        // Overload for NeoForge event compatibility
+        if (entity instanceof AbstractClientPlayer player) {
+            capeRender(player);
+        }
     }
 }

@@ -1,12 +1,14 @@
 {
   "required": true,
   "package": "chappie.theboys.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "theboys.refmap.json",
   "minVersion": "0.8",
   "client": [
     "client.AbstractSoundInstanceMixin",
     "client.CapeLayerMixin",
+    "client.EntityRenderersAccessor",
     "client.GameRendererMixin",
-    "client.GuiMixin",
     "client.HumanoidArmorLayerMixin",
     "client.HumanoidModelMixin",
     "client.ItemInHandLayerMixin",
@@ -20,7 +22,9 @@
     "client.SoundEngineMixin"
   ],
   "mixins": [
+    "AbstractSchoolingFishMixin",
     "ArmorItemMixin",
+    "DolphinMixin",
     "EntityMixin",
     "InventoryMixin",
     "ItemStackMixin",
@@ -28,6 +32,7 @@
     "LivingEntityMixin",
     "LivingEntityRendererAccessor",
     "MobEffectUtilMixin",
+    "MobMixin",
     "PlayerMixin",
     "ServerLevelMixin",
     "SkullBlockEntityAccessor"

@@ -99,7 +99,7 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
     };
 
     public SynthesizerBlockEntity(BlockPos pos, BlockState blockState) {
-        super(TBBlockEntities.SYNTHESIZER, pos, blockState);
+        super(TBBlockEntities.SYNTHESIZER.get(), pos, blockState);
     }
 
     @Override
@@ -365,7 +365,7 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
                 this.cookingProgress = 0;
                 this.cookingTotalTime = 200;
                 ItemStack stack = this.items.get(2);
-                ItemStack resultItem = TBItems.VIAL.getDefaultInstance();
+                ItemStack resultItem = TBItems.VIAL.get().getDefaultInstance();
                 int vials = this.numOfVials();
                 if (stack.is(Items.POISONOUS_POTATO) || stack.getRarity() != Rarity.COMMON || stack.getItem() instanceof PotionItem) {
                     if (vials < 3 ? level.random.nextInt(100) < 75 : level.random.nextInt(100) < 50) {

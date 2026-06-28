@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'net.neoforged.moddev' version '2.0.28-beta'
 	id 'maven-publish'
 }
 
@@ -10,80 +10,67 @@ base {
 	archivesName = project.archives_base_name
 }
 
-loom {
-	accessWidenerPath = file("src/main/resources/${project.archives_base_name}.accesswidener")
+neoForge {
+    version = project.neoforge_version
+
+    accessTransformers {
+        file('src/main/resources/META-INF/accesstransformer.cfg')
+    }
+
+    parchment {
+        minecraftVersion = project.minecraft_version
+        mappingsVersion = project.parchment_version
+    }
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        theboys {
+            sourceSet(sourceSets.main)
+        }
+    }
 }
 
 repositories {
-	exclusiveContent {
-		forRepository {
-			maven {
-				name = "Modrinth"
-				url = "https://api.modrinth.com/maven"
-			}
-		}
-		filter {
-			includeGroup "maven.modrinth"
-		}
-	}
-	maven {
-		name = 'GeckoLib'
-		url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
-		content {
-			includeGroupByRegex("software\\.bernie.*")
-			includeGroup("com.eliotlash.mclib")
-		}
-	}
-	maven {
-		name = "Ladysnake Mods"
-		url = 'https://maven.ladysnake.org/releases'
-	}
+	mavenCentral()
 	maven {
 		name = 'ParchmentMC'
 		url = 'https://maven.parchmentmc.org'
 	}
 	maven {
-		name = 'BlameJared Maven (CrT / Bookshelf)'
-		url = 'https://maven.blamejared.com'
+		name = 'GeckoLib'
+		url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
 	}
 	maven {
-		name = "Fuzs Mod Resources"
-		url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
 	}
 	mavenLocal()
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered() {
-		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-${project.minecraft_version}:${project.parchment_version}@zip")
-	}
+	implementation "net.neoforged:neoforge:${project.neoforge_version}"
+
 	compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
-	modImplementation("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")
+	implementation("io.github.llamalad7:mixinextras-neoforge:${mixin_extras_version}")
 
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
 
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}+${project.minecraft_version}"
+	implementation "chappie.modulus:modulus:${minecraft_version}-${project.modulus_version}"
 
-	modImplementation include("software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}")
-	implementation("com.eliotlash.mclib:mclib:20")
-
-	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}")
-	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}")
-
-	modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
-	modImplementation include("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
-
-	modImplementation "chappie.modulus:modulus:${minecraft_version}-${project.modulus_version}"
-
-	modApi modRuntimeOnly("maven.modrinth:modmenu:${project.mod_menu_version}")
 }
 
 processResources {
 	inputs.property "version", project.version
 
-	filesMatching("fabric.mod.json") {
+	filesMatching("META-INF/neoforge.mods.toml") {
 		expand "version": project.version
 	}
 }

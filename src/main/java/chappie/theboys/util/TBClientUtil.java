@@ -40,8 +40,8 @@ public class TBClientUtil {
         int i = flag1 ? 1 : -1;
         ItemStack stack = pPlayer.getMainArm() == side ? pPlayer.getMainHandItem() : pPlayer.getOffhandItem();
 
-        boolean vial = stack.getItem() == TBItems.VIAL || pPlayer.getMainArm() != side && timeline > 0;
-        if (stack.getItem() == TBItems.SYRINGE || vial) {
+        boolean vial = stack.getItem() == TBItems.VIAL.get() || pPlayer.getMainArm() != side && timeline > 0;
+        if (stack.getItem() == TBItems.SYRINGE.get() || vial) {
             pRendererArm.xRot = (float) Math.toRadians(-12.5F);
             pRendererArm.yRot = (float) Math.toRadians(50F * i);
             pRendererArm.zRot = (float) Math.toRadians(-30.5F * i);

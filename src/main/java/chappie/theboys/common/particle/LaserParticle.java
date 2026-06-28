@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
@@ -17,6 +15,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Quaternionf;
 
 public class LaserParticle extends RisingParticle {
@@ -81,7 +81,7 @@ public class LaserParticle extends RisingParticle {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static class LaserParticleFactory implements ParticleProvider<LaserParticleOptions> {
         private final SpriteSet sprite;
 
@@ -116,7 +116,7 @@ public class LaserParticle extends RisingParticle {
 
         @Override
         public ParticleType<?> getType() {
-            return TBParticleTypes.LASER;
+            return TBParticleTypes.LASER.get();
         }
     }
 }

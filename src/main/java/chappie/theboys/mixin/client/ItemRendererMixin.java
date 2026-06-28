@@ -45,8 +45,8 @@ public abstract class ItemRendererMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderModelLists(Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/item/ItemStack;IILcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V"))
     private void tryRenderGuiItem(ItemStack pStack, ItemDisplayContext pDisplayContext, boolean pLeftHand, PoseStack pPoseStack, MultiBufferSource pBuffer, int pCombinedLight, int pCombinedOverlay, BakedModel pModel, CallbackInfo ci) {
         if (pStack.getItem() instanceof ArmorItem armorItem) {
-            ItemStack stack = pStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
-            if (!stack.isEmpty() && stack.getItem() instanceof SuitItem item
+            ItemStack stack = pStack.has(TBDataComponents.SUIT) ? pStack.get(TBDataComponents.SUIT).toStack() : ItemStack.EMPTY;
+            if (stack.getItem() instanceof SuitItem item
                     && armorItem.getEquipmentSlot() == item.properties.getSlot()) {
                 BakedModel pBakedModel = this.getModel(stack, this.minecraft.level, this.minecraft.player, 0);
                 pPoseStack.pushPose();
