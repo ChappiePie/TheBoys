@@ -94,7 +94,7 @@ public abstract class HumanoidArmorLayerMixin<S extends HumanoidRenderState, M e
         ClientSuitProperties properties = suit.getClientSuitProperties();
         float alpha = TBConfig.COMMON.suitOpacity.get().floatValue();
         poseStack.pushPose();
-        Entity entity = renderState instanceof IRenderStateEntity<?> e ? e.modulus$entity() : null;
+        Entity entity = renderState instanceof IRenderStateEntity e ? e.modulus$entity() : null;
         HumanoidModel<HumanoidRenderState> suitModel = this.theBoys$suitModelSet.get(slot);
         properties.setupSuitScale(suitModel, entity, slot, armorItem);
         properties.renderSuitModel(suitModel, poseStack, submitNodeCollector, renderState, slot, packedLight, armorItem, suitItem, model, alpha);

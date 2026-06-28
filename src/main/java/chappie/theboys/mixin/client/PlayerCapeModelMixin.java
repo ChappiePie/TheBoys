@@ -21,7 +21,7 @@ public class PlayerCapeModelMixin {
             at = @At(value = "INVOKE", target = "Lorg/joml/Quaternionf;rotateX(F)Lorg/joml/Quaternionf;")
     )
     private Quaternionf rotateWithFlight(Quaternionf instance, float angle, Operation<Quaternionf> original, @Local(argsOnly = true) AvatarRenderState playerRenderState) {
-       if (playerRenderState instanceof IRenderStateEntity<?> entity) {
+       if (playerRenderState instanceof IRenderStateEntity entity) {
            for (FlightAbility a : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(entity.modulus$entity()))) {
                return instance.rotateX(angle * (1.0F - a.sprintingTimer.value(ClientUtil.getPartialTick())));
            }

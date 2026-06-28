@@ -19,7 +19,7 @@ public abstract class LivingEntityRendererMixin<S extends LivingEntityRenderStat
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("HEAD"))
     public void theBoys$renderStart(S livingEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         poseStack.pushPose();
-        if (livingEntityRenderState instanceof IRenderStateEntity<?> e) {
+        if (livingEntityRenderState instanceof IRenderStateEntity e) {
             ClientEvents.flightAnimation(e.modulus$entity(), ClientUtil.getPartialTick(), poseStack);
         }
     }

@@ -31,7 +31,7 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
     @Override
     public void render(PoseStack pPoseStack, SubmitNodeCollector submitNodeCollector, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {
         super.render(pPoseStack, submitNodeCollector, renderState, pSlot, pPackedLight, armorStack, suitStack, model, alpha);
-        if (renderState instanceof IRenderStateEntity<?> state && state.modulus$entity() instanceof AbstractClientPlayer player && pSlot == EquipmentSlot.CHEST) {
+        if (renderState instanceof IRenderStateEntity state && state.modulus$entity() instanceof AbstractClientPlayer player && pSlot == EquipmentSlot.CHEST) {
             this.model.setupAnim(renderState);
 
             ModelPart cape = this.model.root().getChild("cape");

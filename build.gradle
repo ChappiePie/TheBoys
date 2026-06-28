@@ -1,6 +1,6 @@
 plugins {
-    id 'fabric-loom' version '1.12-SNAPSHOT'
-	id 'maven-publish'
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+    id 'maven-publish'
 }
 
 version = "${project.minecraft_version}-${project.mod_version}"
@@ -73,12 +73,11 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}+${project.minecraft_version}"
 
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
+    modImplementation include("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
 
-	modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:${project.fcap_version}"
-	modImplementation ("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${project.fcap_version}")
-
-	modImplementation ("software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}")
-	implementation("com.eliotlash.mclib:mclib:20")
+    modImplementation include("software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}")
+    implementation("com.eliotlash.mclib:mclib:20")
 
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}")
 	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}")

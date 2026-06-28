@@ -102,7 +102,7 @@ public class TBClientUtil {
                 } else if (slot == EquipmentSlot.CHEST) {
 
                     ClientUtil.modified(model.body).modulus$setSize(vec3f.add(0.05F, 0.05F, 0.05F, new Vector3f()));
-                    if (renderState instanceof IRenderStateEntity<?> e && CommonUtil.smallArms(e.modulus$entity())) {
+                    if (renderState instanceof IRenderStateEntity e && CommonUtil.smallArms(e.modulus$entity())) {
                         ClientUtil.modified(model.rightArm).modulus$setSizeAndPos(vec3f.add(-0.5F, 0, 0), new Vector3f(0.5F, 0, 0));
                         ClientUtil.modified(model.leftArm).modulus$setSizeAndPos(vec3f.add(-0.5F, 0, 0), new Vector3f(-0.5F, 0, 0));
                     } else {
