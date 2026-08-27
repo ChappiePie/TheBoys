@@ -1,11 +1,11 @@
 package chappie.theboys.mixin;
 
 import chappie.modulus.util.CommonUtil;
+import chappie.modulus.util.data.CommonAccessors;
 import chappie.theboys.common.ability.FishSwarmAbility;
-import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.animal.AbstractSchoolingFish;
+import net.minecraft.world.entity.animal.fish.AbstractSchoolingFish;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,9 +22,8 @@ public class AbstractSchoolingFishMixin {
         AbstractSchoolingFish fish = (AbstractSchoolingFish) (Object) this;
         for (Player player : fish.level().getEntitiesOfClass(Player.class,
                 CommonUtil.boxWithRange(fish.position(), FishSwarmAbility.DETECTION_RADIUS))) {
-            for (FishSwarmAbility ability : CommonUtil.listOfType(FishSwarmAbility.class,
-                    CommonUtil.getAbilities(player))) {
-                if (ability.isEnabled() && fish.position().distanceTo(player.position()) <= ability.dataManager.get(TBCommonUtil.DISTANCE)) {
+            for (FishSwarmAbility ability : CommonUtil.getAbilitiesByType(FishSwarmAbility.class, player)) {
+                if (ability.isEnabled() && fish.position().distanceTo(player.position()) <= ability.dataManager.get(CommonAccessors.DISTANCE)) {
                     ci.cancel();
                     break;
                 }
@@ -37,9 +36,8 @@ public class AbstractSchoolingFishMixin {
         AbstractSchoolingFish fish = (AbstractSchoolingFish) (Object) this;
         for (Player player : fish.level().getEntitiesOfClass(Player.class,
                 CommonUtil.boxWithRange(fish.position(), FishSwarmAbility.DETECTION_RADIUS))) {
-            for (FishSwarmAbility a : CommonUtil.listOfType(FishSwarmAbility.class,
-                    CommonUtil.getAbilities(player))) {
-                if (!a.isEnabled() || fish.position().distanceTo(player.position()) >= a.dataManager.get(TBCommonUtil.DISTANCE)) {
+            for (FishSwarmAbility a : CommonUtil.getAbilitiesByType(FishSwarmAbility.class, player)) {
+                if (!a.isEnabled() || fish.position().distanceTo(player.position()) >= a.dataManager.get(CommonAccessors.DISTANCE)) {
                     continue;
                 }
                 RandomSource rand = fish.getRandom();

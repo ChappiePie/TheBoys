@@ -2,15 +2,14 @@
 
  import chappie.theboys.common.entity.TrailEntity;
  import chappie.theboys.mixin.LivingEntityRendererAccessor;
- import chappie.theboys.util.interfaces.EntitySavingFields;
  import com.mojang.blaze3d.vertex.PoseStack;
  import net.minecraft.client.Minecraft;
- import net.minecraft.client.renderer.RenderType;
  import net.minecraft.client.renderer.SubmitNodeCollector;
  import net.minecraft.client.renderer.entity.EntityRenderer;
  import net.minecraft.client.renderer.entity.EntityRendererProvider;
  import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
- import net.minecraft.client.renderer.state.CameraRenderState;
+ import net.minecraft.client.renderer.rendertype.RenderTypes;
+ import net.minecraft.client.renderer.state.level.CameraRenderState;
  import net.minecraft.client.renderer.texture.OverlayTexture;
  import net.minecraft.util.ARGB;
  import net.minecraft.world.entity.LivingEntity;
@@ -56,7 +55,7 @@ public class TrailRenderer extends EntityRenderer<TrailEntity, TrailRenderState>
         float f = 1F - (renderState.tickCount / (float) renderState.lifeTime);
         float alpha = f / 2.0F;
         f = Math.max(0, 0.5F + f - 0.5F);
-        ((EntitySavingFields) attached).theBoys$setup(renderState.fieldSavingMap);
+        ((chappie.modulus.util.EntityStateOverride) attached).modulus$setup(renderState.fieldSavingMap);
         poseStack.pushPose();
         EntityRenderer<? super LivingEntity, ?> renderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(attached);
         if (renderer instanceof LivingEntityRendererAccessor accessor) {
@@ -70,14 +69,14 @@ public class TrailRenderer extends EntityRenderer<TrailEntity, TrailRenderState>
         float green = (renderState.color.getGreen() + (int) ((255 - renderState.color.getGreen()) * f)) / 255F;
         float blue = (renderState.color.getBlue() + (int) ((255 - renderState.color.getBlue()) * f)) / 255F;
         int colour = ARGB.color((int) (alpha * 255), (int) (red * 255), (int) (green * 255), (int) (blue * 255));
-        nodeCollector.submitCustomGeometry(poseStack, RenderType.entityTranslucent(renderState.trail.texture()), (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(renderState.trail.texture()), (pose, consumer) -> {
             PoseStack renderStack = new PoseStack();
             renderStack.last().pose().set(pose.pose());
             renderStack.last().normal().set(pose.normal());
             renderState.trail.model().renderToBuffer(renderStack, consumer, renderState.lightCoords, OverlayTexture.NO_OVERLAY, colour);
         });
         poseStack.popPose();
-        ((EntitySavingFields) attached).theBoys$reset();
+        ((chappie.modulus.util.EntityStateOverride) attached).modulus$reset();
         super.submit(renderState, poseStack, nodeCollector, cameraRenderState);
     }
 }

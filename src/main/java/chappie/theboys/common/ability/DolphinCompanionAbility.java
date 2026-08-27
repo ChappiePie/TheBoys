@@ -2,7 +2,7 @@ package chappie.theboys.common.ability;
 
 import chappie.modulus.common.ability.base.Ability;
 import chappie.modulus.common.ability.base.AbilityBuilder;
-import chappie.theboys.util.TBCommonUtil;
+import chappie.modulus.util.data.CommonAccessors;
 import net.minecraft.world.entity.LivingEntity;
 
 public class DolphinCompanionAbility extends Ability {
@@ -14,6 +14,6 @@ public class DolphinCompanionAbility extends Ability {
     @Override
     public void defineData() {
         super.defineData();
-        this.dataManager.define(TBCommonUtil.DISTANCE, this.entity.level().random.nextIntBetweenInclusive(100, 200));
+        this.dataManager.define(CommonAccessors.DISTANCE, this.entity.level().getRandom().nextIntBetweenInclusive(100, 200));
     }
 }

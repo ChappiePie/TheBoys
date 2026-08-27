@@ -6,13 +6,13 @@ import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.item.suit.SuitItem;
 import chappie.theboys.common.item.suit.SuitProperties;
 import com.google.common.collect.ImmutableMap;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -34,7 +34,7 @@ import static net.minecraft.world.item.equipment.ArmorType.*;
 public class TBItems {
 
     public static final ArrayList<Item> ITEMS = new ArrayList<>();
-    public static final ArrayList<ItemStack> ITEMS_TAB = new ArrayList<>();
+    public static final ArrayList<Item> ITEMS_TAB = new ArrayList<>();
 
     public static final ImmutableMap<ArmorType, SuitItem> HOMELANDER_SUIT = registerSuitParts("homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
     public static final ImmutableMap<ArmorType, SuitItem> ATRAIN_SUIT = registerSuitParts("atrain", (p) -> p.armorScale((stack) ->
@@ -48,23 +48,27 @@ public class TBItems {
     public static final SyringeItem SYRINGE = register("syringe", SyringeItem::new, new Properties(), false);
     public static final VialItem VIAL = register("vial", VialItem::new, new Properties(), false);
 
-    public static final CreativeModeTab THE_BOYS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TheBoys.id("theboys"), FabricItemGroup.builder()
-            .icon(() -> new ItemStack(Objects.requireNonNull(TBItems.HOMELANDER_SUIT.get(CHESTPLATE))))
-            .title(Component.translatable("title.theboys")).displayItems((itemDisplayParameters, output) -> {
-                output.acceptAll(TBItems.ITEMS_TAB);
+    public static final CreativeModeTab THE_BOYS_TAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TheBoys.id("the_boys"),
+            FabricCreativeModeTab.builder()
+                    .icon(() -> new ItemStack(Objects.requireNonNull(TBItems.HOMELANDER_SUIT.get(CHESTPLATE))))
+                    .title(Component.translatable("title.theboys")).displayItems((itemDisplayParameters, output) -> {
+                        for (Item item : TBItems.ITEMS_TAB) {
+                            output.accept(new ItemStack(item));
+                        }
 
-                output.accept(SYRINGE);
-                output.accept(VIAL);
-                output.accept(VialItem.compoundV());
-                for (ResourceLocation resourceLocation : Superpower.REGISTRY.keySet()) {
-                    if (resourceLocation.getNamespace().equals(TheBoys.MODID)) {
-                        ItemStack pStack = new ItemStack(VIAL);
-                        pStack.set(TBDataComponents.SUPERPOWER, resourceLocation.toString());
-                        output.accept(pStack);
-                    }
-                }
-            }).build());
+                        output.accept(SYRINGE);
+                        output.accept(VIAL);
+                        output.accept(VialItem.compoundV());
+                        for (Identifier id : Superpower.REGISTRY.keySet()) {
+                            if (id.getNamespace().equals(TheBoys.MODID)) {
+                                ItemStack pStack = new ItemStack(VIAL);
+                                pStack.set(TBDataComponents.SUPERPOWER, id.toString());
+                                output.accept(pStack);
+                            }
+                        }
+                    }).build());
 
+    //
     private static ImmutableMap<ArmorType, SuitItem> registerSuitParts(String type, Consumer<SuitProperties> consumer, ArmorType... slots) {
         return TBItems.registerSuitParts(type, consumer, ArmorMaterials.LEATHER.defense(), 0.0F, slots);
     }
@@ -88,7 +92,7 @@ public class TBItems {
         T registered = Registry.register(BuiltInRegistries.ITEM, TheBoys.id(id), item.apply(properties.setId(ResourceKey.create(Registries.ITEM, TheBoys.id(id)))));
         ITEMS.add(registered);
         if (ownSort) {
-            ITEMS_TAB.add(new ItemStack(registered));
+            ITEMS_TAB.add(registered);
         }
         return registered;
     }

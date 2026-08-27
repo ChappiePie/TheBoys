@@ -4,7 +4,6 @@
   "minVersion": "0.8",
   "client": [
     "client.AbstractSoundInstanceMixin",
-    "client.BlockRendererMixin",
     "client.ChatScreenMixin",
     "client.ClientAvatarStateMixin",
     "client.EntityRenderersAccessor",
@@ -20,13 +19,13 @@
     "client.LivingEntityRendererMixin",
     "client.LocalPlayerMixin",
     "client.MinecraftMixin",
+    "client.ModelBlockRendererMixin",
     "client.PlayerCapeModelMixin",
     "client.PlayerRendererMixin",
     "client.ScreenAccessor",
+    "client.SectionCompilerMixin",
     "client.SelectItemModelPropertiesMixin",
-    "client.SimpleBlockRenderContextMixin",
-    "client.SoundEngineMixin",
-    "client.TerrainRenderContextMixin"
+    "client.SoundEngineMixin"
   ],
   "mixins": [
     "AbstractSchoolingFishMixin",
@@ -43,9 +42,7 @@
     "PlayerMixin",
     "ServerLevelMixin",
     "client.BlockRenderInfoMixin",
-    "client.EntityMixin",
-    "client.sodium.MixinBlockOcclusionCache",
-    "client.sodium.MixinBlockRenderer"
+    "client.EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

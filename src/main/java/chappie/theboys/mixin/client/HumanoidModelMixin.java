@@ -26,18 +26,18 @@ public class HumanoidModelMixin<T extends HumanoidRenderState> {
     public ModelPart leftArm;
 
     @Inject(method = "poseRightArm", at = @At("HEAD"))
-    public void slowDownRightArm(T renderState, HumanoidModel.ArmPose pose, CallbackInfo ci) {
+    public void slowDownRightArm(T renderState, CallbackInfo ci) {
         if (renderState instanceof IRenderStateEntity state) {
-            for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(state.modulus$entity()))) {
+            for (FlightAbility ability : CommonUtil.getAbilitiesByType(FlightAbility.class, state.modulus$entity())) {
                 this.rightArm.xRot -= this.rightArm.xRot * ability.timer.value(ClientUtil.getPartialTick());
             }
         }
     }
 
     @Inject(method = "poseLeftArm", at = @At("HEAD"))
-    public void slowDownLeftArm(T renderState, HumanoidModel.ArmPose pose, CallbackInfo ci) {
+    public void slowDownLeftArm(T renderState, CallbackInfo ci) {
         if (renderState instanceof IRenderStateEntity state) {
-            for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(state.modulus$entity()))) {
+            for (FlightAbility ability : CommonUtil.getAbilitiesByType(FlightAbility.class, state.modulus$entity())) {
                 this.leftArm.xRot -= this.leftArm.xRot * ability.timer.value(ClientUtil.getPartialTick());
             }
         }

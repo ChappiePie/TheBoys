@@ -38,9 +38,9 @@ public class WaterSplashParticle extends SingleQuadParticle {
                 this.zd *= 1.1;
             }
 
-            this.xd *= (double)this.friction;
-            this.yd *= (double)this.friction;
-            this.zd *= (double)this.friction;
+            this.xd *= this.friction;
+            this.yd *= this.friction;
+            this.zd *= this.friction;
             if (this.onGround) {
                 this.xd *= 0.7F;
                 this.zd *= 0.7F;

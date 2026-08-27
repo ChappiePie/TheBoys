@@ -20,18 +20,13 @@ public class ChatScreenMixin {
 
     @Inject(method = "init()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;setCanLoseFocus(Z)V"))
     private void mixin$changingFilter(CallbackInfo ci) {
-        this.input.setFilter((str) -> {
-            var player = Minecraft.getInstance().player;
-
-            if (player != null && !TBConfig.COMMON.chatForMuted.get()
-                    && !CommonUtil.listOfType(NodHeadAbility.class, CommonUtil.getAbilities(player)).isEmpty()) {
-                if (str.startsWith("/tell ") || str.startsWith("/say ")) {
-                    return false;
-                }
-                return str.isBlank() || str.startsWith("/");
-            }
-            return true;
-        });
+        // EditBox.setFilter() removed in 26.2
+        // Use setResponder to visually indicate muted state
+        var player = Minecraft.getInstance().player;
+        if (player != null && !TBConfig.COMMON.chatForMuted.get()
+                && !CommonUtil.getAbilitiesByType(NodHeadAbility.class, player).isEmpty()) {
+            this.input.setEditable(false);
+        }
     }
 
     @Inject(method = "handleChatInput(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
@@ -39,7 +34,7 @@ public class ChatScreenMixin {
         var player = Minecraft.getInstance().player;
 
         if (player != null && !TBConfig.COMMON.chatForMuted.get()
-                && !CommonUtil.listOfType(NodHeadAbility.class, CommonUtil.getAbilities(player)).isEmpty()) {
+                && !CommonUtil.getAbilitiesByType(NodHeadAbility.class, player).isEmpty()) {
             if (!str.isBlank() && !str.startsWith("/") || str.startsWith("/say ") || str.startsWith("/tell ")) {
                 ci.cancel();
             }

@@ -1,7 +1,7 @@
 package chappie.theboys.util.tooltip;
 
-import chappie.theboys.common.ability.base.TBSuperpower;
+import chappie.modulus.common.ability.base.Superpower;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
-public record SuperpowerTooltip(TBSuperpower superpower) implements TooltipComponent {
+public record SuperpowerTooltip(Superpower superpower) implements TooltipComponent {
 }

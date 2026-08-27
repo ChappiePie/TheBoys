@@ -33,7 +33,7 @@ public class ClientAvatarStateMixin {
         AbstractClientPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
 
-        for (ParkourAbility ability : CommonUtil.listOfType(ParkourAbility.class, CommonUtil.getAbilities(player))) {
+        for (ParkourAbility ability : CommonUtil.getAbilitiesByType(ParkourAbility.class, player)) {
             if (ability.slideHandler.isActive()) {
                 int ticks = ability.dataManager.get(SlideHandler.SLIDE_TICKS);
                 boolean isStopping = ability.dataManager.get(SlideHandler.IS_STOPPING);

@@ -25,7 +25,7 @@ public class MinecraftMixin implements ISetupGameProfiles {
 
     @Inject(method = "shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z", at = @At("RETURN"), cancellable = true)
     public void mixin$isCurrentlyGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(Minecraft.getInstance().getCameraEntity()))) {
+        for (SuperHearingAbility a : CommonUtil.getAbilitiesByType(SuperHearingAbility.class, Minecraft.getInstance().getCameraEntity())) {
             if (a.isEnabled()) {
                 if (entity != null && entity.isAlive() && !cir.getReturnValue()) {
                     TBEntityCap cap = TBEntityCap.getCap(entity);

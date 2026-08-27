@@ -15,7 +15,7 @@ import chappie.theboys.util.TBConfig;
 import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +25,8 @@ public class TheBoys implements ModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-    public static ResourceLocation id(String id) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, id);
+    public static Identifier id(String id) {
+        return Identifier.fromNamespaceAndPath(MODID, id);
     }
 
     @Override

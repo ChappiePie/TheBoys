@@ -1,6 +1,6 @@
-accessWidener v2 named
-accessible method net/minecraft/client/gui/components/AbstractSliderButton getSprite ()Lnet/minecraft/resources/ResourceLocation;
-accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleSprite ()Lnet/minecraft/resources/ResourceLocation;
+accessWidener v2 official
+accessible method net/minecraft/client/gui/components/AbstractSliderButton getSprite ()Lnet/minecraft/resources/Identifier;
+accessible method net/minecraft/client/gui/components/AbstractSliderButton getHandleSprite ()Lnet/minecraft/resources/Identifier;
 
 accessible method net/minecraft/world/level/block/LiquidBlock getFluidState (Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/material/FluidState;
-accessible method net/minecraft/client/renderer/LevelRenderer compileSections (Lnet/minecraft/client/Camera;)V
+accessible method net/minecraft/client/renderer/LevelRenderer compileSections (Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V

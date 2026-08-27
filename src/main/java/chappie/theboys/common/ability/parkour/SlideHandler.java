@@ -224,7 +224,7 @@ public class SlideHandler extends ParkourHandler {
         this.slideExitTicks = cooldown ? 8 : 0;
         if (cooldown) {
             this.slideCooldown.start(28);
-            if (this.parkourAbility.entity.level().isClientSide()) {
+            if (this.parkourAbility.getEntity().level().isClientSide()) {
                 this.stopTicks = 8;
             }
         }

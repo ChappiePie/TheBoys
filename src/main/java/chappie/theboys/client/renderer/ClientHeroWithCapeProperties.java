@@ -13,9 +13,10 @@ import com.mojang.math.Axis;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -30,7 +31,7 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
 
     @Override
     public void render(PoseStack pPoseStack, SubmitNodeCollector submitNodeCollector, HumanoidRenderState renderState, EquipmentSlot pSlot, int pPackedLight, ItemStack armorStack, ItemStack suitStack, HumanoidModel<?> model, float alpha) {
-        super.render(pPoseStack, submitNodeCollector, renderState, pSlot, pPackedLight, armorStack, suitStack, model, alpha);
+        // Render cape on chestplate slot
         if (renderState instanceof IRenderStateEntity state && state.modulus$entity() instanceof AbstractClientPlayer player && pSlot == EquipmentSlot.CHEST) {
             this.model.setupAnim(renderState);
 
@@ -43,7 +44,7 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
             } else {
                 pPoseStack.translate(0, -0.02, 0.025);
             }
-            for (FlightAbility a : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
+            for (FlightAbility a : CommonUtil.getAbilitiesByType(FlightAbility.class, player)) {
                 float t = a.sprintingTimer.value(ClientUtil.getPartialTick());
                 cape.xRot -= (float) ((cape.xRot - Math.toRadians(170)) * t);
             }
@@ -66,6 +67,6 @@ public final class ClientHeroWithCapeProperties extends ClientSuitProperties {
     }
 
     public RenderType renderType() {
-        return RenderType.entityTranslucent(TheBoys.id("textures/suits/%s/cape.png".formatted(this.type())));
+        return RenderTypes.entityTranslucent(TheBoys.id("textures/suits/%s/cape.png".formatted(this.type())));
     }
 }

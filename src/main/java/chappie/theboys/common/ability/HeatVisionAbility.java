@@ -3,16 +3,16 @@ package chappie.theboys.common.ability;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.AbilityClientProperties;
 import chappie.modulus.common.ability.base.condition.KeyCondition;
-import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
+import chappie.modulus.util.IHasTimer;
+import chappie.modulus.util.data.CommonAccessors;
 import chappie.modulus.util.data.DataAccessor;
 import chappie.modulus.util.model.ModelProperties;
+import chappie.theboys.client.renderer.LaserRenderTypes;
 import chappie.theboys.common.ability.base.TBAbilityTypes;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.particle.LaserParticleOptions;
-import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.TBConfig;
-import com.google.common.collect.Iterables;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -30,7 +30,6 @@ import net.minecraft.world.phys.*;
 
 import java.awt.*;
 import java.util.AbstractMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -42,12 +41,13 @@ public class HeatVisionAbility extends GlowEyesAbility {
     public static final DataAccessor<Float> DISTANCE = new DataAccessor<>("distance", DataAccessor.DataSerializer.FLOAT);
     public static final DataAccessor<Float> STRENGTH = new DataAccessor<>("strength", DataAccessor.DataSerializer.FLOAT);
 
-    public final Timer timer = new Timer(() -> this.dataManager.get(MAX_TIMER), this::isEnabled);
+    public final IHasTimer.Timer timer = addTimer(() -> this.dataManager.get(MAX_TIMER), this::isEnabled);
     private Map.Entry<BlockPos, Integer> blocksInFire;
 
     public HeatVisionAbility(LivingEntity entity, AbilityBuilder builder) {
         super(entity, builder);
-        this.eyesTimer = new Timer(() -> 4, () -> !(this.entity instanceof Player) && isEnabled() || this.conditionManager.test("eyes"));
+        this.getTimers().remove(this.glowTimer);
+        this.glowTimer = this.addTimer(() -> 4, () -> !(this.entity instanceof Player) && isEnabled() || this.conditionManager.test("eyes"));
     }
 
     // Basic modifications for nice Heat vision ability
@@ -98,7 +98,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
                         new LaserParticleOptions(this.entity.getId(), Color.WHITE.getRGB()),
                         true, hitResult.getLocation(), new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.01F, 1);
                 CommonUtil.spawnParticleForAll(this.entity.level(),
-                        new LaserParticleOptions(this.entity.getId(), this.dataManager.get(TBCommonUtil.COLOR).getRGB()),
+                        new LaserParticleOptions(this.entity.getId(), this.dataManager.get(CommonAccessors.COLOR).getRGB()),
                         true, hitResult.getLocation(), new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.04F, 4);
 
                 CommonUtil.spawnParticleForAll(this.entity.level(),
@@ -115,7 +115,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
             @Override
             public  void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, SubmitNodeCollector bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!modelProperties.root().hasChild("head")) return;
-                Color color = dataManager.get(TBCommonUtil.COLOR);
+                Color color = dataManager.get(CommonAccessors.COLOR);
                 float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
                 boolean humanoid = renderer.getModel() instanceof HumanoidModel;
                 poseStack.pushPose();
@@ -142,11 +142,13 @@ public class HeatVisionAbility extends GlowEyesAbility {
                         }
                         poseStack.scale(0.5F, 0.75F, 1);
                         poseStack.translate(x, -0.05, 0);
-                        bufferIn.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.MAIN_LASER, (pose, vertexConsumer) ->
-                                ClientUtil.renderFilledBox(pose.pose(), vertexConsumer, box, 1F, 1F, 1F, f, packedLightIn));
-                        bufferIn.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.LASER, (PoseStack.Pose pose, VertexConsumer vertexConsumer) -> {
-                            ClientUtil.renderFilledBox(pose.pose(), vertexConsumer, box.inflate(0.015D), red, green, blue, f * 0.2F, packedLightIn);
-                            ClientUtil.renderFilledBox(pose.pose(), vertexConsumer, box.inflate(0.03D), red, green, blue, f * 0.2F, packedLightIn);
+                        // Core (translucent, white)
+                        bufferIn.submitCustomGeometry(poseStack, LaserRenderTypes.LASER_CORE, (PoseStack.Pose pose, VertexConsumer vertexConsumer) ->
+                                LaserRenderTypes.renderLaserBox(pose.pose(), vertexConsumer, box, 1F, 1F, 1F, f));
+                        // Glow (additive, colored)
+                        bufferIn.submitCustomGeometry(poseStack, LaserRenderTypes.LASER_GLOW, (PoseStack.Pose pose, VertexConsumer vertexConsumer) -> {
+                            LaserRenderTypes.renderLaserBox(pose.pose(), vertexConsumer, box.inflate(0.015D), red, green, blue, f * 0.2F);
+                            LaserRenderTypes.renderLaserBox(pose.pose(), vertexConsumer, box.inflate(0.03D), red, green, blue, f * 0.2F);
                         });
                         poseStack.popPose();
                     }
@@ -191,10 +193,5 @@ public class HeatVisionAbility extends GlowEyesAbility {
                 }
             }
         }
-    }
-
-    @Override
-    public Iterable<Timer> timers() {
-        return Iterables.concat(super.timers(), List.of(this.timer));
     }
 }

@@ -1,14 +1,10 @@
 package chappie.theboys.client.gui;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.util.function.Function;
@@ -54,31 +50,22 @@ public class ModSlider extends AbstractSliderButton {
         }
     }
 
-    @Override
-    public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        final Minecraft mc = Minecraft.getInstance();
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, this.getSprite(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, this.getHandleSprite(), this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 8, this.getHeight());
-
-        int i = this.getX() + 2;
-        int j = this.getX() + this.getWidth() - 2;
-        renderScrollingString(guiGraphics, mc.font, this.getMessage(), i, this.getY(), j, this.getY() + this.getHeight(), (this.active ? 16777215 : 10526880) | Mth.ceil(this.alpha * 255.0F) << 24);
-    }
+    // Rendering handled by AbstractSliderButton.extractWidgetRenderState()
+    // Custom message via getMessage() override handles blocked state display
 
 
     @Override
     public void onClick(MouseButtonEvent event, boolean isDoubleClick) {
         if (this.isBlocked()) return;
-        super.onClick(event, isDoubleClick);
         this.tick = 5;
         this.click++;
+        super.onClick(event, isDoubleClick);
     }
 
     @Override
-    protected void onDrag(MouseButtonEvent event, double mouseX, double mouseY) {
-        if (!this.isBlocked()) {
-            super.onDrag(event, mouseX, mouseY);
-        }
+    protected void onDrag(MouseButtonEvent event, double dx, double dy) {
+        if (this.isBlocked()) return;
+        super.onDrag(event, dx, dy);
     }
 
     @Override
@@ -99,10 +86,10 @@ public class ModSlider extends AbstractSliderButton {
     }
 
     public double getValue() {
-        return Mth.clampedLerp(minValue, this.maxValue(), this.value);
+        return Mth.clampedLerp(this.value, minValue, this.maxValue());
     }
 
-    public void setValue(double value) {
+    public void setRealValue(double value) {
         this.value = (value - minValue) / (maxValue() - minValue);
         this.applyValue();
     }
@@ -116,7 +103,7 @@ public class ModSlider extends AbstractSliderButton {
     }
 
     public void valueToInitial() {
-        this.setValue(this.initialValue);
+        this.setRealValue(this.initialValue);
         this.click = this.tick = 0;
     }
 

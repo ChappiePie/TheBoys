@@ -19,7 +19,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -178,11 +178,11 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
     }
 
     private boolean areAdjacentChunksTicking(Level level, BlockPos pos) {
-        ChunkPos chunkPos = new ChunkPos(pos);
+        ChunkPos chunkPos = ChunkPos.containing(pos);
 
-        for (int i = chunkPos.x - 1; i <= chunkPos.x + 1; i++) {
-            for (int j = chunkPos.z - 1; j <= chunkPos.z + 1; j++) {
-                if (!level.shouldTickBlocksAt(ChunkPos.asLong(i, j)) || level.getChunkSource().getChunkNow(i, j) == null) {
+        for (int i = chunkPos.x() - 1; i <= chunkPos.x() + 1; i++) {
+            for (int j = chunkPos.z() - 1; j <= chunkPos.z() + 1; j++) {
+                if (!level.shouldTickBlocksAt(ChunkPos.pack(i, j)) || level.getChunkSource().getChunkNow(i, j) == null) {
                     return false;
                 }
             }
@@ -224,10 +224,10 @@ public class SuperHearingAbility extends Ability implements IHasTimer, Vibration
                 if (context.sourceEntity() instanceof LivingEntity livingEntity) {
                     boolean b = entity.level() == livingEntity.level()
                             && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(livingEntity)
-                            && !entity.isAlliedTo(livingEntity)
-                            && livingEntity.getType() != EntityType.ARMOR_STAND
-                            && !livingEntity.isInvulnerable()
-                            && !livingEntity.isDeadOrDying()
+//                            && !entity.isAlliedTo(livingEntity)
+                            && livingEntity.getType() != EntityTypes.ARMOR_STAND
+//                            && !livingEntity.isInvulnerable()
+//                            && !livingEntity.isDeadOrDying()
                             && entity.level().getWorldBorder().isWithinBounds(livingEntity.getBoundingBox());
                     return b && !livingEntity.is(entity);
                 }

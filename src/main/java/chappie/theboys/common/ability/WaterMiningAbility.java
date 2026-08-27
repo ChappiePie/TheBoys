@@ -4,7 +4,7 @@ import chappie.modulus.common.ability.base.Ability;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.theboys.TheBoys;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -26,7 +26,7 @@ public class WaterMiningAbility extends Ability {
 
     private void setAttribute(LivingEntity entity, String name, Attribute attribute, double amount, AttributeModifier.Operation operation) {
         AttributeInstance instance = entity.getAttribute(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute));
-        ResourceLocation location = TheBoys.id(name);
+        Identifier location = TheBoys.id(name);
 
         if (instance != null) {
             var modifier = instance.getModifier(location);

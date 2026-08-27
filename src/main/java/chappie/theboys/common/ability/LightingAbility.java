@@ -13,12 +13,12 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 public class LightingAbility extends Ability implements IHasTimer {
-    public static final ResourceLocation WHITE = TheBoys.id("textures/models/white.png");
+    public static final Identifier WHITE = TheBoys.id("textures/models/white.png");
 
     public Timer timer = new Timer(() -> 10, this::isEnabled);
 
@@ -128,7 +128,7 @@ public class LightingAbility extends Ability implements IHasTimer {
                                 renderPart(from, to, width, height, renderStack, consumer, 1, 1, 1, f);
                             }
                         });
-                        nodeCollector.submitCustomGeometry(poseStack, RenderType.entityTranslucentEmissive(WHITE), (pose, consumer) -> {
+                        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucentEmissive(WHITE), (pose, consumer) -> {
                             PoseStack renderStack = new PoseStack();
                             renderStack.last().pose().set(pose.pose());
                             renderStack.last().normal().set(pose.normal());

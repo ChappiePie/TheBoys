@@ -7,7 +7,7 @@ import chappie.theboys.common.ability.FlightAbility;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.model.PlayerCapeModel;
+import net.minecraft.client.model.player.PlayerCapeModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public class PlayerCapeModelMixin {
     )
     private Quaternionf rotateWithFlight(Quaternionf instance, float angle, Operation<Quaternionf> original, @Local(argsOnly = true) AvatarRenderState playerRenderState) {
        if (playerRenderState instanceof IRenderStateEntity entity) {
-           for (FlightAbility a : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(entity.modulus$entity()))) {
+           for (FlightAbility a : CommonUtil.getAbilitiesByType(FlightAbility.class, entity.modulus$entity())) {
                return instance.rotateX(angle * (1.0F - a.sprintingTimer.value(ClientUtil.getPartialTick())));
            }
        }

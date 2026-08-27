@@ -5,9 +5,9 @@ import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.AbilityClientProperties;
 import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.IHasTimer;
+import chappie.modulus.util.data.CommonAccessors;
 import chappie.modulus.util.events.SetupAnimCallback;
 import chappie.theboys.common.particle.TBParticleTypes;
-import chappie.theboys.util.TBCommonUtil;
 import com.google.common.collect.Lists;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -41,7 +41,7 @@ public class FishSwarmAbility extends Ability implements IHasTimer {
     @Override
     public void defineData() {
         super.defineData();
-        this.dataManager.define(TBCommonUtil.DISTANCE, this.entity.level().random.nextIntBetweenInclusive(50, 100));
+        this.dataManager.define(CommonAccessors.DISTANCE, this.entity.level().getRandom().nextIntBetweenInclusive(50, 100));
     }
 
     @Override

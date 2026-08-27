@@ -1,24 +1,23 @@
 package chappie.theboys.client.gui.render.pip;
 
-import chappie.modulus.util.ClientUtil;
 import chappie.theboys.client.gui.render.state.LaserPreviewRenderState;
+import chappie.theboys.client.renderer.LaserRenderTypes;
 import chappie.theboys.common.ability.HeatVisionAbility;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4fStack;
 
 import java.util.function.Supplier;
@@ -27,19 +26,19 @@ public class GuiLaserRenderer extends PictureInPictureRenderer<LaserPreviewRende
 
     private static final Supplier<PlayerModel> EYES_LAYER_MODEL = () -> new PlayerModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER), false);
 
-    public GuiLaserRenderer(MultiBufferSource.BufferSource bufferSource) {
-        super(bufferSource);
+    public GuiLaserRenderer() {
+        super();
     }
 
     @Override
-    public @NotNull Class<LaserPreviewRenderState> getRenderStateClass() {
+    public Class<LaserPreviewRenderState> getRenderStateClass() {
         return LaserPreviewRenderState.class;
     }
 
     @Override
-    protected void renderToTexture(LaserPreviewRenderState state, PoseStack poseStack) {
+    protected void renderToTexture(LaserPreviewRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
         Minecraft minecraft = Minecraft.getInstance();
-        minecraft.gameRenderer.getLighting().setupFor(Lighting.Entry.PLAYER_SKIN);
+        minecraft.gameRenderer.lighting().setupFor(Lighting.Entry.PLAYER_SKIN);
         Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
         int guiScale = minecraft.getWindow().getGuiScale();
         matrixStack.pushMatrix();
@@ -50,7 +49,12 @@ public class GuiLaserRenderer extends PictureInPictureRenderer<LaserPreviewRende
 
         // Render Player model
         RenderType renderType = state.model().renderType(state.texture());
-        state.model().renderToBuffer(poseStack, this.bufferSource.getBuffer(renderType), 15728880, OverlayTexture.NO_OVERLAY);
+        submitNodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
+            PoseStack renderStack = new PoseStack();
+            renderStack.last().pose().set(pose.pose());
+            renderStack.last().normal().set(pose.normal());
+            state.model().renderToBuffer(renderStack, consumer, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, -1);
+        });
 
         // Render Lasers and eyes overlay
         poseStack.pushPose();
@@ -61,33 +65,44 @@ public class GuiLaserRenderer extends PictureInPictureRenderer<LaserPreviewRende
         float offset = length == 1 ? 0 : length == 2 ? 0.0625F * 4F : 0.0625F * (8.25F - (3 - length) * 4.25F);
         poseStack.translate(0F, offset, 0F);
         poseStack.scale(1F, length, 1F);
-        renderEyes(poseStack, state.tickCount());
-        renderBeams(poseStack, state.laserLength());
+        renderEyes(poseStack, submitNodeCollector, state.tickCount());
+        renderBeams(poseStack, submitNodeCollector, state.laserLength());
         poseStack.popPose();
         poseStack.popPose();
 
-        this.bufferSource.endBatch();
-        minecraft.gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
+        minecraft.gameRenderer.lighting().setupFor(Lighting.Entry.ITEMS_3D);
         matrixStack.popMatrix();
     }
 
-    private void renderEyes(PoseStack poseStack, int tickCount) {
+    private void renderEyes(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int tickCount) {
         poseStack.pushPose();
         poseStack.scale(1.03125F, 1.03125F, 1.03125F);
-        VertexConsumer vertexConsumer = this.bufferSource.getBuffer(RenderType.beaconBeam(HeatVisionAbility.GLOW_EYES, true));
+        RenderType beaconBeam = RenderTypes.beaconBeam(HeatVisionAbility.GLOW_EYES, true);
         for (int i = 0; i < 3; i++) {
             poseStack.pushPose();
             poseStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
             float alpha = i == 0 ? 1F : 0.25F;
-            renderModelPart(EYES_LAYER_MODEL.get().head, poseStack, vertexConsumer, ARGB.colorFromFloat(alpha, 1.0F, 0.0F, 0.0F));
+            int color = ARGB.colorFromFloat(alpha, 1.0F, 0.0F, 0.0F);
+            submitNodeCollector.submitCustomGeometry(poseStack, beaconBeam, (pose, consumer) -> {
+                PoseStack rs = new PoseStack();
+                rs.last().pose().set(pose.pose());
+                rs.last().normal().set(pose.normal());
+                EYES_LAYER_MODEL.get().head.render(rs, consumer, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, color);
+            });
             poseStack.popPose();
         }
         poseStack.translate(0, 0, -(Math.cos(tickCount * tickCount) / 100F));
-        renderModelPart(EYES_LAYER_MODEL.get().hat, poseStack, vertexConsumer, ARGB.colorFromFloat(1F, 1.0F, 0.0F, 0.0F));
+        int hatColor = ARGB.colorFromFloat(1F, 1.0F, 0.0F, 0.0F);
+        submitNodeCollector.submitCustomGeometry(poseStack, beaconBeam, (pose, consumer) -> {
+            PoseStack rs = new PoseStack();
+            rs.last().pose().set(pose.pose());
+            rs.last().normal().set(pose.normal());
+            EYES_LAYER_MODEL.get().hat.render(rs, consumer, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, hatColor);
+        });
         poseStack.popPose();
     }
 
-    private void renderBeams(PoseStack poseStack, double length) {
+    private void renderBeams(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, double length) {
         if (length == 0) {
             return;
         }
@@ -97,20 +112,24 @@ public class GuiLaserRenderer extends PictureInPictureRenderer<LaserPreviewRende
             poseStack.pushPose();
             poseStack.scale(0.5F, 0.75F, 1);
             poseStack.translate(x, -0.05, 0);
-            ClientUtil.renderFilledBox(poseStack.last().pose(), this.bufferSource.getBuffer(ClientUtil.ModRenderTypes.MAIN_LASER), box, 1F, 1F, 1F, 1, 15728880);
-            VertexConsumer laserConsumer = this.bufferSource.getBuffer(ClientUtil.ModRenderTypes.LASER);
-            ClientUtil.renderFilledBox(poseStack.last().pose(), laserConsumer, box.inflate(0.015D), 1F, 0F, 0F, 0.2F, 15728880);
-            ClientUtil.renderFilledBox(poseStack.last().pose(), laserConsumer, box.inflate(0.03D), 1F, 0F, 0F, 0.2F, 15728880);
+
+            // Core (translucent, white) — no depth test for PIP
+            submitNodeCollector.submitCustomGeometry(poseStack, LaserRenderTypes.PIP_LASER_CORE, (pose, consumer) ->
+                    LaserRenderTypes.renderLaserBox(pose.pose(), consumer, box, 1F, 1F, 1F, 1F));
+            // Glow (additive, colored) — no depth test for PIP
+            AABB glowBox1 = box.inflate(0.035D);
+            AABB glowBox2 = box.inflate(0.05D);
+            submitNodeCollector.submitCustomGeometry(poseStack, LaserRenderTypes.PIP_LASER_GLOW, (pose, consumer) -> {
+                LaserRenderTypes.renderLaserBox(pose.pose(), consumer, glowBox1, 1F, 0F, 0F, 0.2F);
+                LaserRenderTypes.renderLaserBox(pose.pose(), consumer, glowBox2, 1F, 0F, 0F, 0.2F);
+            });
+
             poseStack.popPose();
         }
     }
 
-    private void renderModelPart(ModelPart headPart, PoseStack poseStack, VertexConsumer vertexConsumer, int color) {
-        headPart.render(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, color);
-    }
-
     @Override
-    protected @NotNull String getTextureLabel() {
+    protected String getTextureLabel() {
         return "laser preview";
     }
 }

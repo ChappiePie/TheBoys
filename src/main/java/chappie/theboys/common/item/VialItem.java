@@ -2,22 +2,21 @@ package chappie.theboys.common.item;
 
 import chappie.modulus.common.ability.base.Superpower;
 import chappie.theboys.client.renderer.VialRenderer;
-import chappie.theboys.common.ability.base.TBSuperpower;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.tooltip.SuperpowerTooltip;
+import com.geckolib.animatable.GeoItem;
+import com.geckolib.animatable.SingletonGeoAnimatable;
+import com.geckolib.animatable.client.GeoRenderProvider;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.renderer.GeoItemRenderer;
+import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
-import software.bernie.geckolib.animatable.client.GeoRenderProvider;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager;
-import software.bernie.geckolib.renderer.GeoItemRenderer;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -57,9 +56,9 @@ public class VialItem extends Item implements GeoItem {
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
         String superpower = stack.getOrDefault(TBDataComponents.SUPERPOWER, "");
         if (!superpower.isEmpty() && !superpower.equals("compoundV")) {
-            Superpower sup = Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower)).get().value();
-            if (sup instanceof TBSuperpower tbs) {
-                return Optional.of(new SuperpowerTooltip(tbs));
+            Superpower sup = Superpower.REGISTRY.get(Identifier.tryParse(superpower)).get().value();
+            if (sup != null) {
+                return Optional.of(new SuperpowerTooltip(sup));
             }
         }
         return Optional.empty();

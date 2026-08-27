@@ -1,7 +1,6 @@
 package chappie.theboys.networking.client;
 
 import chappie.modulus.util.ClientUtil;
-import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.render.IHasContext;
 import chappie.theboys.TheBoys;
 import chappie.theboys.client.renderer.TrailRenderState;
@@ -11,8 +10,8 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -23,7 +22,7 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.PlayerModelType;
@@ -33,7 +32,7 @@ import java.util.Map;
 
 public class ClientSpawnTrail implements CustomPacketPayload {
 
-    public static final ResourceLocation PACKET_ID = TheBoys.id("spawn_trail");
+    public static final Identifier PACKET_ID = TheBoys.id("spawn_trail");
     public static final Type<ClientSpawnTrail> PACKET = new Type<>(PACKET_ID);
     public static StreamCodec<FriendlyByteBuf, ClientSpawnTrail> CODEC = CustomPacketPayload.codec(ClientSpawnTrail::write, ClientSpawnTrail::new);
     public final TrailEntity entity;
@@ -122,7 +121,7 @@ public class ClientSpawnTrail implements CustomPacketPayload {
                     }
                     if (e.attached instanceof AbstractClientPlayer player) {
                         PlayerModel playerModel = new PlayerModel(Minecraft.getInstance().getEntityModels().bakeLayer(
-                                CommonUtil.smallArms(player) ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), CommonUtil.smallArms(player));
+                                ClientUtil.smallArms(player) ? ModelLayers.PLAYER_SLIM : ModelLayers.PLAYER), ClientUtil.smallArms(player));
                         playerModel.hat.visible = false;
                         playerModel.leftSleeve.visible = false;
                         playerModel.rightSleeve.visible = false;

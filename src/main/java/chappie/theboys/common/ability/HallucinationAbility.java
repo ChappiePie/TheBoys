@@ -29,7 +29,6 @@ public class HallucinationAbility extends Ability {
         consumer.accept(new AbilityClientProperties() {
             @Override
             public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, SubmitNodeCollector bufferIn, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
-                AbilityClientProperties.super.render(renderer, poseStack, bufferIn, packedLightIn, entity, modelProperties);
             }
         });
     }

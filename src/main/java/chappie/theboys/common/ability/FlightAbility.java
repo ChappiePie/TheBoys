@@ -1,6 +1,5 @@
 package chappie.theboys.common.ability;
 
-import chappie.modulus.common.ability.base.Ability;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.AbilityClientProperties;
 import chappie.modulus.util.CommonUtil;
@@ -14,36 +13,36 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
 import java.util.function.Consumer;
 
-public class FlightAbility extends Ability implements IHasTimer {
+public class FlightAbility extends chappie.modulus.common.ability.FlightAbility {
 
-    public static final EntityDimensions FLIGHT_DIMENSIONS =  EntityDimensions.scalable(0.6F, 0.6F).withEyeHeight(0.51F);
-    public static final DataAccessor<Float> SPRINT_SPEED = new DataAccessor<>("sprint_speed", DataAccessor.DataSerializer.FLOAT);
-    public static final DataAccessor<Float> SPEED = new DataAccessor<>("speed", DataAccessor.DataSerializer.FLOAT);
+    // TB-specific data
     public static final DataAccessor<Boolean> BREAK_BLOCKS = new DataAccessor<>("break_blocks", DataAccessor.DataSerializer.BOOLEAN);
-
     public static final DataAccessor<Boolean> BOOSTING = new DataAccessor<>("boosting", DataAccessor.DataSerializer.BOOLEAN);
-
-    public static final DataAccessor<Boolean> SPRINTING = new DataAccessor<>("sprinting", DataAccessor.DataSerializer.BOOLEAN);
     public static final DataAccessor<Boolean> ARM_AHEAD = new DataAccessor<>("arm_ahead", DataAccessor.DataSerializer.BOOLEAN);
-    public static final DataAccessor<Integer> STRAFE_IMPULSE = new DataAccessor<>("strafe_impulse", DataAccessor.DataSerializer.INT);
-    public static final DataAccessor<Integer> FORWARD_IMPULSE = new DataAccessor<>("forward_impulse", DataAccessor.DataSerializer.INT);
-
-    public final Timer timer = new Timer(() -> 5, this::isEnabled);
-    public final Timer sprintingTimer = new Timer(() -> 10, () -> this.isEnabled() && this.dataManager.get(SPRINTING));
-    public final Timer forwardTimer = new Timer(() -> 7, () -> this.isEnabled() && this.dataManager.get(FORWARD_IMPULSE) > 0);
-    public final Timer backwardTimer = new Timer(() -> 7, () -> this.isEnabled() && this.dataManager.get(FORWARD_IMPULSE) < 0);
-
-    public final Cooldown cooldown = new Cooldown();
+    /**
+     * Block damage map: when a supe lands with enough force, these blocks transform.
+     * Add/remove entries to customize environmental destruction.
+     */
+    private static final java.util.Map<Block, Block> BLOCK_DAMAGE_MAP = java.util.Map.ofEntries(
+            java.util.Map.entry(Blocks.STONE, Blocks.COBBLESTONE),
+            java.util.Map.entry(Blocks.STONE_BRICKS, Blocks.CRACKED_STONE_BRICKS),
+            java.util.Map.entry(Blocks.COBBLESTONE, Blocks.GRAVEL),
+            java.util.Map.entry(Blocks.GRASS_BLOCK, Blocks.DIRT),
+            java.util.Map.entry(Blocks.DIRT, Blocks.COARSE_DIRT),
+            java.util.Map.entry(Blocks.OAK_LOG, Blocks.STRIPPED_OAK_LOG),
+            java.util.Map.entry(Blocks.BIRCH_LOG, Blocks.STRIPPED_BIRCH_LOG),
+            java.util.Map.entry(Blocks.SPRUCE_LOG, Blocks.STRIPPED_SPRUCE_LOG),
+            java.util.Map.entry(Blocks.JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_LOG),
+            java.util.Map.entry(Blocks.DARK_OAK_LOG, Blocks.STRIPPED_DARK_OAK_LOG),
+            java.util.Map.entry(Blocks.ACACIA_LOG, Blocks.STRIPPED_ACACIA_LOG)
+    );
 
     public FlightAbility(LivingEntity entity, AbilityBuilder builder) {
         super(entity, builder);
@@ -52,15 +51,9 @@ public class FlightAbility extends Ability implements IHasTimer {
     @Override
     public void defineData() {
         super.defineData();
-        this.dataManager.define(SPEED, 1.0F);
-        this.dataManager.define(SPRINT_SPEED, 2.0F);
         this.dataManager.define(BREAK_BLOCKS, true);
         this.dataManager.define(BOOSTING, false, false);
-
-        this.dataManager.define(SPRINTING, false, false);
         this.dataManager.define(ARM_AHEAD, false, false);
-        this.dataManager.define(STRAFE_IMPULSE, 0, false);
-        this.dataManager.define(FORWARD_IMPULSE, 0, false);
     }
 
     @Override
@@ -75,78 +68,47 @@ public class FlightAbility extends Ability implements IHasTimer {
         }
     }
 
+    /**
+     * Blocks that get destroyed entirely on impact
+     */
+    private static final java.util.Set<Block> BLOCK_DESTROY_SET = java.util.Set.of(Blocks.GLASS);
+    public final IHasTimer.Cooldown cooldown = addCooldown();
+
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (enabled) {
-            if (entity.level().isClientSide()) {
-                float f = entity.zza;
-                boolean sprinting = entity.isSprinting();
-                if (this.dataManager.get(SPRINTING) != sprinting) {
-                    this.dataManager.setFromClient(SPRINTING, sprinting);
-                }
-                if (this.dataManager.get(FORWARD_IMPULSE) != f) {
-                    this.dataManager.setFromClient(FORWARD_IMPULSE, Math.round(f));
-                }
-            }
-            boolean sprinting = this.dataManager.get(SPRINTING) || entity.isSprinting();
-            if (!sprinting || this.dataManager.get(FORWARD_IMPULSE) <= 0) {
-                this.dataManager.set(BOOSTING, false);
-            }
-            if (!(entity instanceof Player) && this.enabledTicks == 0) {
-                entity.setDeltaMovement(entity.getDeltaMovement().add(0, 0.4, 0));
-            }
-
-            float speed = sprinting ? this.dataManager.get(SPRINT_SPEED) : this.dataManager.get(SPEED);
-            Vec3 vec3;
-            if (sprinting) {
-                if (this.cooldown.end()) {
-                    if (this.conditionManager.test("boost")) {
-                        this.cooldown.start(60);
-                        this.dataManager.set(BOOSTING, true);
-                        CommonUtil.spawnParticleForAll(this.entity.level(), ParticleTypes.EXPLOSION,
-                                true, this.entity.position(), Vec3.ZERO, 1, 10);
-                    }
-                }
-                if (this.dataManager.get(BOOSTING)) {
-                    speed += this.cooldown.value(1) * 4F;
-                    CommonUtil.spawnParticleForAll(this.entity.level(), ParticleTypes.CLOUD,
-                            true, this.entity.position(), Vec3.ZERO, 0.05F, 10);
-                    if (this.cooldown.timer == 0) {
-                        this.dataManager.set(BOOSTING, false);
-                    }
-                }
-                vec3 = entity.getDeltaMovement().scale(0.25F).add(entity.getLookAngle().scale(speed));
-            } else {
-                this.dataManager.set(BOOSTING, false);
-                vec3 = entity.getDeltaMovement().multiply(1.05, 0.1F, 1.05); // slight sliding effect
-                vec3 = vec3.add(0, Math.sin(entity.tickCount / 10F) / 50F, 0); // hover
-                vec3 = vec3.add(inputVector(entity, speed * 2)); // unite two vectors, default and with movements.
-            }
-            entity.setDeltaMovement(vec3);
-        } else {
+        if (!enabled) {
             this.dataManager.set(BOOSTING, false);
+            this.dataManager.set(SPRINTING, false);
         }
     }
 
-    private Vec3 inputVector(LivingEntity entity, float speedModifier) {
-        double yya = entity.zza == 0 ? 0 : entity.getLookAngle().y; // stop flight by y, when don't use any keys
-        yya = entity.zza < 0 ? -yya : yya; // flight by y when using up or down keys
-        speedModifier *= 0.01F;
-        Vec3 vec = new Vec3(entity.xxa, yya, entity.zza);
-        if (entity.xxa == 0 && entity.zza == 0) {
-            vec = entity.getDeltaMovement();
+    @Override
+    protected float modifySpeed(LivingEntity entity, float baseSpeed, boolean sprinting) {
+        if (!sprinting || this.dataManager.get(FORWARD_IMPULSE) <= 0) {
+            this.dataManager.set(BOOSTING, false);
         }
-
-        double d0 = vec.lengthSqr();
-        if (d0 < 1.0E-7D) {
-            return Vec3.ZERO;
+        if (sprinting) {
+            if (this.cooldown.end()) {
+                if (this.conditionManager.test("boost")) {
+                    this.cooldown.start(60);
+                    this.dataManager.set(BOOSTING, true);
+                    CommonUtil.spawnParticleForAll(this.entity.level(), ParticleTypes.EXPLOSION,
+                            true, this.entity.position(), Vec3.ZERO, 1, 10);
+                }
+            }
+            if (this.dataManager.get(BOOSTING)) {
+                baseSpeed += this.cooldown.value(1) * 4F;
+                CommonUtil.spawnParticleForAll(this.entity.level(), ParticleTypes.CLOUD,
+                        true, this.entity.position(), Vec3.ZERO, 0.05F, 10);
+                if (this.cooldown.timer == 0) {
+                    this.dataManager.set(BOOSTING, false);
+                }
+            }
         } else {
-            Vec3 vec3 = (d0 > 1.0D ? vec.normalize() : vec).scale(speedModifier);
-            double f = Math.sin(Math.toRadians(entity.getYRot()));
-            double f1 = Math.cos(Math.toRadians(entity.getYRot()));
-            return new Vec3(vec3.x * f1 - vec3.z * f, yya * speedModifier * 16, vec3.z * f1 + vec3.x * f);
+            this.dataManager.set(BOOSTING, false);
         }
+        return baseSpeed;
     }
 
     public boolean causeFallDamage(ServerLevel level, LivingEntity entity, double fallDistance) {
@@ -155,35 +117,16 @@ public class FlightAbility extends Ability implements IHasTimer {
             for (int x = 0; x < 5; x++) {
                 for (int y = 0; y < 5; y++) {
                     for (int z = 0; z < 5; z++) {
-                        double xPos = entity.getX() - 2.5 + x + entity.level().random.nextInt(5);
-                        double yPos = entity.getY() - 2.5 + y + entity.level().random.nextInt(5);
-                        double zPos = entity.getZ() - 2.5 + z + entity.level().random.nextInt(5);
+                        double xPos = entity.getX() - 2.5 + x + entity.level().getRandom().nextInt(5);
+                        double yPos = entity.getY() - 2.5 + y + entity.level().getRandom().nextInt(5);
+                        double zPos = entity.getZ() - 2.5 + z + entity.level().getRandom().nextInt(5);
                         BlockPos pos = new BlockPos((int) xPos, (int) yPos, (int) zPos);
                         Block block = entity.level().getBlockState(pos).getBlock();
 
-                        if (block == Blocks.STONE) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.COBBLESTONE.defaultBlockState());
-                        } else if (block == Blocks.STONE_BRICKS) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
-                        } else if (block == Blocks.COBBLESTONE) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
-                        } else if (block == Blocks.GRASS_BLOCK) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
-                        } else if (block == Blocks.DIRT) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.COARSE_DIRT.defaultBlockState());
-                        } else if (block == Blocks.OAK_LOG) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_OAK_LOG.defaultBlockState());
-                        } else if (block == Blocks.BIRCH_LOG) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_BIRCH_LOG.defaultBlockState());
-                        } else if (block == Blocks.SPRUCE_LOG) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_SPRUCE_LOG.defaultBlockState());
-                        } else if (block == Blocks.JUNGLE_LOG) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_JUNGLE_LOG.defaultBlockState());
-                        } else if (block == Blocks.DARK_OAK_LOG) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_DARK_OAK_LOG.defaultBlockState());
-                        } else if (block == Blocks.ACACIA_LOG) {
-                            entity.level().setBlockAndUpdate(pos, Blocks.STRIPPED_ACACIA_LOG.defaultBlockState());
-                        } else if (block == Blocks.GLASS) {
+                        Block replacement = BLOCK_DAMAGE_MAP.get(block);
+                        if (replacement != null) {
+                            entity.level().setBlockAndUpdate(pos, replacement.defaultBlockState());
+                        } else if (BLOCK_DESTROY_SET.contains(block)) {
                             entity.level().destroyBlock(pos, false);
                         }
 
@@ -200,11 +143,6 @@ public class FlightAbility extends Ability implements IHasTimer {
     public void initializeClient(Consumer<AbilityClientProperties> consumer) {
         super.initializeClient(consumer);
         consumer.accept(new FlightClientProperties(this));
-    }
-
-    @Override
-    public List<Timer> timers() {
-        return List.of(this.timer, this.sprintingTimer, this.forwardTimer, this.backwardTimer, this.cooldown);
     }
 
     public record FlightClientProperties(FlightAbility ability) implements AbilityClientProperties {
@@ -343,8 +281,8 @@ public class FlightAbility extends Ability implements IHasTimer {
                     model.leftArm.zRot += 15F * toRad;
                 }
             }
-            for (HeatVisionAbility heatVisionAbility : CommonUtil.listOfType(HeatVisionAbility.class, CommonUtil.getAbilities(this.ability().entity))) {
-                float f = heatVisionAbility.eyesTimer.value(partialTicks);
+            for (HeatVisionAbility heatVisionAbility : CommonUtil.getAbilitiesByType(HeatVisionAbility.class, this.ability().getEntity())) {
+                float f = heatVisionAbility.glowTimer.value(partialTicks);
                 model.head.xRot -= sprintVal * f * 0.5F;
                 if (right) {
                     model.rightArm.xRot -= model.rightArm.xRot * f;

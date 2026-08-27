@@ -25,7 +25,7 @@ public class GameRendererMixin {
     @Final
     @Shadow private RenderBuffers renderBuffers;
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;bobHurt(Lcom/mojang/blaze3d/vertex/PoseStack;F)V"), method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V", cancellable = true)
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;bobHurt(Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V"), method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V", cancellable = true)
     private void renderLevel(DeltaTracker deltaTracker, CallbackInfo ci, @Local PoseStack poseStack) {
         ClientEvents.setupRoll(deltaTracker.getGameTimeDeltaPartialTick(false), poseStack);
     }
@@ -34,13 +34,13 @@ public class GameRendererMixin {
             method = "<init>",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/render/GuiRenderer;<init>(Lnet/minecraft/client/gui/render/state/GuiRenderState;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;Ljava/util/List;)V"
+                    target = "Lnet/minecraft/client/gui/render/GuiRenderer;<init>(Lnet/minecraft/client/renderer/state/gui/GuiRenderState;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;Ljava/util/List;)V"
             ),
-            index = 4
+            index = 2
     )
     private List<PictureInPictureRenderer<?>> theBoys$appendLaserRenderer(List<PictureInPictureRenderer<?>> renderers) {
         List<PictureInPictureRenderer<?>> mutable = new ArrayList<>(renderers);
-        mutable.add(new GuiLaserRenderer(this.renderBuffers.bufferSource()));
+        mutable.add(new GuiLaserRenderer());
         return mutable;
     }
 }

@@ -10,3 +10,9 @@ pluginManagement {
 }
 
 rootProject.name = 'TheBoys'
+
+includeBuild('D:/McModding/Modulus') {
+    dependencySubstitution {
+        substitute module('chappie.modulus:modulus') using project(':')
+    }
+}

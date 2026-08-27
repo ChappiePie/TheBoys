@@ -17,7 +17,7 @@ public abstract class PlayerMixin {
     @Inject(method = "getDestroySpeed", at = @At("RETURN"), cancellable = true)
     public void theBoys$getDestroySpeed(BlockState state, CallbackInfoReturnable<Float> cir) {
         Player player = (Player) (Object) this;
-        for (WaterMiningAbility ability : CommonUtil.listOfType(WaterMiningAbility.class, CommonUtil.getAbilities(player))) {
+        for (WaterMiningAbility ability : CommonUtil.getAbilitiesByType(WaterMiningAbility.class, player)) {
             if (ability.isEnabled() && (player.isInWater() || player.isEyeInFluid(FluidTags.WATER))) {
                 float f = cir.getReturnValue();
                 

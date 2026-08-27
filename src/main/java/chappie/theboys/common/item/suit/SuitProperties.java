@@ -3,7 +3,7 @@ package chappie.theboys.common.item.suit;
 import chappie.theboys.TheBoys;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -37,8 +37,8 @@ public class SuitProperties extends Item.Properties {
         this.armorScale = (stack) -> BASIC_ARMOR_SCALE.apply(slot.getSlot());
     }
 
-    public SuitProperties attributeModifier(Attribute attribute, Function<ResourceLocation, AttributeModifier> modifierFunction) {
-        this.builder.add(new ItemAttributeModifiers.Entry(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute), modifierFunction.apply(ResourceLocation.withDefaultNamespace("armor." + this.slot.getName())), EquipmentSlotGroup.bySlot(this.slot.getSlot())));
+    public SuitProperties attributeModifier(Attribute attribute, Function<Identifier, AttributeModifier> modifierFunction) {
+        this.builder.add(new ItemAttributeModifiers.Entry(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute), modifierFunction.apply(Identifier.withDefaultNamespace("armor." + this.slot.getName())), EquipmentSlotGroup.bySlot(this.slot.getSlot())));
         return this;
     }
 

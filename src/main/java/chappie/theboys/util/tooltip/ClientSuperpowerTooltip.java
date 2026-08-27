@@ -1,17 +1,15 @@
 package chappie.theboys.util.tooltip;
 
-import chappie.modulus.util.ClientUtil;
-import chappie.theboys.common.ability.base.TBSuperpower;
-import net.minecraft.client.Minecraft;
+import chappie.modulus.common.ability.base.Superpower;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 
-public record ClientSuperpowerTooltip(TBSuperpower superpower) implements ClientTooltipComponent {
-    private static final ResourceLocation SLOT_SPRITE = ResourceLocation.withDefaultNamespace("container/bundle/slot");
+public record ClientSuperpowerTooltip(Superpower superpower) implements ClientTooltipComponent {
+    private static final Identifier SLOT_SPRITE = Identifier.withDefaultNamespace("container/bundle/slot");
 
     @Override
     public int getHeight(Font font) {
@@ -24,7 +22,7 @@ public record ClientSuperpowerTooltip(TBSuperpower superpower) implements Client
     }
 
     @Override
-    public void renderImage(Font pFont, int pX, int pY, int width, int height, GuiGraphics pGuiGraphics) {
+    public void extractImage(Font pFont, int pX, int pY, int width, int height, GuiGraphicsExtractor pGuiGraphics) {
         int i = this.gridSizeX();
         int j = this.gridSizeY();
 
@@ -37,15 +35,18 @@ public record ClientSuperpowerTooltip(TBSuperpower superpower) implements Client
         }
     }
 
-    private void renderSlot(int pX, int pY, Font pFont, GuiGraphics guiGraphics) {
-        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_SPRITE, pX, pY, 0, 18, 20);
+    private void renderSlot(int pX, int pY, Font pFont, GuiGraphicsExtractor GuiGraphicsExtractor) {
+        GuiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_SPRITE, pX, pY, 0, 18, 20);
         int border = 1;
-        guiGraphics.fill(pX + border, pY + border, pX + 18 + border, pY + 18 + border, ARGB.color(57, 57, 57));
-        guiGraphics.fill(pX - border, pY - border, pX + 18 - border, pY + 18 - border, -1);
-        guiGraphics.fill(pX, pY, pX + 18, pY + 18, ARGB.color(157, 157, 157));
+        GuiGraphicsExtractor.fill(pX + border, pY + border, pX + 18 + border, pY + 18 + border, ARGB.color(57, 57, 57));
+        GuiGraphicsExtractor.fill(pX - border, pY - border, pX + 18 - border, pY + 18 - border, -1);
+        GuiGraphicsExtractor.fill(pX, pY, pX + 18, pY + 18, ARGB.color(157, 157, 157));
 
-        guiGraphics.drawString(pFont, this.superpower.getDisplayName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
-        this.superpower.renderIcon(pX + 1, pY + 1, 1, Minecraft.getInstance(), guiGraphics, ClientUtil.getPartialTick());
+        GuiGraphicsExtractor.text(pFont, this.superpower.getDisplayName().getString(), pX + this.gridSizeX() * 20 + 3, pY + 5, -1, true);
+        if (this.superpower.iconTexture() != null) {
+            GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, this.superpower.iconTexture(),
+                    pX + 1, pY + 1, this.superpower.iconU(), this.superpower.iconV(), 16, 16, 256, 256);
+        }
     }
 
     private int gridSizeX() {

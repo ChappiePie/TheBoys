@@ -1,13 +1,12 @@
 package chappie.theboys.common.ability;
 
-import chappie.modulus.common.ability.base.Ability;
+import chappie.modulus.common.ability.GlowAbility;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.common.ability.base.AbilityClientProperties;
-import chappie.modulus.util.IHasTimer;
+import chappie.modulus.util.data.CommonAccessors;
 import chappie.modulus.util.model.ModelProperties;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
-import chappie.theboys.util.TBCommonUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ArmedModel;
@@ -15,55 +14,57 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.awt.*;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-public class GlowEyesAbility extends Ability implements IHasTimer {
+/**
+ * The Boys-specific glow eyes with multi-layer rendering and eye height/length customization.
+ */
+public class GlowEyesAbility extends GlowAbility {
 
-    public static final ResourceLocation GLOW_EYES = TheBoys.id("textures/models/glow_eyes.png");
-
-    public Timer eyesTimer = new Timer(() -> 4, this::isEnabled);
+    public static final Identifier GLOW_EYES = TheBoys.id("textures/models/glow_eyes.png");
 
     public GlowEyesAbility(LivingEntity entity, AbilityBuilder builder) {
         super(entity, builder);
     }
 
     @Override
-    public void defineData() {
-        super.defineData();
-        this.dataManager.define(TBCommonUtil.COLOR, Color.RED);
+    protected Identifier getGlowTexture() {
+        return GLOW_EYES;
     }
 
     @Override
     public void initializeClient(Consumer<AbilityClientProperties> consumer) {
-        super.initializeClient(consumer);
+        // Skip Core's default single-pass renderer, provide our own multi-layer one
         consumer.accept(new AbilityClientProperties() {
 
-            private final Supplier<HumanoidModel<?>> copyModel = () ->
-                    new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER));
+            private HumanoidModel<?> cachedModel;
+
+            private HumanoidModel<?> getModel() {
+                if (cachedModel == null) {
+                    cachedModel = new HumanoidModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ModelLayers.PLAYER));
+                }
+                return cachedModel;
+            }
 
             @Override
             public void render(LivingEntityRenderer<? extends LivingEntity, ? extends LivingEntityRenderState, ? extends EntityModel<?>> renderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLightIn, LivingEntity entity, ModelProperties modelProperties) {
                 if (!modelProperties.root().hasChild("head")) return;
-                Color color = dataManager.get(TBCommonUtil.COLOR);
+                Color color = dataManager.get(CommonAccessors.COLOR);
                 float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
                 boolean humanoid = renderer.getModel() instanceof HumanoidModel || renderer.getModel() instanceof ArmedModel && renderer.getModel() instanceof HeadedModel;
                 poseStack.pushPose();
-                // Basically that's render of eyes without lasers
                 {
                     float f = 1.03125f;
-                    float alpha = eyesTimer.value(modelProperties.partialTicks());
+                    float alpha = glowTimer.value(modelProperties.partialTicks());
                     poseStack.pushPose();
                     modelProperties.root().getChild("head").translateAndRotate(poseStack);
                     if (!humanoid) {
@@ -79,28 +80,23 @@ public class GlowEyesAbility extends Ability implements IHasTimer {
                         poseStack.scale(1F, f1, 1F);
                     }
                     poseStack.scale(f, f, f);
-                    nodeCollector.submitCustomGeometry(poseStack, RenderType.beaconBeam(GLOW_EYES, true), (pose, consumer) -> {
+                    nodeCollector.submitCustomGeometry(poseStack, net.minecraft.client.renderer.rendertype.RenderTypes.beaconBeam(GLOW_EYES, true), (pose, consumer) -> {
                         PoseStack renderStack = new PoseStack();
                         renderStack.last().pose().set(pose.pose());
                         renderStack.last().normal().set(pose.normal());
                         for (int i = 0; i < 3; i++) {
                             renderStack.pushPose();
                             renderStack.translate(0, (i == 2 ? -1 : i) / 32F, 0);
-                            this.copyModel.get().head.render(renderStack, consumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
+                            this.getModel().head.render(renderStack, consumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(i == 0 ? alpha : alpha * 0.25F, red, green, blue));
                             renderStack.popPose();
                         }
                         renderStack.translate(0, 0, -(Math.cos(entity.tickCount * entity.tickCount) / 100F));
-                        this.copyModel.get().hat.render(renderStack, consumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, red, green, blue));
+                        this.getModel().hat.render(renderStack, consumer, packedLightIn, OverlayTexture.NO_OVERLAY, ARGB.colorFromFloat(alpha, red, green, blue));
                     });
                     poseStack.popPose();
                 }
                 poseStack.popPose();
             }
         });
-    }
-
-    @Override
-    public Iterable<Timer> timers() {
-        return List.of(this.eyesTimer);
     }
 }

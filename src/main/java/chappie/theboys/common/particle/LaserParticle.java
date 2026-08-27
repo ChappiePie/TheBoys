@@ -3,7 +3,7 @@ package chappie.theboys.common.particle;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.RisingParticle;
-import net.minecraft.client.renderer.state.QuadParticleRenderState;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -46,18 +46,8 @@ public class LaserParticle extends RisingParticle {
     }
 
     @Override
-    public int getLightColor(float partialTick) {
-        float f = ((float) this.age + partialTick) / (float) this.lifetime;
-        f = Mth.clamp(f, 0.0F, 1.0F);
-        int i = super.getLightColor(partialTick);
-        int j = i & 0xFF;
-        int k = i >> 16 & 0xFF;
-        j += (int) (f * 15.0F * 16.0F);
-        if (j > 240) {
-            j = 240;
-        }
-
-        return j | k << 16;
+    protected int getLightCoords(float partialTick) {
+        return 240 | (240 << 16); // Full brightness
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.dispenser.EquipmentDispenseItemBehavior;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -37,7 +37,7 @@ public class SuitItem extends Item {
             case "homelander", "stormfront" -> new ClientHeroWithCapeProperties(this);
             case "starlight" -> new ClientSuitProperties(this) {
                 @Override
-                public ResourceLocation suitTexture(EquipmentSlot slot, ItemStack armorStack, String type) {
+                public Identifier suitTexture(EquipmentSlot slot, ItemStack armorStack, String type) {
                     return slot == EquipmentSlot.FEET ? TheBoys.id("textures/suits/%s/layer_1.png".formatted(this.type())) : super.suitTexture(slot, armorStack, type);
                 }
             };
@@ -82,7 +82,7 @@ public class SuitItem extends Item {
                 }
             }
         }
-        player.displayClientMessage(Component.translatable("item.theboys.suit.rmb").withStyle(ChatFormatting.RED), true);
+        player.sendOverlayMessage(Component.translatable("item.theboys.suit.rmb").withStyle(ChatFormatting.RED));
         return InteractionResult.FAIL;
     }
 

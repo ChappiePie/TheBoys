@@ -25,6 +25,7 @@ public class FocusOnGoalAbility extends Ability {
         super.defineData();
         this.dataManager.define(TARGET_ID, this.entity.getId(), false);
         this.dataManager.define(FORWARD_IMPULSE, 0, false);
+        this.dataManager.clientWritable(FORWARD_IMPULSE);
     }
 
     @Override
@@ -76,7 +77,7 @@ public class FocusOnGoalAbility extends Ability {
     }
 
     public boolean hasSpeedAbility() {
-        for (SpeedAbility speedAbility : CommonUtil.listOfType(SpeedAbility.class, CommonUtil.getAbilities(entity))) {
+        for (SpeedAbility speedAbility : CommonUtil.getAbilitiesByType(SpeedAbility.class, entity)) {
             if (speedAbility.isEnabled()) {
                 return true;
             }

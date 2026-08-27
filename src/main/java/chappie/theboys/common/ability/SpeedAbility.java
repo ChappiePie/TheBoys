@@ -1,6 +1,5 @@
 package chappie.theboys.common.ability;
 
-import chappie.modulus.common.ability.base.Ability;
 import chappie.modulus.common.ability.base.AbilityBuilder;
 import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.IHasTimer;
@@ -8,10 +7,9 @@ import chappie.modulus.util.data.DataAccessor;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.entity.TrailEntity;
-import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.interfaces.ILivingEntityEx;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -23,18 +21,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.awt.*;
-import java.util.List;
 
-public class SpeedAbility extends Ability implements IHasTimer {
+public class SpeedAbility extends chappie.modulus.common.ability.SpeedAbility {
+
     public static final VoxelShape STABLE_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.25D, 16.0D);
     public static final DataAccessor<Integer> TRAIL_DURATION = new DataAccessor<>("trail_duration", DataAccessor.DataSerializer.INT);
-    public static final DataAccessor<Integer> MAX_SPEED_LVL = new DataAccessor<>("max_speed_lvl", DataAccessor.DataSerializer.INT);
-    public static final DataAccessor<Integer> SPEED_LVL = new DataAccessor<>("speed_lvl", DataAccessor.DataSerializer.INT);
 
-    private final Cooldown upgradeCooldown = new Cooldown();
-    private final Cooldown cooldown = new Cooldown();
-
-    public final Cooldown crouchCooldown = new Cooldown();
+    public final IHasTimer.Cooldown crouchCooldown = addCooldown();
 
     private double xOld, zOld;
 
@@ -45,15 +38,12 @@ public class SpeedAbility extends Ability implements IHasTimer {
     @Override
     public void defineData() {
         super.defineData();
-        this.dataManager.define(TBCommonUtil.COLOR, Color.BLUE);
         this.dataManager.define(TRAIL_DURATION, 10);
-        this.dataManager.define(SPEED_LVL, 1);
-        this.dataManager.define(MAX_SPEED_LVL, 10);
     }
 
     @Override
     public void update(LivingEntity entity, boolean enabled) {
-        super.update(entity, enabled);
+        // 180° turn on double crouch
         if (enabled && !entity.isSwimming() && !entity.isFallFlying()) {
             if (this.conditionManager.test("double_crouch") && this.crouchCooldown.end()) {
                 this.crouchCooldown.start(2);
@@ -64,61 +54,56 @@ public class SpeedAbility extends Ability implements IHasTimer {
                 }
             }
         }
-        if (entity.level().isClientSide()) return;
-        for (Timer timer : this.timers()) {
-            timer.update();
+        super.update(entity, enabled);
+    }
+
+    @Override
+    protected void applySpeedAttribute(LivingEntity entity, int speedLevel) {
+        super.applySpeedAttribute(entity, speedLevel);
+        this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED.value(), speedLevel, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+
+        // Feed player periodically
+        if (entity instanceof Player player && player.tickCount % 100 == 0) {
+            player.getFoodData().eat(1, 1.0F);
         }
-        if (enabled && !entity.isSwimming() && !entity.isFallFlying() && entity instanceof ILivingEntityEx ex) {
-            int speedLevel = this.dataManager.get(SPEED_LVL);
+    }
 
-            double dx = entity.getX() - ex.theBoys$oldPos().x;
-            double dz = entity.getZ() - ex.theBoys$oldPos().z;
-            boolean isMoving = (dx*dx + dz*dz) > 1.0e-6;
+    @Override
+    protected void resetSpeed(LivingEntity entity) {
+        super.resetSpeed(entity);
+        this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED.value(), 0.0F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    }
 
-            if (entity instanceof Player player && player.tickCount % 100 == 0) {
-                player.getFoodData().eat(1, 1.0F);
-            }
-            this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED.value(), speedLevel, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-            this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED.value(), speedLevel, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    @Override
+    protected void onMoving(LivingEntity entity, int speedLevel) {
+        this.setupTrail(entity, speedLevel);
+    }
 
-            if (isMoving && !entity.isPassenger()) {
-                this.setupTrail(entity, speedLevel);
-
-                if (this.upgradeCooldown.end() && speedLevel < this.getMaxSpeedLevel()) {
-                    this.dataManager.set(SPEED_LVL, speedLevel + 1);
-                    this.upgradeCooldown.start(this.dataManager.get(SPEED_LVL) * 10);
-                }
-            } else {
-                if (this.cooldown.end() && speedLevel > 1) {
-                    this.dataManager.set(SPEED_LVL, speedLevel - 1);
-                    this.cooldown.start(this.dataManager.get(SPEED_LVL));
+    @Override
+    protected void onSprintCollision(LivingEntity entity, int speedLevel) {
+        for (LivingEntity e : entity.level().getEntitiesOfClass(LivingEntity.class,
+                CommonUtil.boxWithRange(entity.position(), 0.5D))) {
+            if (e != entity) {
+                if (entity.level() instanceof ServerLevel level) {
+                    e.hurtServer(level, e.damageSources().inWall(), speedLevel);
                 }
             }
-
-            if (entity.isSprinting()) {
-                /*if (player.isOnGround() && speedLevel > 10 && walkDifference > 1.6F && !player.getAbilities().instabuild) {
-                    if (!(Suit.getSuit(player) instanceof SpeedsterSuit)) {
-                        player.setSecondsOnFire(10);
-                    }
-                }*/
-
-                if (speedLevel > 5 && isMoving) {
-                    for (LivingEntity e : entity.level().getEntitiesOfClass(LivingEntity.class,
-                            CommonUtil.boxWithRange(entity.position(), 0.5D))) {
-                        if (e != entity) {
-                            if (entity.level() instanceof ServerLevel level) {
-                                e.hurtServer(level, e.damageSources().inWall(), speedLevel);
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            this.dataManager.set(SPEED_LVL, 1);
-            this.setAttribute(entity, this.builder.id, Attributes.MOVEMENT_SPEED.value(), 0.0F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-            this.setAttribute(entity, this.builder.id, Attributes.ATTACK_SPEED.value(), 0.0F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-            this.cooldown.timer = this.upgradeCooldown.timer = 0;
         }
+    }
+
+    @Override
+    public int getMaxSpeedLevel() {
+        int speedLevel = super.getMaxSpeedLevel();
+        TheBoysCap cap = TheBoysCap.getCap(this.entity);
+        if (cap != null && cap.compoundV()) {
+            speedLevel = (int) (speedLevel * 1.5F);
+        }
+        return speedLevel;
+    }
+
+    @Override
+    protected Identifier getAttributeId() {
+        return TheBoys.id(this.builder.id);
     }
 
     private void setupTrail(LivingEntity entity, int speedLevel) {
@@ -135,18 +120,9 @@ public class SpeedAbility extends Ability implements IHasTimer {
         }
     }
 
-    public int getMaxSpeedLevel() {
-        int speedLevel = this.dataManager.get(MAX_SPEED_LVL);
-        TheBoysCap cap = TheBoysCap.getCap(this.entity);
-        if (cap != null && cap.compoundV()) {
-            speedLevel = (int) (speedLevel * 1.5F);
-        }
-        return speedLevel;
-    }
-
     public void setAttribute(LivingEntity entity, String name, Attribute attribute, double amount, AttributeModifier.Operation operation) {
         AttributeInstance instance = entity.getAttribute(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute));
-        ResourceLocation location = TheBoys.id(name);
+        Identifier location = TheBoys.id(name);
 
         if (instance != null) {
             var modifier = instance.getModifier(location);
@@ -158,10 +134,5 @@ public class SpeedAbility extends Ability implements IHasTimer {
                 instance.addTransientModifier(new AttributeModifier(location, amount, operation));
             }
         }
-    }
-
-    @Override
-    public Iterable<Timer> timers() {
-        return List.of(this.cooldown, this.upgradeCooldown, crouchCooldown);
     }
 }

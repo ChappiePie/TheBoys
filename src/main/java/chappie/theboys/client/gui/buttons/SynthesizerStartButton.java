@@ -4,7 +4,7 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.client.gui.SynthesizerScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
@@ -33,19 +33,19 @@ public class SynthesizerStartButton extends ImageButton {
     }
 
     @Override
-    public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractContents(@NotNull GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        super.extractContents(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
         MutableComponent text = this.screen.getMenu().data.get(0) == 0 ? Component.translatable("button.theboys.synthesizer.start") : Component.translatable("button.theboys.synthesizer.stop");
         text = text.withStyle(ChatFormatting.UNDERLINE);
         int i = this.active ? 16777215 : 10526880;
 
-        var pose = guiGraphics.pose();
+        var pose = GuiGraphicsExtractor.pose();
         pose.pushMatrix();
         pose.translate(this.getX() + this.getWidth() / 2F, this.getY() + this.getHeight() * 0.75F);
         pose.scale(0.75F, 0.75F);
         pose.translate(0, -this.getHeight() / 2F);
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font, text, 0, 0, i | Mth.ceil(this.alpha * 255.0F) << 24);
+        GuiGraphicsExtractor.centeredText(Minecraft.getInstance().font, text, 0, 0, i | Mth.ceil(this.alpha * 255.0F) << 24);
         pose.popMatrix();
-        //guiGraphics.drawCenteredString(font, text, this.getX() + this.getWidth() / 2, this.getY(), i | Mth.ceil(this.alpha * 255.0F) << 24);
+        //GuiGraphicsExtractor.centeredText(font, text, this.getX() + this.getWidth() / 2, this.getY(), i | Mth.ceil(this.alpha * 255.0F) << 24);
     }
 }

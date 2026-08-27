@@ -14,7 +14,7 @@ public class MobEffectUtilMixin {
 
     @Inject(method = "hasWaterBreathing(Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("RETURN"), cancellable = true)
     private static void waterBreathing(LivingEntity entity, CallbackInfoReturnable<Boolean> cir) {
-        for (WaterBreathingAbility ability : CommonUtil.listOfType(WaterBreathingAbility.class, CommonUtil.getAbilities(entity))) {
+        for (WaterBreathingAbility ability : CommonUtil.getAbilitiesByType(WaterBreathingAbility.class, entity)) {
             if (ability.isEnabled()) {
                 cir.setReturnValue(true);
             }

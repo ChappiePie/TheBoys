@@ -3,7 +3,7 @@ package chappie.theboys.client.renderer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.awt.*;
@@ -20,6 +20,6 @@ public class TrailRenderState extends LivingEntityRenderState {
     public float partialTick;
     public TrailResources trail;
 
-    public record TrailResources(EntityModel<? extends EntityRenderState> model, ResourceLocation texture) {
+    public record TrailResources(EntityModel<? extends EntityRenderState> model, Identifier texture) {
     }
 }

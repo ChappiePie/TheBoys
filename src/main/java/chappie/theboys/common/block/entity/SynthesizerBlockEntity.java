@@ -4,6 +4,10 @@ import chappie.modulus.util.IHasTimer;
 import chappie.theboys.common.block.menu.SynthesizerMenu;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.VialItem;
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -31,10 +35,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -343,22 +343,24 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
                 Item item = fuelStack.getItem();
                 fuelStack.shrink(1);
                 if (fuelStack.isEmpty()) {
-                    ItemStack item2 = item.getCraftingRemainder();
-                    this.items.set(1, item2);
+                    ItemStackTemplate item2 = item.getCraftingRemainder();
+                    if (item2 != null) {
+                        this.items.set(1, item2.create());
+                    }
                 }
             }
         }
 
         if (this.isLit() && this.work) {
             this.cookingProgress++;
-            int i = level.random.nextInt(6);
+            int i = level.getRandom().nextInt(6);
             if (this.cookingProgress % (this.cookingTotalTime / 10) == 0) {
                 if (!this.setWaterMb(this.waterMb - 25)) {
                     this.setWork(false);
                 }
             }
 
-            if (this.cookingProgress % (this.cookingTotalTime / 10) == 0 && level.random.nextInt(100) <= 25) {
+            if (this.cookingProgress % (this.cookingTotalTime / 10) == 0 && level.getRandom().nextInt(100) <= 25) {
                 this.removeItem(3 + i, 1);
             }
 
@@ -369,13 +371,13 @@ public class SynthesizerBlockEntity extends BaseContainerBlockEntity implements 
                 ItemStack resultItem = TBItems.VIAL.getDefaultInstance();
                 int vials = this.numOfVials();
                 if (stack.is(Items.POISONOUS_POTATO) || stack.getRarity() != Rarity.COMMON || stack.getItem() instanceof PotionItem) {
-                    if (vials < 3 ? level.random.nextInt(100) < 75 : level.random.nextInt(100) < 50) {
+                    if (vials < 3 ? level.getRandom().nextInt(100) < 75 : level.getRandom().nextInt(100) < 50) {
                         resultItem = VialItem.compoundV();
                     }
                 } else {
-                    if (level.random.nextInt(100) <= 25) {
+                    if (level.getRandom().nextInt(100) <= 25) {
                         resultItem = VialItem.compoundV();
-                    } else if (level.random.nextInt(100) <= 40) {
+                    } else if (level.getRandom().nextInt(100) <= 40) {
                         ItemStack potionStack = new ItemStack(Items.POTION);
                         Potion potion = BuiltInRegistries.POTION.stream().filter(p -> BuiltInRegistries.POTION.getKey(p).getNamespace().equals("minecraft") && !p.getEffects().isEmpty()).findAny().get();
                         potionStack.set(DataComponents.POTION_CONTENTS, new PotionContents(BuiltInRegistries.POTION.wrapAsHolder(potion)));

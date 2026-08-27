@@ -14,26 +14,26 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.ProfileResult;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.model.AnimationUtils;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.Services;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.entity.player.PlayerModelType;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +49,7 @@ import java.util.function.Function;
 
 public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
 
-    public static final ResourceLocation TEXTURE_LOCATION = TheBoys.id("textures/gui/eye_options.png");
+    public static final Identifier TEXTURE_LOCATION = TheBoys.id("textures/gui/eye_options.png");
     private static double LASERS_LENGTH = 5;
     public final Map<Renderable, Function<Integer, Integer>> changeYPos = new HashMap<>();
     private final LinkedList<Renderable> laserOptions = new LinkedList<>();
@@ -98,10 +98,10 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     }
 
     @Override
-    public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {
+    public void resize(int pWidth, int pHeight) {
         ModSlider eyesLengthSlider = this.eyesLengthSlider, eyesHeightSlider = this.eyesHeightSlider, rotationSlider = this.rotationSlider;
         String s = this.name != null ? this.name.getValue() : "";
-        super.resize(pMinecraft, pWidth, pHeight);
+        super.resize(pWidth, pHeight);
         this.addLaserOptions();
         this.eyesLengthSlider.copy(eyesLengthSlider);
         this.eyesHeightSlider.copy(eyesHeightSlider);
@@ -152,7 +152,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
 
         this.changeYPos.put(this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) ->
-                        this.minecraft.setScreen(this.parent)).bounds(this.width / 2 - 166, this.height / 2 + 75, 128, 20).build()),
+                        this.minecraft.gui.setScreen(this.parent)).bounds(this.width / 2 - 166, this.height / 2 + 75, 128, 20).build()),
                 y -> y + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0) + 5);
     }
 
@@ -162,7 +162,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int pMouseX, int pMouseY, float pPartialTick) {
         if (this.playerInfo != null) {
             PlayerModelType currentModel = this.playerInfo.getSkin().model();
             if (this.skinModel != currentModel) {
@@ -172,14 +172,13 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             }
         }
         this.setModelProperties(this.model, pPartialTick);
-        Matrix3x2fStack matrix = guiGraphics.pose();
+        Matrix3x2fStack matrix = GuiGraphicsExtractor.pose();
 
         if (this.minecraft != null && this.minecraft.level == null) {
-            this.renderPanorama(guiGraphics, pPartialTick);
+            this.extractPanorama(GuiGraphicsExtractor, pPartialTick);
         }
 
-        this.renderBlurredBackground(guiGraphics);
-        this.renderMenuBackground(guiGraphics);
+        this.extractMenuBackground(GuiGraphicsExtractor);
 
         int h = this.height / 2 + (laserOptions.isEmpty() ? 35 : laserOptions.size() < 4 ? 15 : 0);
         {
@@ -187,21 +186,21 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
             matrix.pushMatrix();
             matrix.scale(f, f);
             matrix.translate((this.width / 2F - 200) / f, (h - 95) / f);
-            guiGraphics.drawString(this.font, Component.translatable("title.theboys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
+            GuiGraphicsExtractor.text(this.font, Component.translatable("title.theboys").withStyle(ClientUtil.BOLD_MINECRAFT), 0, 0,
                     ARGB.color(255, 170, 20, 20), true);
             matrix.popMatrix();
         }
 
-        guiGraphics.fill(this.width / 2 - 200, h - 70, this.lastXofPresets, h + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0), 1979711488);
-        guiGraphics.fill(this.width / 2 - 200, h - 72, this.lastXofPresets, h - 70, 1191182335);
+        GuiGraphicsExtractor.fill(this.width / 2 - 200, h - 70, this.lastXofPresets, h + (!laserOptions.isEmpty() ? laserOptions.size() > 3 ? 70 : 40 : 0), 1979711488);
+        GuiGraphicsExtractor.fill(this.width / 2 - 200, h - 72, this.lastXofPresets, h - 70, 1191182335);
 
         int i = this.width / 2 + 80;
         int j = this.height / 2 - 70;
-        guiGraphics.fill(i, j - 2, i + 100, j, 1191182335);
-        guiGraphics.enableScissor(i, j, i + 100, j + 140);
-        guiGraphics.fill(i, j, i + 100, j + 140, 1979711488);
-        renderEntityInInventory(guiGraphics, i + 50, j + 130, 60, (float) (i + 50) - pMouseX, (float) (j + 51) - pMouseY);
-        guiGraphics.disableScissor();
+        GuiGraphicsExtractor.fill(i, j - 2, i + 100, j, 1191182335);
+        GuiGraphicsExtractor.enableScissor(i, j, i + 100, j + 140);
+        GuiGraphicsExtractor.fill(i, j, i + 100, j + 140, 1979711488);
+        renderEntityInInventory(GuiGraphicsExtractor, i + 50, j + 130, 60, (float) (i + 50) - pMouseX, (float) (j + 51) - pMouseY);
+        GuiGraphicsExtractor.disableScissor();
         this.changeYPos.forEach((key, value) -> {
             if (key instanceof AbstractWidget w) {
                 w.setY(value.apply(h));
@@ -210,17 +209,16 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
                 l.setY(value.apply(h));
             }
         });
-        super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
+        super.extractRenderState(GuiGraphicsExtractor, pMouseX, pMouseY, pPartialTick);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
 
     }
 
     public void setModelProperties(PlayerModel model, float pPartialTick) {
         if (this.minecraft == null || model == null) return;
-        model.setAllVisible(true);
         model.hat.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.HAT);
         model.jacket.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.JACKET);
         model.leftPants.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.LEFT_PANTS_LEG);
@@ -246,7 +244,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         return super.mouseClicked(event, isDoubleClick);
     }
 
-    public void renderEntityInInventory(GuiGraphics guiGraphics, int x, int y, int scale, float angleXComponent, float angleYComponent) {
+    public void renderEntityInInventory(GuiGraphicsExtractor GuiGraphicsExtractor, int x, int y, int scale, float angleXComponent, float angleYComponent) {
         if (this.playerInfo == null) {
             return;
         }
@@ -264,13 +262,13 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         this.model.head.yRot = pointerYaw * ((float) Math.PI / 180F);
         this.model.head.xRot = pitch * ((float) Math.PI / 180F);
 
-        ResourceLocation texture = this.playerInfo.getSkin().body().texturePath();
+        Identifier texture = this.playerInfo.getSkin().body().texturePath();
         int width = 100;
         int height = 160;
-        submitLaserOverlay(guiGraphics, texture, x, y + 10, width, height, scale, -pitch, rotationYaw);
+        submitLaserOverlay(GuiGraphicsExtractor, texture, x, y + 10, width, height, scale, -pitch, rotationYaw);
     }
 
-    private void submitLaserOverlay(GuiGraphics guiGraphics, ResourceLocation texture, int x, int y, int width, int height, int scale, float rotationX, float rotationY) {
+    private void submitLaserOverlay(GuiGraphicsExtractor GuiGraphicsExtractor, Identifier texture, int x, int y, int width, int height, int scale, float rotationX, float rotationY) {
         if (this.model == null) return;
         int eyesHeight = this.isCustomEyesType() && this.eyesHeightSlider != null ? (int) this.eyesHeightSlider.getValue() : getEyesHeight();
         int eyesLength = this.isCustomEyesType() && this.eyesLengthSlider != null ? (int) this.eyesLengthSlider.getValue() : getEyesLength();
@@ -289,9 +287,9 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
                 x + width / 2,
                 y,
                 scale,
-                guiGraphics.scissorStack.peek()
+                GuiGraphicsExtractor.scissorStack.peek()
         );
-        guiGraphics.guiRenderState.submitPicturesInPictureState(laserState);
+        GuiGraphicsExtractor.guiRenderState.addPicturesInPictureState(laserState);
     }
 
     private void addSkinPresets() {
@@ -539,8 +537,8 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
                 if (screen.laserOptions.isEmpty()) {
                     screen.addLaserOptions();
                 }
-                screen.eyesHeightSlider.setValue(getEyesHeight());
-                screen.eyesLengthSlider.setValue(getEyesLength());
+                screen.eyesHeightSlider.setRealValue(getEyesHeight());
+                screen.eyesLengthSlider.setRealValue(getEyesLength());
 
                 screen.removeObj(screen.eyesHeightSlider);
                 screen.removeObj(screen.eyesLengthSlider);
@@ -565,11 +563,11 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
                         screen.eyesLengthSlider.valueToInitial();
                     }
                     case 2 -> {
-                        screen.eyesHeightSlider.setValue(6);
+                        screen.eyesHeightSlider.setRealValue(6);
                         screen.eyesLengthSlider.valueToInitial();
                     }
                     case 3 -> {
-                        screen.eyesLengthSlider.setValue(2);
+                        screen.eyesLengthSlider.setRealValue(2);
                         screen.eyesHeightSlider.valueToInitial();
                     }
                     case 4, 5 -> {
@@ -586,12 +584,12 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
 
         @Override
-        public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        public void extractContents(GuiGraphicsExtractor GuiGraphicsExtractor, int pMouseX, int pMouseY, float pPartialTick) {
             this.setFocused(TBConfig.CLIENT.eyesType.get() == this.type);
-            //super.renderWidget(guiGraphics, pMouseX, pMouseY, pPartialTick);
-            ResourceLocation resourcelocation = this.sprites.get(this.isActive(), this.isHoveredOrFocused());
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, resourcelocation, this.getX(), this.getY(), 0, 24 + (this.isHoveredOrFocused() ? 32 : 0), 32, 32, 128, 128);
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, resourcelocation, this.getX() + 4, this.getY() + 4, type > 3 ? 72 : (type - 1) * 24, 0, 24, 24, 128, 128);
+            //super.extractContents(GuiGraphicsExtractor, pMouseX, pMouseY, pPartialTick);
+            Identifier Identifier = this.sprites.get(this.isActive(), this.isHoveredOrFocused());
+            GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, Identifier, this.getX(), this.getY(), 0, 24 + (this.isHoveredOrFocused() ? 32 : 0), 32, 32, 128, 128);
+            GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, Identifier, this.getX() + 4, this.getY() + 4, type > 3 ? 72 : (type - 1) * 24, 0, 24, 24, 128, 128);
         }
     }
 
@@ -616,8 +614,8 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-            guiGraphics.drawString(Minecraft.getInstance().font, this.text, this.x, this.y, this.color);
+        public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int pMouseX, int pMouseY, float pPartialTick) {
+            GuiGraphicsExtractor.text(Minecraft.getInstance().font, this.text, this.x, this.y, this.color);
         }
     }
 }

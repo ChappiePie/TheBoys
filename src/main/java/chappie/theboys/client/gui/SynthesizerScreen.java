@@ -7,11 +7,11 @@ import chappie.theboys.client.gui.buttons.SynthesizerStartButton;
 import chappie.theboys.common.block.entity.SynthesizerBlockEntity;
 import chappie.theboys.common.block.menu.SynthesizerMenu;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -22,7 +22,7 @@ import org.joml.Matrix3x2fStack;
 import java.util.List;
 
 public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> {
-    private static final ResourceLocation SYNTHESIZER_LOCATION = TheBoys.id("textures/gui/synthesizer.png");
+    private static final Identifier SYNTHESIZER_LOCATION = TheBoys.id("textures/gui/synthesizer.png");
     public static IHasTimer.Timer timer = new IHasTimer.Timer(() -> 10, () -> false);
     public static IHasTimer.Timer rollTimer = new SynthesizerBlockEntity.RollTimer(() -> false);
 
@@ -32,11 +32,11 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
         super(menu, playerInventory, title);
     }
 
-    public static void renderTooltip(GuiGraphics guiGraphics, Component toolTip, int pMouseX, int pMouseY, int x, int y, int width, int height) {
+    public static void renderTooltip(GuiGraphicsExtractor GuiGraphicsExtractor, Component toolTip, int pMouseX, int pMouseY, int x, int y, int width, int height) {
         Minecraft mc = Minecraft.getInstance();
         boolean isMouseOverObj = pMouseX >= x && pMouseY >= y && pMouseX <= x + width && pMouseY <= y + height;
         if (isMouseOverObj) {
-            guiGraphics.setComponentTooltipForNextFrame(mc.font, List.of(toolTip), pMouseX, pMouseY);
+            GuiGraphicsExtractor.setComponentTooltipForNextFrame(mc.font, List.of(toolTip), pMouseX, pMouseY);
         }
     }
 
@@ -54,25 +54,26 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
         int i = this.leftPos;
         int j = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 
         float f = this.getMenu().data.get(1) / 500F;
 
         int progress = (int) (37 * f);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, i + 16, j + 10 + 37 - progress, 190, 37 - progress, 12, progress, 256, 256);
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, i + 16, j + 10 + 37 - progress, 190, 37 - progress, 12, progress, 256, 256);
 
         int progress1 = Mth.ceil(this.menu.getBurnProgress() * 16.0F);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, i + 145, j + 28, 202, 0, progress1, 5, 256, 256);
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, i + 145, j + 28, 202, 0, progress1, 5, 256, 256);
 
 
         int progress2 = Mth.ceil(this.menu.getLitProgress() * 14.0F);
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, i + 146, j + 37 + 14 - progress2, 176, 14 - progress2, 14, progress2, 256, 256);
+        GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, i + 146, j + 37 + 14 - progress2, 176, 14 - progress2, 14, progress2, 256, 256);
 
 
-        Matrix3x2fStack matrix = guiGraphics.pose();
+        Matrix3x2fStack matrix = GuiGraphicsExtractor.pose();
         matrix.pushMatrix();
         matrix.translate(i, j);
         matrix.pushMatrix();
@@ -80,7 +81,7 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
         int scissorTop = 0;
         int scissorRight = scissorLeft + 103;
         int scissorBottom = scissorTop + 81;
-        guiGraphics.enableScissor(scissorLeft, scissorTop, scissorRight, scissorBottom);
+        GuiGraphicsExtractor.enableScissor(scissorLeft, scissorTop, scissorRight, scissorBottom);
 
         matrix.translate(87.5F, 40.5F);
         matrix.rotate((float) Math.toRadians(-360F * rollTimer.value(ClientUtil.getPartialTick())));
@@ -88,64 +89,64 @@ public class SynthesizerScreen extends AbstractContainerScreen<SynthesizerMenu> 
 
         for (Slot slot : this.menu.slots) {
             if (slot instanceof SynthesizerMenu.CentrifugeSlot) {
-                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, slot.x - 4, slot.y - 4, 218, 54, 24, 24, 256, 256);
-                super.renderSlot(guiGraphics, slot);
+                GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, slot.x - 4, slot.y - 4, 218, 54, 24, 24, 256, 256);
+                this.extractSlot(GuiGraphicsExtractor, slot, mouseX, mouseY);
             }
         }
-        guiGraphics.disableScissor();
+        GuiGraphicsExtractor.disableScissor();
         matrix.popMatrix();
 
         Slot mainSlot = this.menu.slots.get(2);
         if (!mainSlot.isActive()) {
-            this.renderSlot(guiGraphics, mainSlot);
+            this.extractSlot(GuiGraphicsExtractor, mainSlot, mouseX, mouseY);
         }
         matrix.popMatrix();
     }
 
     @Override
-    protected void renderSlot(@NotNull GuiGraphics guiGraphics, Slot slot) {
+    protected void extractSlot(@NotNull GuiGraphicsExtractor GuiGraphicsExtractor, Slot slot, int mouseX, int mouseY) {
         float f = Math.max(0.4F, 1.0F - timer.value(ClientUtil.getPartialTick()));
         if (slot.index == 2) {
-            Matrix3x2fStack matrix = guiGraphics.pose();
+            Matrix3x2fStack matrix = GuiGraphicsExtractor.pose();
             matrix.pushMatrix();
             matrix.translate(slot.x - 4F, slot.y - 4F);
             matrix.translate(12.5F, 12.5F);
             matrix.scale(f, f);
             matrix.translate(-12.5F, -12.5F);
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, 0, 0, slot.getItem().isEmpty() ? 231 : 206, 29, 25, 25, 256, 256);
+            GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, 0, 0, slot.getItem().isEmpty() ? 231 : 206, 29, 25, 25, 256, 256);
             matrix.popMatrix();
         }
         if (!(slot instanceof SynthesizerMenu.CentrifugeSlot)) {
-            super.renderSlot(guiGraphics, slot);
+            super.extractSlot(GuiGraphicsExtractor, slot, mouseX, mouseY);
         }
         if (slot.index == 2) {
-            Matrix3x2fStack matrix = guiGraphics.pose();
+            Matrix3x2fStack matrix = GuiGraphicsExtractor.pose();
             matrix.pushMatrix();
             matrix.translate(slot.x - 6F, slot.y - 6F);
             matrix.translate(14.5F, 14.5F);
             float scale = timer.value(ClientUtil.getPartialTick());
             matrix.scale(scale, scale);
             matrix.translate(-14.5F, -14.5F);
-            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, 0, 0, 218, 0, 29, 29, 256, 256);
+            GuiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, SYNTHESIZER_LOCATION, 0, 0, 218, 0, 29, 29, 256, 256);
             matrix.popMatrix();
         }
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(this.font, this.title, this.imageWidth / 2 - this.font.width(this.title) / 2, this.titleLabelY - 20, -1, false);
-        //guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
-        //super.renderLabels(guiGraphics, mouseX, mouseY);
+    protected void extractLabels(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY) {
+        GuiGraphicsExtractor.text(this.font, this.title, this.imageWidth / 2 - this.font.width(this.title) / 2, this.titleLabelY - 20, -1, false);
+        //GuiGraphicsExtractor.text(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
+        //super.renderLabels(GuiGraphicsExtractor, mouseX, mouseY);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
 
         Component component = getToolTip();
 
         if (component != null && this.menu.getBurnProgress() == 0) {
-            SynthesizerScreen.renderTooltip(guiGraphics, component, mouseX, mouseY, this.leftPos + 139, this.topPos + 3, 29, 18);
+            SynthesizerScreen.renderTooltip(GuiGraphicsExtractor, component, mouseX, mouseY, this.leftPos + 139, this.topPos + 3, 29, 18);
             this.startButton.active = false;
         } else {
             this.startButton.active = true;

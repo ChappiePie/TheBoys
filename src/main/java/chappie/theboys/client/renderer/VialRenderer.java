@@ -2,30 +2,28 @@ package chappie.theboys.client.renderer;
 
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.item.VialItem;
+import com.geckolib.cache.model.cuboid.CuboidGeoBone;
+import com.geckolib.cache.model.cuboid.GeoCube;
+import com.geckolib.model.DefaultedItemGeoModel;
+import com.geckolib.renderer.GeoItemRenderer;
+import com.geckolib.renderer.base.GeoRenderState;
+import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.data.AtlasIds;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
-import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.cache.object.GeoCube;
-import software.bernie.geckolib.model.DefaultedItemGeoModel;
-import software.bernie.geckolib.model.GeoModel;
-import software.bernie.geckolib.renderer.GeoItemRenderer;
-import software.bernie.geckolib.renderer.base.GeoRenderState;
-import software.bernie.geckolib.renderer.base.RenderModelPositioner;
-
-import static net.minecraft.client.resources.model.ModelBakery.WATER_FLOW;
+import net.minecraft.util.LightCoordsUtil;
 
 public class VialRenderer extends GeoItemRenderer<VialItem> {
+
+    private static final Identifier WATER_FLOW_TEXTURE = Identifier.withDefaultNamespace("block/water_flow");
 
     private int fluidColor = -1;
 
@@ -34,8 +32,8 @@ public class VialRenderer extends GeoItemRenderer<VialItem> {
     }
 
     @Override
-    public RenderType getRenderType(GeoRenderState renderState, ResourceLocation texture) {
-        return RenderType.entityTranslucent(texture);
+    public RenderType getRenderType(GeoRenderState renderState, Identifier texture) {
+        return RenderTypes.entityTranslucent(texture);
     }
 
     @Override
@@ -44,35 +42,47 @@ public class VialRenderer extends GeoItemRenderer<VialItem> {
     }
 
     @Override
-    public void renderBone(GeoRenderState renderState, PoseStack poseStack, GeoBone bone, VertexConsumer buffer, CameraRenderState cameraState, int packedLight, int packedOverlay, int renderColor) {
-        if ("bone3".equals(bone.getName())) {
-            return;
-        }
+    public void preRenderPass(RenderPassInfo<GeoRenderState> renderPassInfo, SubmitNodeCollector submitNodeCollector) {
+        super.preRenderPass(renderPassInfo, submitNodeCollector);
 
-        super.renderBone(renderState, poseStack, bone, buffer, cameraState, packedLight, packedOverlay, renderColor);
+        // Hide bone3 from normal rendering — we render it custom with fluid texture
+        renderPassInfo.model().getBone("bone3").ifPresent(bone ->
+                bone.frameSnapshot.skipRender(true));
     }
 
     @Override
-    public void buildRenderTask(GeoRenderState renderState, PoseStack poseStack, BakedGeoModel bakedModel, GeoModel<VialItem> model, OrderedSubmitNodeCollector renderTasks, CameraRenderState cameraState, @Nullable RenderType renderType, int packedLight, int packedOverlay, int renderColor, @Nullable RenderModelPositioner<GeoRenderState> modelPositioner) {
-        super.buildRenderTask(renderState, poseStack, bakedModel, model, renderTasks, cameraState, renderType, packedLight, packedOverlay, renderColor, modelPositioner);
-        model.getBone("bone3").ifPresent(bone -> {
+    public void submitRenderTasks(RenderPassInfo<GeoRenderState> renderPassInfo, OrderedSubmitNodeCollector renderTasks, RenderType renderType) {
+        super.submitRenderTasks(renderPassInfo, renderTasks, renderType);
+
+        renderPassInfo.model().getBone("bone3").ifPresent(bone -> {
             if (this.fluidColor == -1) {
-                bone.setHidden(true);
                 return;
             }
 
-            bone.setHidden(false);
-            TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(WATER_FLOW.texture());
-            renderTasks.submitCustomGeometry(poseStack, RenderType.entityTranslucent(sprite.atlasLocation()), (pose, vertexConsumer) -> {
+            TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager()
+                    .getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(WATER_FLOW_TEXTURE);
+            int color = ARGB.color(255, this.fluidColor);
+
+            PoseStack poseStack = renderPassInfo.poseStack();
+            renderTasks.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()), (pose, vertexConsumer) -> {
                 VertexConsumer spriteBuffer = sprite.wrap(vertexConsumer);
                 PoseStack cubeStack = new PoseStack();
-                cubeStack.last().set(pose);
-                bone.transformToBone(cubeStack);
+                cubeStack.last().pose().set(pose.pose());
+                cubeStack.last().normal().set(pose.normal());
 
-                for (GeoCube cube : bone.getCubes()) {
-                    cubeStack.pushPose();
-                    renderCube(renderState, cube, cubeStack, spriteBuffer, cameraState, LightTexture.FULL_BRIGHT, packedOverlay, ARGB.color(ARGB.alpha(renderColor), this.fluidColor));
-                    cubeStack.popPose();
+                // Transform to bone position
+                bone.translateToPivotPoint(cubeStack);
+                bone.frameSnapshot.rotate(cubeStack);
+                bone.frameSnapshot.translate(cubeStack);
+                bone.frameSnapshot.scale(cubeStack);
+                bone.translateAwayFromPivotPoint(cubeStack);
+
+                if (bone instanceof CuboidGeoBone cuboidBone) {
+                    for (GeoCube cube : cuboidBone.cubes) {
+                        cubeStack.pushPose();
+                        cube.render(cubeStack, spriteBuffer, LightCoordsUtil.FULL_BRIGHT, 0, color);
+                        cubeStack.popPose();
+                    }
                 }
             });
         });

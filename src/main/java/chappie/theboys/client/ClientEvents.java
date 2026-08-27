@@ -2,16 +2,17 @@ package chappie.theboys.client;
 
 import chappie.modulus.util.ClientUtil;
 import chappie.modulus.util.CommonUtil;
+import chappie.modulus.util.data.CommonAccessors;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
 import chappie.theboys.client.renderer.ClientHeroWithCapeProperties;
+import chappie.theboys.client.renderer.LaserRenderTypes;
 import chappie.theboys.common.ability.*;
 import chappie.theboys.common.ability.parkour.DodgeRollHandler;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.common.item.suit.SuitItem;
-import chappie.theboys.util.TBCommonUtil;
 import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.interfaces.ISimpleSoundInstance;
 import chappie.theboys.util.timers.SyringeVialAnim;
@@ -19,8 +20,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.ClientAvatarState;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -187,9 +188,9 @@ public class ClientEvents {
     }
 
     public static SoundInstance playSound(SoundInstance sound) {
-        var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        if (sound instanceof SimpleSoundInstance soundInstance && camera.getEntity() instanceof Player player) {
-            for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(player))) {
+        var camera = Minecraft.getInstance().gameRenderer.mainCamera();
+        if (sound instanceof SimpleSoundInstance soundInstance && camera.entity() instanceof Player player) {
+            for (SuperHearingAbility a : CommonUtil.getAbilitiesByType(SuperHearingAbility.class, player)) {
                 if (a.isEnabled()
                     //        || a.dataManager.get(SuperHearingAbility.RECEIVED) > 0
                 ) {
@@ -210,7 +211,7 @@ public class ClientEvents {
     public static void setupRoll(float partialTick, PoseStack pPoseStack) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null) {
-            for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(player))) {
+            for (FlightAbility ability : CommonUtil.getAbilitiesByType(FlightAbility.class, player)) {
                 float yBodyRot = Mth.rotLerp(partialTick, player.yBodyRotO, player.yBodyRot);
                 float f = Mth.wrapDegrees(player.getViewYRot(partialTick) - yBodyRot);
                 if (!ability.cooldown.end() && ability.dataManager.get(FlightAbility.BOOSTING) && player.isSprinting() && !Minecraft.getInstance().isPaused()) {
@@ -225,7 +226,7 @@ public class ClientEvents {
             }
         }
         if (Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
-            for (NodHeadAbility ability : CommonUtil.listOfType(NodHeadAbility.class, CommonUtil.getAbilities(player))) {
+            for (NodHeadAbility ability : CommonUtil.getAbilitiesByType(NodHeadAbility.class, player)) {
                 if (!ability.isEnded()) {
                     if (ability.isSideTurn()) {
                         pPoseStack.mulPose(Axis.YP.rotationDegrees((float) Math.toRadians(250F) * ability.turnByShakeCurve(partialTick)));
@@ -241,7 +242,7 @@ public class ClientEvents {
         float bodyRot = entity.getPreciseBodyRotation(partialTicks);
         float xRot = entity.getViewXRot(partialTicks);
         float yRot = entity.getViewYRot(partialTicks);
-        for (ParkourAbility ability : CommonUtil.listOfType(ParkourAbility.class, CommonUtil.getAbilities(entity))) {
+        for (ParkourAbility ability : CommonUtil.getAbilitiesByType(ParkourAbility.class, entity)) {
             if (ability.isEnabled()) {
                 float rollProgress = ability.dodgeRollHandler.rollTimer.value(partialTicks);
                 if (rollProgress > 0) {
@@ -329,7 +330,7 @@ public class ClientEvents {
             }
         }
 
-        for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(entity))) {
+        for (FlightAbility ability : CommonUtil.getAbilitiesByType(FlightAbility.class, entity)) {
             double d0 = -Mth.lerp(partialTicks, entity.xo, entity.getX());
             double d1 = -Mth.lerp(partialTicks, entity.yo, entity.getY());
             double d2 = -Mth.lerp(partialTicks, entity.zo, entity.getZ());
@@ -377,7 +378,7 @@ public class ClientEvents {
             return;
 
         poseStack.pushPose();
-        for (HeatVisionAbility a : CommonUtil.listOfType(HeatVisionAbility.class, CommonUtil.getAbilities(player))) {
+        for (HeatVisionAbility a : CommonUtil.getAbilitiesByType(HeatVisionAbility.class, player)) {
             float f = a.timer.value(partialTicks);
             if (f == 0) continue;
             // remove bob
@@ -389,7 +390,7 @@ public class ClientEvents {
                 poseStack.mulPose(Axis.ZN.rotationDegrees(Mth.sin(f1 * (float) Math.PI) * g * 3.0F));
                 poseStack.translate(-Mth.sin(f1 * (float) Math.PI) * g * 0.5F, Math.abs(Mth.cos(f1 * (float) Math.PI) * g), 0.0F);
             }
-            Color color = a.dataManager.get(TBCommonUtil.COLOR);
+            Color color = a.dataManager.get(CommonAccessors.COLOR);
             HitResult hitResult = CommonUtil.pick(player, a.dataManager.get(HeatVisionAbility.DISTANCE));
             double distance = player.getEyePosition().distanceTo(hitResult.getLocation());
             float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
@@ -400,11 +401,13 @@ public class ClientEvents {
                 AABB box = new AABB(f1, -0.25, -0.15F, 0, -0.25, -0.15F + -distance * f).inflate(0.03D);
                 poseStack.pushPose();
                 poseStack.translate(f1 + (TBConfig.CLIENT.heatVisionHardcored.get() ? 0 : f1), 0.25, 0);
-                submitNodeCollector.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.MAIN_LASER, (pose, buffer) ->
-                        ClientUtil.renderFilledBox(pose.pose(), buffer, box, 1F, 1F, 1F, f, packedLight));
-                submitNodeCollector.submitCustomGeometry(poseStack, ClientUtil.ModRenderTypes.LASER, (pose, buffer) -> {
-                    ClientUtil.renderFilledBox(pose.pose(), buffer, box.inflate(0.015D), red, green, blue, f * 0.2F, packedLight);
-                    ClientUtil.renderFilledBox(pose.pose(), buffer, box.inflate(0.03D), red, green, blue, f * 0.2F, packedLight);
+                // Core (translucent, white)
+                submitNodeCollector.submitCustomGeometry(poseStack, LaserRenderTypes.LASER_CORE, (pose, buffer) ->
+                        LaserRenderTypes.renderLaserBox(pose.pose(), buffer, box, 1F, 1F, 1F, f));
+                // Glow (additive, colored)
+                submitNodeCollector.submitCustomGeometry(poseStack, LaserRenderTypes.LASER_GLOW, (pose, buffer) -> {
+                    LaserRenderTypes.renderLaserBox(pose.pose(), buffer, box.inflate(0.015D), red, green, blue, f * 0.2F);
+                    LaserRenderTypes.renderLaserBox(pose.pose(), buffer, box.inflate(0.03D), red, green, blue, f * 0.2F);
                 });
                 poseStack.popPose();
             }

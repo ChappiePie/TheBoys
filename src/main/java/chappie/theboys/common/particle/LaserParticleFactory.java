@@ -20,7 +20,7 @@ public record LaserParticleFactory(SpriteSet sprite) implements ParticleProvider
             rot = e.getYRot();
             pitch = Math.min(e.getXRot(), 45);
         }
-        TextureAtlasSprite sprite = this.sprite.get(pLevel.random);
+        TextureAtlasSprite sprite = this.sprite.get(pLevel.getRandom());
         LaserParticle particle = new LaserParticle(pType.color(), pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, pitch, rot, sprite);
         particle.scale(2F);
 

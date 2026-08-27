@@ -38,4 +38,3 @@ public class LayerRenderStateMixin implements SuitOverlayHolder {
         }
     }
 }
-

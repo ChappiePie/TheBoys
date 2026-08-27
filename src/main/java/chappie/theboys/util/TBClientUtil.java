@@ -1,7 +1,6 @@
 package chappie.theboys.util;
 
 import chappie.modulus.util.ClientUtil;
-import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.render.IRenderStateEntity;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
@@ -12,20 +11,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
@@ -40,7 +38,7 @@ import java.util.function.Supplier;
 
 public class TBClientUtil {
 
-    public static final ResourceLocation GLOW_EYES_OVERLAY = TheBoys.id("textures/gui/glow_eyes_overlay.png");
+    public static final Identifier GLOW_EYES_OVERLAY = TheBoys.id("textures/gui/glow_eyes_overlay.png");
 
     public static final ArmorModelSet<ModelLayerLocation> SUIT = new ArmorModelSet<>(register("helmet"),
             register("chestplate"),
@@ -102,7 +100,7 @@ public class TBClientUtil {
                 } else if (slot == EquipmentSlot.CHEST) {
 
                     ClientUtil.modified(model.body).modulus$setSize(vec3f.add(0.05F, 0.05F, 0.05F, new Vector3f()));
-                    if (renderState instanceof IRenderStateEntity e && CommonUtil.smallArms(e.modulus$entity())) {
+                    if (renderState instanceof IRenderStateEntity e && ClientUtil.smallArms(e.modulus$entity())) {
                         ClientUtil.modified(model.rightArm).modulus$setSizeAndPos(vec3f.add(-0.5F, 0, 0), new Vector3f(0.5F, 0, 0));
                         ClientUtil.modified(model.leftArm).modulus$setSizeAndPos(vec3f.add(-0.5F, 0, 0), new Vector3f(-0.5F, 0, 0));
                     } else {
@@ -159,6 +157,7 @@ public class TBClientUtil {
             poseStack.translate(0, 0.155 * progress + vialRoll * 0.01F, 0);
             poseStack.mulPose(Axis.YN.rotationDegrees(vialRoll * 20));
         }
+        // Render item in hand
         Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(player, stack, rightArm ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, renderTasks, combinedLight);
         poseStack.popPose();
     }
@@ -175,7 +174,7 @@ public class TBClientUtil {
 
         suitItem.getClientSuitProperties().setupSuitScale(suitModel, player, EquipmentSlot.CHEST, chestStack);
         Vector3f sleeveScale = suitItem.getClientSuitProperties().entityWearScale(EquipmentSlot.CHEST, chestStack);
-        RenderType renderType = RenderType.entityTranslucent(suitItem.getClientSuitProperties().suitTexture(EquipmentSlot.CHEST, chestStack, ""));
+        net.minecraft.client.renderer.rendertype.RenderType renderType = net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(suitItem.getClientSuitProperties().suitTexture(EquipmentSlot.CHEST, chestStack, ""));
 
         ClientUtil.modified(model.rightSleeve).modulus$setSize(sleeveScale);
         ClientUtil.modified(model.leftSleeve).modulus$setSize(sleeveScale);

@@ -2,6 +2,7 @@ package chappie.theboys;
 
 import chappie.modulus.client.ModulusClient;
 import chappie.modulus.client.gui.ChappModListWidget;
+import chappie.modulus.common.ability.base.Superpower;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
 import chappie.theboys.client.ClientEvents;
@@ -12,7 +13,6 @@ import chappie.theboys.client.item.VialTintSource;
 import chappie.theboys.client.model.CapeModel;
 import chappie.theboys.client.renderer.TrailRenderer;
 import chappie.theboys.client.renderer.block.SynthesizerRenderer;
-import chappie.theboys.common.ability.base.TBSuperpower;
 import chappie.theboys.common.block.entity.TBBlockEntities;
 import chappie.theboys.common.block.menu.TBMenus;
 import chappie.theboys.common.entity.TBEntities;
@@ -31,11 +31,11 @@ import com.google.common.collect.ImmutableMap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.client.color.item.ItemTintSources;
@@ -57,7 +57,7 @@ public class TheBoysClient implements ClientModInitializer {
 
     static {
         ChappModListWidget.MOD_CLICKED.put(TheBoys.MODID, (e) ->
-                Minecraft.getInstance().setScreen(new EyeOptionsScreen(e.parent)));
+                Minecraft.getInstance().gui.setScreen(new EyeOptionsScreen(e.parent)));
     }
 
     @Override
@@ -66,11 +66,11 @@ public class TheBoysClient implements ClientModInitializer {
         ImmutableMap.Builder<ModelLayerLocation, LayerDefinition> builder = ImmutableMap.builder();
         TBClientUtil.SUIT.putFrom(TBClientUtil.createArmorMeshSet(), builder);
         for (Map.Entry<ModelLayerLocation, LayerDefinition> value : builder.build().entrySet()) {
-            EntityModelLayerRegistry.registerModelLayer(value.getKey(), value::getValue);
+            ModelLayerRegistry.registerModelLayer(value.getKey(), value::getValue);
         }
-        EntityModelLayerRegistry.registerModelLayer(CapeModel.LAYER_LOCATION, CapeModel::createBodyLayer);
+        ModelLayerRegistry.registerModelLayer(CapeModel.LAYER_LOCATION, CapeModel::createBodyLayer);
         TBNetworking.registerClientMessages();
-        KeyBindingHelper.registerKeyBinding(OVERLAY);
+        KeyMappingHelper.registerKeyMapping(OVERLAY);
         ClientEntityEvents.ENTITY_LOAD.register((e, w) -> {
             if (e instanceof Player) {
                 EyeOptionsScreen.updateData();
@@ -80,17 +80,19 @@ public class TheBoysClient implements ClientModInitializer {
         SetupAnimCallback.EVENT.register(ClientEvents::setupAnim);
         FirstPersonAdditionalHandCallback.EVENT.register(ClientEvents::firstPersonAdditionalHand);
         ClientTickEvents.END_CLIENT_TICK.register(TBOverlays::clientTick);
-        ParticleFactoryRegistry.getInstance().register(TBParticleTypes.LASER, LaserParticleFactory::new);
-        ParticleFactoryRegistry.getInstance().register(TBParticleTypes.WATER_SPLASH, WaterSplashParticle.Provider::new);
+        ParticleProviderRegistry.getInstance().register(TBParticleTypes.LASER, LaserParticleFactory::new);
+        ParticleProviderRegistry.getInstance().register(TBParticleTypes.WATER_SPLASH, WaterSplashParticle.Provider::new);
         EntityRenderers.register(TBEntities.TRAIL, TrailRenderer::new);
 
         ConditionalItemModelProperties.ID_MAPPER.put(TheBoys.id("has_vial"), HasVialDataProperty.MAP_CODEC);
 
         MenuScreens.register(TBMenus.SYNTHESIZER, SynthesizerScreen::new);
-        BlockEntityRenderers.register(TBBlockEntities.SYNTHESIZER, (context) -> new SynthesizerRenderer());
+        BlockEntityRenderers.register(TBBlockEntities.SYNTHESIZER, (context) -> new SynthesizerRenderer(context));
 
-        TooltipComponentCallback.EVENT.register(tooltip ->
+        ClientTooltipComponentCallback.EVENT.register(tooltip ->
                 tooltip instanceof ArmorTooltip(ItemStack itemStack) ? new ClientArmorTooltip(itemStack) :
-                        tooltip instanceof SuperpowerTooltip(TBSuperpower superpower) ? new ClientSuperpowerTooltip(superpower) : null);
+                        tooltip instanceof SuperpowerTooltip(
+                                Superpower superpower
+                        ) ? new ClientSuperpowerTooltip(superpower) : null);
     }
 }

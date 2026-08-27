@@ -32,4 +32,3 @@ public record VialTintSource(int defaultColor) implements ItemTintSource {
         return MAP_CODEC;
     }
 }
-

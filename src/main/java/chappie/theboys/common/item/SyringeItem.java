@@ -7,10 +7,17 @@ import chappie.theboys.client.renderer.SyringeRenderer;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.TBConfig;
+import com.geckolib.animatable.GeoItem;
+import com.geckolib.animatable.SingletonGeoAnimatable;
+import com.geckolib.animatable.client.GeoRenderProvider;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.renderer.GeoItemRenderer;
+import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -23,13 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
-import software.bernie.geckolib.animatable.client.GeoRenderProvider;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager;
-import software.bernie.geckolib.renderer.GeoItemRenderer;
-import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
 
@@ -81,7 +81,7 @@ public class SyringeItem extends Item implements GeoItem {
                     } else {
                         String superpower = vial.getOrDefault(TBDataComponents.SUPERPOWER, "");
                         if (!superpower.isBlank()) {
-                            cap.setSuperpower(Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower)).get().value());
+                            cap.setSuperpower(Superpower.REGISTRY.get(Identifier.tryParse(superpower)).get().value());
                         }
                     }
 
@@ -150,7 +150,7 @@ public class SyringeItem extends Item implements GeoItem {
                                 if (vialSuperpower(mainHandItem).equals("compoundV") || pPlayer.getAbilities().instabuild) {
                                     use = true;
                                 } else {
-                                    pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED), true);
+                                    pPlayer.sendOverlayMessage(Component.translatable("item.theboys.syringe.compoundV").withStyle(ChatFormatting.RED));
                                 }
                             }
                         } else {
@@ -164,13 +164,13 @@ public class SyringeItem extends Item implements GeoItem {
                         }
                     }
                 } else {
-                    pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.offHandSlot").withStyle(ChatFormatting.RED), true);
+                    pPlayer.sendOverlayMessage(Component.translatable("item.theboys.syringe.offHandSlot").withStyle(ChatFormatting.RED));
                 }
             } else {
                 if (offHandItem.getItem() instanceof VialItem) {
                     boysCap.vialAnim.triggerAnim(true, false);
                 } else {
-                    pPlayer.displayClientMessage(Component.translatable("item.theboys.syringe.noVial").withStyle(ChatFormatting.RED), true);
+                    pPlayer.sendOverlayMessage(Component.translatable("item.theboys.syringe.noVial").withStyle(ChatFormatting.RED));
                 }
             }
         }

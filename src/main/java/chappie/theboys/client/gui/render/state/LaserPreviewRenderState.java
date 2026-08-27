@@ -1,14 +1,14 @@
 package chappie.theboys.client.gui.render.state;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public record LaserPreviewRenderState(
         PlayerModel model,
-        ResourceLocation texture,
+        Identifier texture,
         float rotationX,
         float rotationY,
         float pivotY,
@@ -27,7 +27,7 @@ public record LaserPreviewRenderState(
 
     public LaserPreviewRenderState(
             PlayerModel model,
-            ResourceLocation texture,
+            Identifier texture,
             float rotationX,
             float rotationY,
             float pivotY,

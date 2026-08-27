@@ -1,17 +1,16 @@
 package chappie.theboys.util;
 
 import chappie.modulus.util.ClientUtil;
-import chappie.modulus.util.CommonUtil;
 import chappie.theboys.TheBoys;
 import chappie.theboys.common.item.suit.SuitItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -43,7 +42,7 @@ public class ClientSuitProperties {
         return new Vector3f(slot == EquipmentSlot.LEGS ? 0.1F : 0.25F);
     }
 
-    public ResourceLocation suitTexture(EquipmentSlot slot, ItemStack armorStack, String type) {
+    public Identifier suitTexture(EquipmentSlot slot, ItemStack armorStack, String type) {
         return TheBoys.id("textures/suits/%s/layer_%s.png".formatted(this.type(), slot == EquipmentSlot.LEGS ? 1 : 0));
     }
 
@@ -55,7 +54,7 @@ public class ClientSuitProperties {
                 suitModel,
                 renderState,
                 poseStack,
-                RenderType.entityTranslucent(this.suitTexture(slot, armorStack, "")),
+                RenderTypes.entityTranslucent(this.suitTexture(slot, armorStack, "")),
                 pPackedLight,
                 OverlayTexture.NO_OVERLAY,
                 ARGB.colorFromFloat(alpha, 1.0F, 1.0F, 1.0F),
@@ -69,7 +68,7 @@ public class ClientSuitProperties {
         ClientUtil.modifyAllParts(model, (part, iPart) -> {
             Vector3f vec = this.suitScale(slot, armorItem);
             iPart.modulus$setSize(vec);
-            if (CommonUtil.smallArms(entity)) {
+            if (ClientUtil.smallArms(entity)) {
                 ModelPart rightSleeve = model.rightArm.hasChild("right_sleeve") ? model.rightArm.getChild("right_sleeve") : null;
                 ModelPart leftSleeve = model.leftArm.hasChild("left_sleeve") ? model.leftArm.getChild("left_sleeve") : null;
                 if (part == model.rightArm || part == rightSleeve) {

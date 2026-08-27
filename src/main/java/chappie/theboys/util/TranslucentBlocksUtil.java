@@ -14,10 +14,10 @@ public class TranslucentBlocksUtil {
 
     public static final float NO_ALPHA = -1.0F;
 
-    public static boolean canSeeThrough(BlockPos.MutableBlockPos pos) {
+    public static boolean canSeeThrough(BlockPos pos) {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && Minecraft.getInstance().getCameraEntity() != null) {
             try {
-                for (XRayAbility xRayAbility : CommonUtil.listOfType(XRayAbility.class, CommonUtil.getAbilities(Minecraft.getInstance().getCameraEntity()))) {
+                for (XRayAbility xRayAbility : CommonUtil.getAbilitiesByType(XRayAbility.class, Minecraft.getInstance().getCameraEntity())) {
                     if (xRayAbility.hitPos != null && xRayAbility.translucentTimer.value(ClientUtil.getPartialTick()) != 0) {
                         AABB aabb = new AABB(xRayAbility.blockHitPos).inflate(xRayAbility.dataManager.get(XRayAbility.DISTANCE_MULTIPLIER));
                         if (aabb.intersects(new AABB(pos))) {
@@ -44,7 +44,7 @@ public class TranslucentBlocksUtil {
 
         try {
             float partialTick = ClientUtil.getPartialTick();
-            for (XRayAbility xRayAbility : CommonUtil.listOfType(XRayAbility.class, CommonUtil.getAbilities(minecraft.getCameraEntity()))) {
+            for (XRayAbility xRayAbility : CommonUtil.getAbilitiesByType(XRayAbility.class, minecraft.getCameraEntity())) {
                 if (xRayAbility.hitPos == null) {
                     continue;
                 }

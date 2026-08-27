@@ -53,6 +53,7 @@ public class ParkourAbility extends Ability implements IHasTimer {
         super.defineData();
         this.dataManager.define(STRAFE_IMPULSE, 0, false);
         this.dataManager.define(FORWARD_IMPULSE, 0, false);
+        this.dataManager.clientWritable(STRAFE_IMPULSE, FORWARD_IMPULSE);
     }
 
     @Override
@@ -462,7 +463,7 @@ public class ParkourAbility extends Ability implements IHasTimer {
         if (!player.level().isClientSide()) {
             player.hurtMarked = true;
         }
-        player.hasImpulse = true;
+        player.hurtMarked = true;
     }
 
     public double vanillaVertical(Player player) {

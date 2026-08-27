@@ -7,9 +7,9 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import org.joml.Quaternionf;
 
 public class CapeModel extends Model<HumanoidRenderState> {
@@ -18,7 +18,7 @@ public class CapeModel extends Model<HumanoidRenderState> {
 	private final ModelPart cape = this.root.getChild("cape");
 
 	public CapeModel() {
-		super(Minecraft.getInstance().getEntityModels().bakeLayer(CapeModel.LAYER_LOCATION).getChild("main"), RenderType::entityTranslucent);
+        super(Minecraft.getInstance().getEntityModels().bakeLayer(CapeModel.LAYER_LOCATION).getChild("main"), (id) -> RenderTypes.entityTranslucent(id));
 	}
 
 	public static LayerDefinition createBodyLayer() {

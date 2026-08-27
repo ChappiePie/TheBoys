@@ -31,7 +31,7 @@ public abstract class EntityMixin {
     @Inject(method = "turn(DD)V", at = @At("HEAD"), cancellable = true)
     public void mixin$turn(double yRot, double xRot, CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
-        for (ParkourAbility ability : CommonUtil.listOfType(ParkourAbility.class, CommonUtil.getAbilities(entity))) {
+        for (ParkourAbility ability : CommonUtil.getAbilitiesByType(ParkourAbility.class, entity)) {
             if (ability.ledgeHandler.isHanging() && entity instanceof Player player) {
                 ability.ledgeHandler.applyTurn(player, yRot, xRot);
                 ci.cancel();
@@ -52,8 +52,8 @@ public abstract class EntityMixin {
     @Unique
     private boolean theBoys$focusOnGoal() {
         Entity entity = (Entity) (Object) this;
-        for (FocusOnGoalAbility ability : CommonUtil.listOfType(FocusOnGoalAbility.class, CommonUtil.getAbilities(entity))) {
-            if (ability.dataManager.get(FocusOnGoalAbility.TARGET_ID).equals(ability.entity.getId())) {
+        for (FocusOnGoalAbility ability : CommonUtil.getAbilitiesByType(FocusOnGoalAbility.class, entity)) {
+            if (ability.dataManager.get(FocusOnGoalAbility.TARGET_ID).equals(ability.getEntity().getId())) {
                 continue;
             }
             Entity targetEntity = entity.level().getEntity(ability.dataManager.get(FocusOnGoalAbility.TARGET_ID));
