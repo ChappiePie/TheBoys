@@ -20,10 +20,12 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 
 import java.awt.*;
@@ -42,6 +44,7 @@ public class HeatVisionAbility extends GlowEyesAbility {
 
     public final Timer timer = new Timer(() -> this.dataManager.get(MAX_TIMER), this::isEnabled);
     private Map.Entry<BlockPos, Integer> blocksInFire;
+    private Map.Entry<BlockPos, Float> miningProgress;
 
     public HeatVisionAbility(LivingEntity entity, AbilityBuilder builder) {
         super(entity, builder);
@@ -155,29 +158,54 @@ public class HeatVisionAbility extends GlowEyesAbility {
     }
 
     protected void onHitBlock(BlockHitResult hitResult) {
-        BlockPos blockPos = hitResult.getBlockPos();
-        if (this.entity.level().getBlockState(blockPos).getBlock() == Blocks.SAND) {
-            if (this.blocksInFire == null || !this.blocksInFire.getKey().equals(blockPos)) {
-                this.blocksInFire = new AbstractMap.SimpleEntry<>(blockPos, 0);
-            }
-            this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
+        if (TBConfig.COMMON.homelanderBlockDestruction.get()) {
+            BlockPos blockPos = hitResult.getBlockPos();
+            BlockState blockState = entity.level().getBlockState(blockPos);
+            float hardness = blockState.getDestroySpeed(entity.level(), blockPos);
 
-            if (this.blocksInFire.getValue() > 60) {
-                this.entity.level().setBlock(blockPos, Blocks.GLASS.defaultBlockState(), 11);
-                this.blocksInFire = null;
+            if (hardness != -1) {
+                if (miningProgress == null || !miningProgress.getKey().equals(blockPos)) {
+                    miningProgress = new AbstractMap.SimpleEntry<>(blockPos, 0.0f);
+                }
+
+                float progress = miningProgress.getValue();
+                progress += (float) (TBConfig.COMMON.homelanderMiningSpeedMultiplier.get() / (hardness * 30.0f));
+                miningProgress.setValue(progress);
+
+                if (progress >= 1.0f) {
+                    if (TBConfig.COMMON.homelander3x3Destruction.get()) {
+                        destroy3x3(blockPos, hitResult.getDirection());
+                    } else {
+                        entity.level().destroyBlock(blockPos, true, entity);
+                    }
+                    miningProgress = null;
+                }
             }
         } else {
-            blockPos = blockPos.relative(hitResult.getDirection());
-            if (this.entity.level().isEmptyBlock(blockPos)) {
-
+            BlockPos blockPos = hitResult.getBlockPos();
+            if (this.entity.level().getBlockState(blockPos).getBlock() == Blocks.SAND) {
                 if (this.blocksInFire == null || !this.blocksInFire.getKey().equals(blockPos)) {
                     this.blocksInFire = new AbstractMap.SimpleEntry<>(blockPos, 0);
                 }
                 this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
 
-                if (this.blocksInFire.getValue() > 3) {
-                    this.entity.level().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
+                if (this.blocksInFire.getValue() > 60) {
+                    this.entity.level().setBlock(blockPos, Blocks.GLASS.defaultBlockState(), 11);
                     this.blocksInFire = null;
+                }
+            } else {
+                blockPos = blockPos.relative(hitResult.getDirection());
+                if (this.entity.level().isEmptyBlock(blockPos)) {
+
+                    if (this.blocksInFire == null || !this.blocksInFire.getKey().equals(blockPos)) {
+                        this.blocksInFire = new AbstractMap.SimpleEntry<>(blockPos, 0);
+                    }
+                    this.blocksInFire.setValue(this.blocksInFire.getValue() + 1);
+
+                    if (this.blocksInFire.getValue() > 3) {
+                        this.entity.level().setBlock(blockPos, Blocks.FIRE.defaultBlockState(), 11);
+                        this.blocksInFire = null;
+                    }
                 }
             }
         }
@@ -188,6 +216,25 @@ public class HeatVisionAbility extends GlowEyesAbility {
         CommonUtil.spawnParticleForAll(this.entity.getCommandSenderWorld(),
                 ParticleTypes.SMOKE, true, hitResult.getLocation(),
                 new Vec3(entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D, entity.getRandom().nextGaussian() * 0.0005D), 0.05F, 10);
+    }
+
+    private void destroy3x3(BlockPos center, Direction direction) {
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    if (direction.getAxis() == Direction.Axis.X) {
+                        BlockPos pos = center.offset(0, y, z);
+                        entity.level().destroyBlock(pos, true, entity);
+                    } else if (direction.getAxis() == Direction.Axis.Y) {
+                        BlockPos pos = center.offset(x, 0, z);
+                        entity.level().destroyBlock(pos, true, entity);
+                    } else {
+                        BlockPos pos = center.offset(x, y, 0);
+                        entity.level().destroyBlock(pos, true, entity);
+                    }
+                }
+            }
+        }
     }
 
     @Override

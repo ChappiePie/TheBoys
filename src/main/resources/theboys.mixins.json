@@ -30,12 +30,12 @@
     "ItemStackMixin",
     "LiquidBlockMixin",
     "LivingEntityMixin",
-    "LivingEntityRendererAccessor",
     "MobEffectUtilMixin",
     "MobMixin",
     "PlayerMixin",
     "ServerLevelMixin",
-    "SkullBlockEntityAccessor"
+    "SkullBlockEntityAccessor",
+    "client.LivingEntityRendererAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
