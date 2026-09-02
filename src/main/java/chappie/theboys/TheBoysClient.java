@@ -38,7 +38,6 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 public class TheBoysClient implements ClientModInitializer {
@@ -65,11 +64,11 @@ public class TheBoysClient implements ClientModInitializer {
         ParticleFactoryRegistry.getInstance().register(TBParticleTypes.WATER_SPLASH, WaterSplashParticle.Provider::new);
         EntityRendererRegistry.register(TBEntities.TRAIL, TrailRenderer::new);
 
-        ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : ((SyringeItem) stack.getItem()).getColor(stack), TBItems.SYRINGE);
-        ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : ((VialItem) stack.getItem()).getColor(stack), TBItems.VIAL);
+        ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : SyringeItem.getColor(stack), TBItems.SYRINGE);
+        ColorProviderRegistry.ITEM.register((stack, i) -> i > 0 ? -1 : VialItem.getColor(stack), TBItems.VIAL);
 
         ItemProperties.register(TBItems.SYRINGE, TheBoys.id("has_vial"), (pStack, pLevel, pEntity, pSeed) -> {
-            if (!pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY).isEmpty()) {
+            if (pStack.has(TBDataComponents.VIAL)) {
                 return 1;
             }
             return 0;

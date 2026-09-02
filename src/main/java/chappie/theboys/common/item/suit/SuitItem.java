@@ -2,6 +2,7 @@ package chappie.theboys.common.item.suit;
 
 import chappie.theboys.TheBoys;
 import chappie.theboys.client.renderer.ClientHeroWithCapeProperties;
+import chappie.theboys.common.item.datacomponents.SuitContents;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
 import chappie.theboys.util.ClientSuitProperties;
 import net.minecraft.ChatFormatting;
@@ -42,7 +43,7 @@ public class SuitItem extends Item {
             if (!list.isEmpty() && pStack.getItem() instanceof SuitItem item) {
                 ItemStack armorStack = list.get(0).getItemBySlot(item.properties.getSlot());
                 if (armorStack.getItem() instanceof ArmorItem) {
-                    armorStack.set(TBDataComponents.SUIT, pStack.copyWithCount(1));
+                    armorStack.set(TBDataComponents.SUIT, SuitContents.fromStack(pStack));
                     pStack.shrink(1);
                     return pStack;
                 }
@@ -84,12 +85,12 @@ public class SuitItem extends Item {
                 if (!pStack.isEmpty() && pStack.getItem() instanceof ArmorItem && suitStack.getItem() instanceof SuitItem item) {
                     EquipmentSlot suitSlot = item.equipmentSlot(pStack, suitStack, player);
                     if (suitSlot == null || slot.equals(suitSlot)) {
-                        ItemStack suitItem = pStack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
-                        if (!suitItem.isEmpty()) {
+                        boolean hasSuit = pStack.has(TBDataComponents.SUIT);
+                        if (hasSuit) {
                             pStack.remove(TBDataComponents.SUIT);
                         }
-                        if (suitItem.isEmpty()) {
-                            pStack.set(TBDataComponents.SUIT, suitStack.copyWithCount(1));
+                        if (!hasSuit) {
+                            pStack.set(TBDataComponents.SUIT, SuitContents.fromStack(suitStack));
                             if (!player.getAbilities().instabuild) {
                                 suitStack.shrink(1);
                             }

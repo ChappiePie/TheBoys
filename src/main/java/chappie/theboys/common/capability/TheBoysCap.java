@@ -34,7 +34,7 @@ public class TheBoysCap implements AutoSyncedComponent, CommonTickingComponent, 
 
     @Override
     public void tick() {
-        if (this.livingEntity.isAlive()) {
+        if (this.livingEntity != null && this.livingEntity.isAlive()) {
             this.vialAnim.tick(this.livingEntity);
             this.syringeAnim.tick(this.livingEntity);
         }

@@ -9,6 +9,7 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.entity.TrailEntity;
 import chappie.theboys.util.TBCommonUtil;
+import chappie.theboys.util.TBConfig;
 import chappie.theboys.util.interfaces.ILivingEntityEx;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -88,18 +89,13 @@ public class SpeedAbility extends Ability implements IHasTimer {
             }
 
             if (entity.isSprinting()) {
-                /*if (player.isOnGround() && speedLevel > 10 && walkDifference > 1.6F && !player.getAbilities().instabuild) {
-                    if (!(Suit.getSuit(player) instanceof SpeedsterSuit)) {
-                        player.setSecondsOnFire(10);
-                    }
-                }*/
-
-                if (speedLevel > 5 && isMoving) {
+                if (speedLevel > 3 && isMoving) {
                     for (LivingEntity e : entity.getCommandSenderWorld().getEntitiesOfClass(LivingEntity.class,
                             CommonUtil.boxWithRange(entity.position(), 0.5D))) {
                         if (e != entity) {
                             if (entity.getCommandSenderWorld() instanceof ServerLevel) {
-                                e.hurt(e.damageSources().inWall(), speedLevel);
+                                float damage = (float) (speedLevel * entity.getDeltaMovement().length() * TBConfig.COMMON.aTrainSprintDamageMultiplier.get());
+                                e.hurt(e.damageSources().playerAttack((Player) entity), damage);
                             }
                         }
                     }

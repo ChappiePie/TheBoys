@@ -5,7 +5,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.function.UnaryOperator;
 
@@ -15,12 +14,12 @@ public class TBDataComponents {
             "superpower", builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8)
     );
 
-    public static final DataComponentType<ItemStack> VIAL = register(
-            "vial", builder -> builder.persistent(ItemStack.CODEC).networkSynchronized(ItemStack.STREAM_CODEC)
+    public static final DataComponentType<VialContents> VIAL = register(
+            "vial", builder -> builder.persistent(VialContents.CODEC).networkSynchronized(VialContents.STREAM_CODEC)
     );
 
-    public static final DataComponentType<ItemStack> SUIT = register(
-            "suit", builder -> builder.persistent(ItemStack.CODEC).networkSynchronized(ItemStack.STREAM_CODEC)
+    public static final DataComponentType<SuitContents> SUIT = register(
+            "suit", builder -> builder.persistent(SuitContents.CODEC).networkSynchronized(SuitContents.STREAM_CODEC)
     );
 
     private static <T> DataComponentType<T> register(String name, UnaryOperator<DataComponentType.Builder<T>> builder) {

@@ -214,6 +214,7 @@ public class EyeOptionsScreen extends Screen implements IOneScaleScreen {
     public void setModelProperties(PlayerModel<?> model, float pPartialTick) {
         if (this.minecraft == null) return;
         model.setAllVisible(true);
+        model.young = false;
         model.hat.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.HAT);
         model.jacket.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.JACKET);
         model.leftPants.visible = minecraft.options.isModelPartEnabled(PlayerModelPart.LEFT_PANTS_LEG);

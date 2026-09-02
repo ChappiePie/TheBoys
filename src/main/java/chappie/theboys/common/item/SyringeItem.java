@@ -6,6 +6,7 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.client.renderer.SyringeRenderer;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
+import chappie.theboys.common.item.datacomponents.VialContents;
 import chappie.theboys.util.TBConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -42,8 +43,7 @@ public class SyringeItem extends Item implements GeoItem {
     }
 
     public static int getColor(ItemStack pStack) {
-        ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
-        return !vial.isEmpty() ? VialItem.getColor(vial) : -1;
+        return pStack.has(TBDataComponents.VIAL) ? VialItem.getColor(pStack.getOrDefault(TBDataComponents.VIAL, VialContents.EMPTY).toStack()) : -1;
     }
 
     @Override
@@ -52,16 +52,15 @@ public class SyringeItem extends Item implements GeoItem {
     }
 
     private String vialSuperpower(ItemStack pStack) {
-        ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
-        if (!vial.isEmpty()) {
-            return vial.getOrDefault(TBDataComponents.SUPERPOWER, "");
+        VialContents vial = pStack.getOrDefault(TBDataComponents.VIAL, VialContents.EMPTY);
+        if (pStack.has(TBDataComponents.VIAL)) {
+            return vial.superpower();
         }
         return "";
     }
 
     private boolean hasSuperpower(ItemStack pStack) {
-        ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
-        return !vial.isEmpty() && !vial.getOrDefault(TBDataComponents.SUPERPOWER, "").isEmpty();
+        return pStack.has(TBDataComponents.VIAL) && pStack.getOrDefault(TBDataComponents.VIAL, VialContents.EMPTY).hasSuperpower();
     }
 
     @Override
@@ -69,8 +68,8 @@ public class SyringeItem extends Item implements GeoItem {
         if (pLivingEntity instanceof Player player) {
             PowerCap cap = PowerCap.getCap(player);
             boolean b = false;
-            ItemStack vial = pStack.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
-            if (cap != null && !vial.isEmpty()) {
+            VialContents vial = pStack.getOrDefault(TBDataComponents.VIAL, VialContents.EMPTY);
+            if (cap != null && pStack.has(TBDataComponents.VIAL)) {
                 player.getCooldowns().addCooldown(pStack.getItem(), 20);
                 if (this.hasSuperpower(pStack) && (cap.getSuperpower() == null || player.getAbilities().instabuild && !this.vialSuperpower(pStack).equals("compoundV"))) {
                     if (this.vialSuperpower(pStack).equals("compoundV")) {
@@ -79,24 +78,24 @@ public class SyringeItem extends Item implements GeoItem {
                             cap.setSuperpower(superpowers.get(player.getRandom().nextInt(superpowers.size())));
                         }
                     } else {
-                        String superpower = vial.getOrDefault(TBDataComponents.SUPERPOWER, "");
+                        String superpower = vial.superpower();
                         if (!superpower.isBlank()) {
                             cap.setSuperpower(Superpower.REGISTRY.get(ResourceLocation.tryParse(superpower)));
                         }
                     }
 
                     if (!player.getAbilities().instabuild) {
-                        vial.remove(TBDataComponents.SUPERPOWER);
+                        vial = VialContents.EMPTY;
                         pStack.set(TBDataComponents.VIAL, vial);
                         this.broadcastChangesOnContainerMenu(player);
                         b = true;
                     }
                 } else {
-                    if (vial.getOrDefault(TBDataComponents.SUPERPOWER, "").isEmpty()) {
+                    if (!vial.hasSuperpower()) {
                         if (TBConfig.COMMON.storeAbilities.get() || player.getAbilities().instabuild) {
-                            vial.set(TBDataComponents.SUPERPOWER, Superpower.REGISTRY.getKey(cap.getSuperpower()).toString());
+                            vial = new VialContents(Superpower.REGISTRY.getKey(cap.getSuperpower()).toString());
                         } else {
-                            vial.set(TBDataComponents.SUPERPOWER, "compoundV");
+                            vial = new VialContents("compoundV");
                         }
                         this.broadcastChangesOnContainerMenu(player);
                         cap.setSuperpower(null);
@@ -105,7 +104,7 @@ public class SyringeItem extends Item implements GeoItem {
                         if (this.vialSuperpower(pStack).equals("compoundV")) {
                             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 3, false, true, true));
                             if (!player.getAbilities().instabuild) {
-                                vial.remove(TBDataComponents.SUPERPOWER);
+                                vial = VialContents.EMPTY;
                             }
                         }
                     }
@@ -133,8 +132,7 @@ public class SyringeItem extends Item implements GeoItem {
         PowerCap cap = PowerCap.getCap(pPlayer);
         TheBoysCap boysCap = TheBoysCap.getCap(pPlayer);
         if (boysCap != null && cap != null && pHand == InteractionHand.MAIN_HAND) {
-            ItemStack vial = mainHandItem.getOrDefault(TBDataComponents.VIAL, ItemStack.EMPTY);
-            if (!vial.isEmpty()) {
+            if (mainHandItem.has(TBDataComponents.VIAL)) {
                 if (offHandItem.isEmpty()) {
                     if (pPlayer.isCrouching()) {
                         boysCap.vialAnim.triggerAnim(true, true);

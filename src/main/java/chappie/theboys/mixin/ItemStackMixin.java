@@ -21,8 +21,8 @@ public class ItemStackMixin {
     @Inject(method = "forEachModifier(Lnet/minecraft/world/entity/EquipmentSlot;Ljava/util/function/BiConsumer;)V", at = @At("TAIL"))
     public void mixin$forEach(EquipmentSlot equipmentSlot, BiConsumer<Holder<Attribute>, AttributeModifier> action, CallbackInfo ci) {
         ItemStack stack = (ItemStack) (Object) this;
-        ItemStack suitStack = stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY);
-        if (!suitStack.isEmpty() && suitStack.getItem() instanceof SuitItem item) {
+        ItemStack suitStack = stack.has(TBDataComponents.SUIT) ? stack.get(TBDataComponents.SUIT).toStack() : ItemStack.EMPTY;
+        if (suitStack.getItem() instanceof SuitItem item) {
             for (ItemAttributeModifiers.Entry entry : item.properties.defaultModifiers()) {
                 if (entry.slot().test(equipmentSlot)) {
                     action.accept(entry.attribute(), entry.modifier());

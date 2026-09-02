@@ -27,7 +27,7 @@ public class LiquidBlockMixin {
     public void getNewCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext, CallbackInfoReturnable<VoxelShape> cir) {
         if (pContext.isAbove(SpeedAbility.STABLE_SHAPE, pPos, true) && pState.getValue(LiquidBlock.LEVEL) == 0) {
             if (pContext instanceof EntityCollisionContext context && context.getEntity() instanceof LivingEntity entity) {
-                if (((LiquidBlock) (Object) this).getFluidState(pState).is(WATER) && isMovingOnServer(entity)) {
+                if (pState.getFluidState().is(WATER) && isMovingOnServer(entity)) {
                     for (Ability ability : CommonUtil.getAbilities(entity)) {
                         if (ability instanceof SpeedAbility) {
                             if (ability.isEnabled()) {

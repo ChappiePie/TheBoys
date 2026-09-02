@@ -15,7 +15,7 @@ import chappie.theboys.TheBoys;
 import chappie.theboys.common.ability.FlightAbility;
 import chappie.theboys.common.ability.FocusOnGoalAbility;
 import chappie.theboys.common.ability.HeatVisionAbility;
-import chappie.theboys.common.ability.SpeedAbility;
+import chappie.theboys.common.ability.condition.WaterCondition;
 import chappie.theboys.common.ability.interfaces.IHasOverlay;
 import chappie.theboys.util.TBCommonUtil;
 import net.minecraft.core.Registry;
@@ -110,6 +110,7 @@ public class TBSuperpowers {
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"),
             AbilityBuilder.of("fish_swarm", TBAbilityTypes.FISH_SWARM)
                     .additionalData(a -> new IHasOverlay(a, (b) -> b.uOffset(144)))
+                    .condition(WaterCondition::new, "enabling")
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.HELD), "enabling"),
 
             AbilityBuilder.of("water_breathing", TBAbilityTypes.WATER_BREATHING).hide(),

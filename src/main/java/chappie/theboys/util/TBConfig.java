@@ -66,6 +66,18 @@ public class TBConfig {
         public final ForgeConfigSpec.DoubleValue heatVisionDamage;
         public final ForgeConfigSpec.DoubleValue heatVisionRange;
 
+        // X-Ray
+        public final ForgeConfigSpec.IntValue xRayMaxDistance;
+
+        // Homelander
+        public final ForgeConfigSpec.BooleanValue homelanderBlockDestruction;
+        public final ForgeConfigSpec.DoubleValue homelanderMiningSpeedMultiplier;
+        public final ForgeConfigSpec.DoubleValue homelanderRammingDamageScale;
+        public final ForgeConfigSpec.BooleanValue homelander3x3Destruction;
+
+        // A-Train
+        public final ForgeConfigSpec.DoubleValue aTrainSprintDamageMultiplier;
+
         Common(ForgeConfigSpec.Builder builder) {
             builder.comment("Common Settings").push("common");
             this.suitOpacity = builder.comment("Change suit opacity on armor").translation("config.theboys.suitOpacity").defineInRange("suitOpacity", 1.0D, 0.0D, 1.0D);
@@ -74,6 +86,22 @@ public class TBConfig {
 
             this.heatVisionDamage = builder.comment("Heat vision damage against entities").translation("config.theboys.heatVisionDamage").defineInRange("heatVisionDamage", 2.0D, 0.0D, 100.0D);
             this.heatVisionRange = builder.comment("Heat vision maximum range").translation("config.theboys.heatVisionRange").defineInRange("heatVisionRange", 20.0D, 0.0D, 256.0D);
+
+            builder.push("X-Ray");
+            this.xRayMaxDistance = builder.comment("Max distance for X-Ray vision to penetrate walls").defineInRange("xRayMaxDistance", 10, 1, 100);
+            builder.pop();
+
+            builder.push("Homelander");
+            this.homelanderBlockDestruction = builder.comment("Enable/disable block destruction with lasers").define("homelanderBlockDestruction", true);
+            this.homelanderMiningSpeedMultiplier = builder.comment("Speed multiplier for mining with lasers").defineInRange("homelanderMiningSpeedMultiplier", 2.0, 0.1, 10.0);
+            this.homelanderRammingDamageScale = builder.comment("Damage scaling for ramming into entities").defineInRange("homelanderRammingDamageScale", 1.5, 0.1, 10.0);
+            this.homelander3x3Destruction = builder.comment("Enable/disable 3x3 block destruction with lasers").define("homelander3x3Destruction", false);
+            builder.pop();
+
+            builder.push("A-Train");
+            this.aTrainSprintDamageMultiplier = builder.comment("Damage multiplier for sprinting into entities").defineInRange("aTrainSprintDamageMultiplier", 2.0, 0.1, 10.0);
+            builder.pop();
+
             builder.pop();
         }
 

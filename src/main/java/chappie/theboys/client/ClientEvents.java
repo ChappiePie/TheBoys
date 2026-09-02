@@ -149,8 +149,8 @@ public class ClientEvents {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.isArmor()) {
                 ItemStack stack = event.entity().getItemBySlot(slot);
-                if (stack.getItem() instanceof ArmorItem && !stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).isEmpty()) {
-                    ItemStack suitStack = stack.get(TBDataComponents.SUIT);
+                if (stack.getItem() instanceof ArmorItem && stack.has(TBDataComponents.SUIT)) {
+                    ItemStack suitStack = stack.get(TBDataComponents.SUIT).toStack();
                     if (suitStack.getItem() instanceof SuitItem item) {
                         if (event.modelProperties().layers().stream().anyMatch(layer -> layer instanceof HumanoidArmorLayer)) {
                             Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.entity(), stack);
@@ -311,7 +311,7 @@ public class ClientEvents {
     public static boolean capeRender(AbstractClientPlayer player) {
         ItemStack stack = player.getItemBySlot(EquipmentSlot.CHEST);
         if (!stack.isEmpty() && stack.getItem() instanceof ArmorItem) {
-            if (stack.getOrDefault(TBDataComponents.SUIT, ItemStack.EMPTY).getItem() instanceof SuitItem item) {
+            if (stack.has(TBDataComponents.SUIT) && stack.get(TBDataComponents.SUIT).toStack().getItem() instanceof SuitItem item) {
                 return !(item.getClientSuitProperties() instanceof ClientHeroWithCapeProperties);
             }
         }
