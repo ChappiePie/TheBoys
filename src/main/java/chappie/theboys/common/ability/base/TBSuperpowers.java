@@ -113,7 +113,7 @@ public class TBSuperpowers {
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.FIRST).action(KeyCondition.Action.HELD), "enabling"))
             .add(AbilityBuilder.of("fish_swarm", TBAbilityTypes.FISH_SWARM)
                     .hud(a -> new AbilityHudProperties().texture(TBOverlays.TEXTURE).uv(144, 0).autoKey())
-                    .condition(a -> new Condition(a, (c) -> a.getEntity().isInWater()), "enabling")
+                    .condition(WaterCondition::new, "enabling")
                     .condition(a -> new KeyCondition(a).keyType(KeyMap.KeyType.SECOND).action(KeyCondition.Action.HELD), "enabling"))
             .passive("water_breathing", TBAbilityTypes.WATER_BREATHING)
             .passive("water_mining", TBAbilityTypes.WATER_MINING)
