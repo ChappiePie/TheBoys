@@ -82,7 +82,7 @@ public class SynthesizerBlock extends BaseEntityBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return ItemInteractionResult.SUCCESS;
         } else {
             if (level.getBlockEntity(pos) instanceof SynthesizerBlockEntity e) {

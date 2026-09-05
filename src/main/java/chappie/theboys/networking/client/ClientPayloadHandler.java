@@ -23,9 +23,6 @@ import java.util.Map;
 
 import static net.minecraft.client.renderer.entity.LivingEntityRenderer.isEntityUpsideDown;
 
-/**
- * Handles client-bound packets. This class is only ever loaded on the CLIENT dist.
- */
 public class ClientPayloadHandler {
 
     public static void registerAll(PayloadRegistrar registrar) {

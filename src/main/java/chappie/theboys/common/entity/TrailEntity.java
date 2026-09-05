@@ -69,9 +69,11 @@ public class TrailEntity extends Entity {
         return true;
     }
 
+    @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
     }
 
+    @Override
     protected void addAdditionalSaveData(CompoundTag compound) {
     }
 

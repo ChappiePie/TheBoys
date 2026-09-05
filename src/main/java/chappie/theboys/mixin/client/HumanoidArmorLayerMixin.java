@@ -44,22 +44,22 @@ public abstract class HumanoidArmorLayerMixin<T extends LivingEntity, A extends 
                 Vector3f vec3f = item.getClientSuitProperties().armorScale(pLivingEntity, stack);
                 switch (pSlot) {
                     case HEAD -> {
-                        ClientUtil.modified(pModel.head).setSize(vec3f);
-                        ClientUtil.modified(pModel.hat).setSize(vec3f);
+                        ClientUtil.modified(pModel.head).modulus$setSize(vec3f);
+                        ClientUtil.modified(pModel.hat).modulus$setSize(vec3f);
                     }
                     case CHEST -> {
-                        ClientUtil.modified(pModel.body).setSize(vec3f);
-                        ClientUtil.modified(pModel.rightArm).setSize(vec3f);
-                        ClientUtil.modified(pModel.leftArm).setSize(vec3f);
+                        ClientUtil.modified(pModel.body).modulus$setSize(vec3f);
+                        ClientUtil.modified(pModel.rightArm).modulus$setSize(vec3f);
+                        ClientUtil.modified(pModel.leftArm).modulus$setSize(vec3f);
                     }
                     case LEGS -> {
-                        ClientUtil.modified(pModel.body).setSize(vec3f);
-                        ClientUtil.modified(pModel.rightLeg).setSize(vec3f);
-                        ClientUtil.modified(pModel.leftLeg).setSize(vec3f);
+                        ClientUtil.modified(pModel.body).modulus$setSize(vec3f);
+                        ClientUtil.modified(pModel.rightLeg).modulus$setSize(vec3f);
+                        ClientUtil.modified(pModel.leftLeg).modulus$setSize(vec3f);
                     }
                     case FEET -> {
-                        ClientUtil.modified(pModel.rightLeg).setSize(vec3f);
-                        ClientUtil.modified(pModel.leftLeg).setSize(vec3f);
+                        ClientUtil.modified(pModel.rightLeg).modulus$setSize(vec3f);
+                        ClientUtil.modified(pModel.leftLeg).modulus$setSize(vec3f);
                     }
                 }
             }
@@ -77,7 +77,7 @@ public abstract class HumanoidArmorLayerMixin<T extends LivingEntity, A extends 
                 pModel.copyPropertiesTo(this.theBoys$model);
                 this.setPartVisibility((A) this.theBoys$model, pSlot);
                 pPoseStack.pushPose();
-                ClientUtil.modifyAllParts(this.theBoys$model, (part, iPart) -> iPart.setSize(properties.suitScale(pSlot, pLivingEntity, stack)));
+                ClientUtil.modifyAllParts(this.theBoys$model, (part, iPart) -> iPart.modulus$setSize(properties.suitScale(pSlot, pLivingEntity, stack)));
                 RenderType renderType = RenderType.entityTranslucent(properties.suitTexture(pSlot, pLivingEntity, stack, ""));
                 properties.renderSuitModel((SuitModel<LivingEntity>) this.theBoys$model, renderType, pPoseStack, pBuffer, pLivingEntity, pSlot, pPackedLight, stack, suitStack, pModel, alpha);
                 properties.render(pPoseStack, pBuffer, pLivingEntity, pSlot, pPackedLight, stack, suitStack, pModel, alpha);

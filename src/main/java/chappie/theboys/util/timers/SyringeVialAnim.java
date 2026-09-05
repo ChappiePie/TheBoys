@@ -56,7 +56,7 @@ public class SyringeVialAnim implements IHasTimer {
         this.rollVial.predicate = () -> a && timeline < 0.7F;
         this.insertVial.predicate = () -> a && timeline > 0.8F;
 
-        if (this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem) || timeline >= 1.0f) {
+        if ((this.triggerAnim && !(mainHandItem.getItem() instanceof SyringeItem)) || timeline >= 1.0f) {
             this.triggerAnim = false;
             this.boysCap.syncToAll();
         }

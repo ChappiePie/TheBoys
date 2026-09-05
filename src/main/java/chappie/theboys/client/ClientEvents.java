@@ -5,9 +5,8 @@ import chappie.modulus.util.CommonUtil;
 import chappie.modulus.util.events.FirstPersonAdditionalHandCallback;
 import chappie.modulus.util.events.SetupAnimCallback;
 import chappie.theboys.client.renderer.ClientHeroWithCapeProperties;
-import chappie.theboys.common.ability.FlightAbility;
-import chappie.theboys.common.ability.HeatVisionAbility;
-import chappie.theboys.common.ability.SuperHearingAbility;
+import chappie.theboys.common.ability.*;
+import chappie.theboys.common.ability.parkour.DodgeRollHandler;
 import chappie.theboys.common.capability.TheBoysCap;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
@@ -69,7 +68,6 @@ public class ClientEvents {
             if (event.pHand() == InteractionHand.MAIN_HAND) {
                 event.pMatrixStack().translate(i / 16f * t, 2 / 16f * t, -3 / 16f * t);
                 event.pMatrixStack().translate(i * 8.75F / 16f, 19.75F / 16f, 6.0F / 16f);
-                //event.pMatrixStack().translate(-1 * timeline, 2 * timeline, -3 * timeline);
                 event.pMatrixStack().mulPose(Axis.ZP.rotationDegrees(i * -36F * t));
                 event.pMatrixStack().mulPose(Axis.YP.rotationDegrees(i * 72F * t));
                 event.pMatrixStack().mulPose(Axis.XP.rotationDegrees(-55F * t));
@@ -80,7 +78,6 @@ public class ClientEvents {
                 }
                 event.pMatrixStack().translate(i * 2 / 16f * t, 3 / 16f * t, -1 / 16f * t);
                 event.pMatrixStack().translate(i * -8.75F / 16f, 19.75F / 16f, 6.0F / 16f);
-
                 event.pMatrixStack().mulPose(Axis.ZP.rotationDegrees(i * 138F * t));
                 event.pMatrixStack().mulPose(Axis.YP.rotationDegrees(i * -49F * t));
                 event.pMatrixStack().mulPose(Axis.XP.rotationDegrees(-74F * t));
@@ -107,7 +104,7 @@ public class ClientEvents {
     public static void setupAnim(SetupAnimCallback.SetupAnimEvent event) {
         TheBoysCap theBoysCap = TheBoysCap.getCap(event.entity());
         float partialTicks = event.modelProperties().partialTicks();
-        if (event.entity() instanceof Player pPlayer) {
+        if (event.entity() instanceof Player pPlayer && theBoysCap != null) {
             boolean flag1 = pPlayer.getMainArm() == HumanoidArm.RIGHT;
             int i = flag1 ? 1 : -1;
             ModelPart mainHand = flag1 ? event.model().rightArm : event.model().leftArm;
@@ -115,13 +112,11 @@ public class ClientEvents {
             if (pPlayer.getMainHandItem().getItem() == TBItems.SYRINGE.get()) {
                 float timeline = theBoysCap.syringeAnim.timeline.value(partialTicks);
                 float t = Math.min(timeline, 0.25F) * 4F;
-
                 float t3 = 1.0F - t;
                 if (t3 < 1) {
                     mainHand.xRot = mainHand.xRot * t3 - (float) (Math.toRadians(90 * t));
                     mainHand.yRot = mainHand.yRot * t3 - (float) (Math.toRadians(60 * i * t));
                     mainHand.zRot = mainHand.zRot * t3 + (float) (Math.toRadians(32 * i * t));
-
                     offHand.xRot = offHand.xRot * t3 - (float) (Math.toRadians(90 * t));
                     offHand.yRot = offHand.yRot * t3 - (float) (Math.toRadians(40 * i * t));
                     offHand.zRot = offHand.zRot * t3 + (float) (Math.toRadians(45 * i * t));
@@ -134,12 +129,10 @@ public class ClientEvents {
                 float t = Math.min(timeline, 0.5F) * 2F;
                 float t1 = Mth.sin(pPlayer.tickCount + partialTicks) * vialAnim.rollVial.value(partialTicks);
                 float t2 = vialAnim.insertVial.value(partialTicks);
-
                 float t3 = 1.0F - t;
                 offHand.xRot = offHand.xRot * t3 - (float) Math.toRadians(105F + t2 * 4F) * t;
                 offHand.yRot = offHand.yRot * t3 + (float) Math.toRadians(45F + t1) * t * i;
                 offHand.zRot = offHand.zRot * t3 - (float) Math.toRadians(85F * t * i);
-
                 mainHand.xRot = mainHand.xRot * t3 - (float) Math.toRadians(72.5F * t);
                 mainHand.yRot = mainHand.yRot * t3 - (float) Math.toRadians(45F * t * i);
                 mainHand.zRot = mainHand.zRot * t3 + (float) Math.toRadians(90F * t * i);
@@ -155,27 +148,26 @@ public class ClientEvents {
                         if (event.modelProperties().layers().stream().anyMatch(layer -> layer instanceof HumanoidArmorLayer)) {
                             Vector3f vec3f = item.getClientSuitProperties().entityWearScale(slot, event.entity(), stack);
                             if (slot == EquipmentSlot.HEAD) {
-                                ClientUtil.modified(event.model().hat).setSize(vec3f);
+                                ClientUtil.modified(event.model().hat).modulus$setSize(vec3f);
                             }
                             if (event.model() instanceof PlayerModel model) {
                                 switch (slot) {
                                     case CHEST -> {
-                                        ClientUtil.modified(model.jacket).setSize(vec3f);
-                                        ClientUtil.modified(model.rightSleeve).setSize(vec3f);
-                                        ClientUtil.modified(model.leftSleeve).setSize(vec3f);
+                                        ClientUtil.modified(model.jacket).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.rightSleeve).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.leftSleeve).modulus$setSize(vec3f);
                                     }
                                     case LEGS -> {
-                                        ClientUtil.modified(model.jacket).setSize(vec3f);
-                                        ClientUtil.modified(model.rightPants).setSize(vec3f);
-                                        ClientUtil.modified(model.leftPants).setSize(vec3f);
+                                        ClientUtil.modified(model.jacket).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.rightPants).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.leftPants).modulus$setSize(vec3f);
                                     }
                                     case FEET -> {
-                                        ClientUtil.modified(model.rightPants).setSize(vec3f);
-                                        ClientUtil.modified(model.leftPants).setSize(vec3f);
+                                        ClientUtil.modified(model.rightPants).modulus$setSize(vec3f);
+                                        ClientUtil.modified(model.leftPants).modulus$setSize(vec3f);
                                     }
                                 }
                             }
-
                         }
                     }
                 }
@@ -187,9 +179,7 @@ public class ClientEvents {
         var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         if (sound instanceof SimpleSoundInstance soundInstance && camera.getEntity() instanceof Player player) {
             for (SuperHearingAbility a : CommonUtil.listOfType(SuperHearingAbility.class, CommonUtil.getAbilities(player))) {
-                if (a.isEnabled()
-                    //        || a.dataManager.get(SuperHearingAbility.RECEIVED) > 0
-                ) {
+                if (a.isEnabled()) {
                     Vec3 vec3 = new Vec3(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ());
                     double distance = vec3.distanceTo(player.position());
                     if (soundInstance instanceof ISimpleSoundInstance iSound && distance < 40) {
@@ -215,16 +205,105 @@ public class ClientEvents {
                         float f1 = ability.cooldown.value(partialTick);
                         pPoseStack.mulPose(Axis.ZP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
                         pPoseStack.mulPose(Axis.YP.rotationDegrees(player.getRandom().nextFloat() * 4 * f1));
-
                     }
-
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees((f * ability.sprintingTimer.value(partialTick)) / 2.0F));
                 break;
+            }
+
+            if (Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
+                for (NodHeadAbility ability : CommonUtil.listOfType(NodHeadAbility.class, CommonUtil.getAbilities(player))) {
+                    if (!ability.isEnded()) {
+                        if (ability.isSideTurn()) {
+                            pPoseStack.mulPose(Axis.YP.rotationDegrees((float) Math.toRadians(250F) * ability.turnByShakeCurve(partialTick)));
+                        } else {
+                            pPoseStack.mulPose(Axis.XP.rotationDegrees((float) Math.toRadians(300F) * ability.nodCurve(partialTick)));
+                        }
+                    }
+                }
             }
         }
     }
 
     public static void flightAnimation(LivingEntity entity, float partialTicks, PoseStack poseStack) {
+        float bodyRot = entity.getPreciseBodyRotation(partialTicks);
+        float xRot = entity.getViewXRot(partialTicks);
+        float yRot = entity.getViewYRot(partialTicks);
+
+        for (ParkourAbility ability : CommonUtil.listOfType(ParkourAbility.class, CommonUtil.getAbilities(entity))) {
+            if (ability.isEnabled()) {
+                float rollProgress = ability.dodgeRollHandler.rollTimer.value(partialTicks);
+                if (rollProgress > 0) {
+                    boolean isRolling = ability.dodgeRollHandler.isActive();
+                    float rollPhase = isRolling
+                            ? Mth.clamp(
+                            Mth.lerp(
+                                    partialTicks,
+                                    ability.dodgeRollHandler.rollTicksO,
+                                    ability.dataManager.get(DodgeRollHandler.ROLL_TICKS)
+                            ) / 12.0F,
+                            0.0F,
+                            1.0F
+                    )
+                            : 1.0F;
+                    int rollSide = ability.dataManager.get(DodgeRollHandler.ROLL_SIDE);
+
+                    poseStack.translate(0, 1.501F - 0.75F * rollProgress, 0);
+                    poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyRot));
+                    poseStack.mulPose(Axis.XP.rotationDegrees(rollPhase * 360F * (rollSide == 2 ? 1 : -1)));
+                    poseStack.mulPose(Axis.YP.rotationDegrees(bodyRot - 180.0F));
+                    poseStack.translate(0, -1.501F, 0);
+                    return;
+                }
+
+                float wallSlide = ability.wallHandler.getSlideProgress(partialTicks);
+                if (wallSlide > 0) {
+                    var wallDir = ability.wallHandler.getWallDirection();
+                    if (wallDir != null && entity instanceof Player player) {
+                        float wallYaw = switch (wallDir) {
+                            case WEST -> 270f;
+                            case NORTH -> 180f;
+                            case EAST -> 90f;
+                            default -> 0f;
+                        };
+                        float relativeAngle = Mth.wrapDegrees(wallYaw - player.yBodyRot);
+                        boolean wallInFront = Math.abs(relativeAngle) < 45f;
+                        boolean wallOnRight = relativeAngle >= 45f && relativeAngle <= 135f;
+                        boolean wallOnLeft = relativeAngle <= -45f && relativeAngle >= -135f;
+                        float offsetAmount = 0.15F * wallSlide;
+
+                        poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
+                        if (wallInFront) {
+                            poseStack.translate(0.0F, 0.0F, -offsetAmount);
+                        } else if (wallOnRight) {
+                            poseStack.translate(offsetAmount, 0.0F, 0.0F);
+                        } else if (wallOnLeft) {
+                            poseStack.translate(-offsetAmount, 0.0F, 0.0F);
+                        }
+                        poseStack.mulPose(Axis.XP.rotationDegrees(-6.0F * wallSlide));
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(2.0F * wallSlide));
+                        poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
+                        poseStack.translate(0.0F, -0.18F * wallSlide, 0.03F * wallSlide);
+                    } else {
+                        poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
+                        poseStack.mulPose(Axis.XP.rotationDegrees(-6.0F * wallSlide));
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(2.0F * wallSlide));
+                        poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
+                        poseStack.translate(0.0F, -0.18F * wallSlide, 0.03F * wallSlide);
+                    }
+                    return;
+                }
+
+                float slide = ability.slideHandler.slideProgress(partialTicks);
+                if (slide > 0) {
+                    poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
+                    poseStack.mulPose(Axis.XP.rotationDegrees(-12.25F * slide));
+                    poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
+                    poseStack.translate(0, -slide, 0);
+                    return;
+                }
+            }
+        }
+
         for (FlightAbility ability : CommonUtil.listOfType(FlightAbility.class, CommonUtil.getAbilities(entity))) {
             double d0 = -Mth.lerp(partialTicks, entity.xo, entity.getX());
             double d1 = -Mth.lerp(partialTicks, entity.yo, entity.getY());
@@ -242,8 +321,6 @@ public class ClientEvents {
             float f4 = ability.sprintingTimer.value(partialTicks);
             float distance = Mth.sqrt((float) (d0 * d0 + d1 * d1 + d2 * d2)) * (-f2 + f1);
             float defaultRotation = Mth.clamp(distance, -1.0F, 1.0F) * 12.25F;
-            float xRot = entity.getViewXRot(partialTicks);
-            float yRot = entity.getViewYRot(partialTicks);
 
             poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
 
@@ -261,7 +338,6 @@ public class ClientEvents {
             poseStack.mulPose(Axis.XP.rotationDegrees((xRot / 2F) * f4));
             poseStack.translate(0, -f4, 0);
 
-
             poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
             break;
         }
@@ -272,6 +348,8 @@ public class ClientEvents {
         if (mc.player == null || !mc.options.getCameraType().isFirstPerson() || hand == InteractionHand.OFF_HAND)
             return false;
         AbstractClientPlayer player = mc.player;
+        TheBoysCap cap = TheBoysCap.getCap(player);
+        if (cap == null) return false;
         boolean canceled = false;
         poseStack.pushPose();
         for (HeatVisionAbility a : CommonUtil.listOfType(HeatVisionAbility.class, CommonUtil.getAbilities(player))) {
@@ -290,7 +368,7 @@ public class ClientEvents {
             double distance = player.getEyePosition().distanceTo(hitResult.getLocation());
             float red = color.getRed() / 255F, green = color.getGreen() / 255F, blue = color.getBlue() / 255F;
             poseStack.pushPose();
-            float f1 = TheBoysCap.getCap(player).eyesLength();
+            float f1 = cap.eyesLength();
             poseStack.scale(1F, f1, 1F);
             for (int i = 0; i < 2; i++) {
                 AABB box = new AABB(i == 0 ? 0.1F : -0.1F, -0.25, -0.15F, 0, -0.25, -0.15F + -distance * f).inflate(0.03D);
@@ -309,20 +387,13 @@ public class ClientEvents {
         return canceled;
     }
 
-    public static boolean capeRender(AbstractClientPlayer player) {
-        ItemStack stack = player.getItemBySlot(EquipmentSlot.CHEST);
+    public static boolean capeRender(LivingEntity entity) {
+        ItemStack stack = entity.getItemBySlot(EquipmentSlot.CHEST);
         if (!stack.isEmpty() && stack.getItem() instanceof ArmorItem) {
             if (stack.has(TBDataComponents.SUIT) && stack.get(TBDataComponents.SUIT).toStack().getItem() instanceof SuitItem item) {
                 return !(item.getClientSuitProperties() instanceof ClientHeroWithCapeProperties);
             }
         }
         return true;
-    }
-
-    public static void capeRender(LivingEntity entity, Object renderer) {
-        // Overload for NeoForge event compatibility
-        if (entity instanceof AbstractClientPlayer player) {
-            capeRender(player);
-        }
     }
 }

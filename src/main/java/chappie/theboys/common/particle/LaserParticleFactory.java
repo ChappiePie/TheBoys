@@ -1,0 +1,27 @@
+package chappie.theboys.common.particle;
+
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
+@OnlyIn(Dist.CLIENT)
+public record LaserParticleFactory(SpriteSet sprite) implements ParticleProvider<LaserParticleOptions> {
+
+    @Override
+    public Particle createParticle(LaserParticleOptions pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        float rot = 0, pitch = 0;
+        if (pLevel.getEntity(pType.entityId()) instanceof LivingEntity e) {
+            rot = e.getYRot();
+            pitch = Math.min(e.getXRot(), 45);
+        }
+        TextureAtlasSprite sprite = this.sprite.get(pLevel.random);
+        LaserParticle particle = new LaserParticle(pType.color(), pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, pitch, rot, sprite);
+        particle.scale(2F);
+        return particle;
+    }
+}

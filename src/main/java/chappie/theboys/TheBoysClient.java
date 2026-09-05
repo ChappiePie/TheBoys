@@ -19,7 +19,7 @@ import chappie.theboys.common.item.SyringeItem;
 import chappie.theboys.common.item.TBItems;
 import chappie.theboys.common.item.VialItem;
 import chappie.theboys.common.item.datacomponents.TBDataComponents;
-import chappie.theboys.common.particle.LaserParticle;
+import chappie.theboys.common.particle.LaserParticleFactory;
 import chappie.theboys.common.particle.TBParticleTypes;
 import chappie.theboys.common.particle.WaterSplashParticle;
 import chappie.theboys.util.TBConfig;
@@ -70,7 +70,6 @@ public class TheBoysClient {
 
         NeoForge.EVENT_BUS.addListener(this::onEntityJoinLevel);
         NeoForge.EVENT_BUS.addListener(this::onClientTick);
-        NeoForge.EVENT_BUS.addListener(this::onRenderLivingPre);
 
         SetupAnimCallback.EVENT.register(ClientEvents::setupAnim);
         FirstPersonAdditionalHandCallback.EVENT.register(ClientEvents::firstPersonAdditionalHand);
@@ -99,7 +98,7 @@ public class TheBoysClient {
     }
 
     private void registerParticleProviders(RegisterParticleProvidersEvent event) {
-        event.registerSpriteSet(TBParticleTypes.LASER.get(), LaserParticle.LaserParticleFactory::new);
+        event.registerSpriteSet(TBParticleTypes.LASER.get(), LaserParticleFactory::new);
         event.registerSpriteSet(TBParticleTypes.WATER_SPLASH.get(), WaterSplashParticle.Provider::new);
     }
 
@@ -144,12 +143,7 @@ public class TheBoysClient {
         TBOverlays.clientTick(Minecraft.getInstance());
     }
 
-    private void onRenderLivingPre(RenderLivingEvent.Pre event) {
-        ClientEvents.capeRender(event.getEntity(), event.getRenderer());
-    }
-
     private void registerGuiLayers(RegisterGuiLayersEvent event) {
         event.registerBelowAll(TheBoys.id("overlays"), TBOverlays::render);
     }
-
 }

@@ -37,7 +37,8 @@ public class TBItems {
     public static final ImmutableMap<ArmorItem.Type, DeferredHolder<Item, SuitItem>> HOMELANDER_SUIT = registerSuitParts("homelander", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
     public static final ImmutableMap<ArmorItem.Type, DeferredHolder<Item, SuitItem>> ATRAIN_SUIT = registerSuitParts("atrain", (p) -> p.armorScale((stack) ->
             p.getSlot() != EquipmentSlot.HEAD ? SuitProperties.BASIC_ARMOR_SCALE.apply(p.getSlot()) : new Vector3f(-Integer.MAX_VALUE)), HELMET, CHESTPLATE, LEGGINGS, BOOTS);
-    //public static final ImmutableMap<ArmorItem.Type, DeferredHolder<Item, SuitItem>> BLACK_NOIR_SUIT = registerSuitParts("black_noir", (p) -> {}, HELMET, CHESTPLATE, LEGGINGS, BOOTS);
+    public static final ImmutableMap<ArmorItem.Type, DeferredHolder<Item, SuitItem>> BLACK_NOIR_SUIT = registerSuitParts("black_noir", (p) -> {
+    }, HELMET, CHESTPLATE, LEGGINGS, BOOTS);
     public static final ImmutableMap<ArmorItem.Type, DeferredHolder<Item, SuitItem>> THE_DEEP_SUIT = registerSuitParts("the_deep", (p) -> p.armorScale((stack) -> new Vector3f(-Integer.MAX_VALUE)), CHESTPLATE, LEGGINGS, BOOTS);
     public static final ImmutableMap<ArmorItem.Type, DeferredHolder<Item, SuitItem>> TRANSLUCENT_SUIT = registerSuitParts("translucent", (p) -> {}, CHESTPLATE, LEGGINGS, BOOTS);
 

@@ -6,7 +6,11 @@
   "minVersion": "0.8",
   "client": [
     "client.AbstractSoundInstanceMixin",
+    "client.BlockMixin",
+    "client.CapeFeatureRendererMixin",
     "client.CapeLayerMixin",
+    "client.ChatScreenMixin",
+    "client.EntityMixin",
     "client.EntityRenderersAccessor",
     "client.GameRendererMixin",
     "client.HumanoidArmorLayerMixin",
@@ -15,10 +19,12 @@
     "client.ItemInHandRendererMixin",
     "client.ItemRendererMixin",
     "client.LivingEntityRendererMixin",
+    "client.LocalPlayerMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",
     "client.PlayerRendererMixin",
     "client.ScreenAccessor",
+    "client.SectionCompilerMixin",
     "client.SoundEngineMixin"
   ],
   "mixins": [

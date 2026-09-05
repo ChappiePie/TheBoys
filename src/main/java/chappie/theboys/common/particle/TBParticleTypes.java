@@ -15,16 +15,16 @@ public class TBParticleTypes {
 
     public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES = DeferredRegister.create(BuiltInRegistries.PARTICLE_TYPE, TheBoys.MODID);
 
-    public static final DeferredHolder<ParticleType<?>, ParticleType<LaserParticle.LaserParticleOptions>> LASER = PARTICLE_TYPES.register("laser",
+    public static final DeferredHolder<ParticleType<?>, ParticleType<LaserParticleOptions>> LASER = PARTICLE_TYPES.register("laser",
             () -> new ParticleType<>(false) {
                 @Override
-                public MapCodec<LaserParticle.LaserParticleOptions> codec() {
-                    return LaserParticle.LaserParticleOptions.CODEC;
+                public MapCodec<LaserParticleOptions> codec() {
+                    return LaserParticleOptions.CODEC;
                 }
 
                 @Override
-                public StreamCodec<? super RegistryFriendlyByteBuf, LaserParticle.LaserParticleOptions> streamCodec() {
-                    return LaserParticle.LaserParticleOptions.STREAM_CODEC;
+                public StreamCodec<? super RegistryFriendlyByteBuf, LaserParticleOptions> streamCodec() {
+                    return LaserParticleOptions.STREAM_CODEC;
                 }
             });
 

@@ -35,6 +35,8 @@ public class SpeedAbility extends Ability implements IHasTimer {
     private final Cooldown upgradeCooldown = new Cooldown();
     private final Cooldown cooldown = new Cooldown();
 
+    public final Cooldown crouchCooldown = new Cooldown();
+
     private double xOld, zOld;
 
     public SpeedAbility(LivingEntity entity, AbilityBuilder builder) {
@@ -53,7 +55,17 @@ public class SpeedAbility extends Ability implements IHasTimer {
     @Override
     public void update(LivingEntity entity, boolean enabled) {
         super.update(entity, enabled);
-        if (entity.getCommandSenderWorld().isClientSide) return;
+        if (enabled && !entity.isSwimming() && !entity.isFallFlying()) {
+            if (this.conditionManager.test("double_crouch") && this.crouchCooldown.end()) {
+                this.crouchCooldown.start(2);
+                entity.setYRot(180.0F + entity.getYRot());
+                entity.yRotO = entity.getYRot();
+                if (entity.getVehicle() != null) {
+                    entity.getVehicle().onPassengerTurned(entity);
+                }
+            }
+        }
+        if (entity.level().isClientSide()) return;
         for (Timer timer : this.timers()) {
             timer.update();
         }
@@ -150,6 +162,6 @@ public class SpeedAbility extends Ability implements IHasTimer {
 
     @Override
     public Iterable<Timer> timers() {
-        return List.of(this.cooldown, this.upgradeCooldown);
+        return List.of(this.cooldown, this.upgradeCooldown, crouchCooldown);
     }
 }
